@@ -37,11 +37,15 @@ export function classifyHand(world, cfg) {
     if (bent || folded) curled++;
   }
   const angle = angleDeg(sub(world[4], world[2]), sub(world[8], world[5]));
+  // isL：开始出现取景框用的判定
   const isL = thumb >= cfg.thumbStraightMin
     && index >= cfg.indexStraightMin
     && curled >= cfg.minCurled
     && angle >= cfg.angleMin && angle <= cfg.angleMax;
-  return { isL, thumb, index, curled, angle };
+  // isLoose：取景框已经出现后，维持它用的更宽松的判定（手指稍微变形也不消失）
+  const k = cfg.keep;
+  const isLoose = index >= k.indexStraightMin && angle >= k.angleMin && angle <= k.angleMax;
+  return { isL, isLoose, thumb, index, curled, angle };
 }
 
 // 摄像头画面（归一化坐标）→ 屏幕，左右镜像，按 cover 方式铺满屏幕
@@ -67,11 +71,35 @@ export function createFrameState() {
   };
 }
 
+// 眯一只眼：一只闭、一只睁（两只一起闭是眨眼，不算）。blink 是 FaceLandmarker 的 eyeBlinkLeft / Right（0–1）
+export function isWink(blinkL, blinkR, cfg) {
+  if (blinkL == null || blinkR == null) return false;
+  const closed = Math.max(blinkL, blinkR);
+  const open = Math.min(blinkL, blinkR);
+  return closed >= cfg.closedMin && open <= cfg.openMax;
+}
+
 // hands = 这一帧新算出来的手；null = 这一帧没有新结果（隔帧计算时），只做平滑和淡入淡出
+// ctx.wink = 现在是不是眯着一只眼
 export function updateFrame(state, hands, now, dt, ctx) {
   const { cfg, video, W, H } = ctx;
+  const wink = !!ctx.wink;
   if (hands) state.hands = hands;
-  const both = hands && hands.length >= 2 && hands[0].info.isL && hands[1].info.isL;
+  const two = hands && hands.length >= 2;
+  const strictL = two && hands[0].info.isL && hands[1].info.isL;
+  const looseL = two && hands[0].info.isLoose && hands[1].info.isLoose;
+  let both;
+  if (state.active) {
+    // 已经出现：两只手都还大致像 L 就保持（眼睛可以睁开）
+    both = looseL || strictL;
+  } else if (cfg.trigger === 'wink') {
+    both = looseL && wink;                  // 必须眯一只眼
+  } else if (cfg.trigger === 'hands') {
+    both = strictL;                         // 只看手，手要比得标准
+  } else {
+    both = strictL || (looseL && wink);     // either：手比得标准，或者手大致框住 + 眯一只眼
+  }
+  state.trigger = both ? (strictL ? 'hands' : 'wink') : null;
 
   if (both) {
     // 两只手的拇指尖、食指尖（可选再加上 L 的拐角）围出的长方形

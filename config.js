@@ -113,15 +113,31 @@ window.CONFIG = {
     onMainPage: false,      // true = 主页面（视线）上也开取景框
     everyNFrames: 2,        // 主页面上手部每几帧算一次（和人脸一起跑，太卡就调大）
     lShape: {
-      thumbStraightMin: 0.88,  // 拇指伸直程度（1 = 完全直）
-      indexStraightMin: 0.90,  // 食指伸直程度
-      curledStraightMax: 0.75, // 中指 / 无名指 / 小指低于这个算弯曲
-      minCurled: 2,            // 三根里至少几根弯曲
-      angleMin: 60,            // 拇指和食指的夹角范围（度）
-      angleMax: 120,
+      // 开始出现取景框：两只手都要满足
+      thumbStraightMin: 0.75,  // 拇指伸直程度（1 = 完全直）
+      indexStraightMin: 0.80,  // 食指伸直程度
+      curledStraightMax: 0.80, // 中指 / 无名指 / 小指低于这个算弯曲
+      minCurled: 1,            // 三根里至少几根弯曲（0 = 不管其余手指）
+      angleMin: 35,            // 拇指和食指的夹角范围（度），不用是直角
+      angleMax: 145,
+      // 取景框出现之后，维持它只要这么宽松：食指大致伸着、夹角在这个范围
+      keep: {
+        indexStraightMin: 0.65,
+        angleMin: 15,
+        angleMax: 170,
+      },
     },
-    onMs: 300,              // 两只手都是 L 持续这么久，取景框才出现
-    offMs: 300,             // 手放下这么久后取景框消失
+    // 怎样算「要开取景框」：
+    //   'either' = 两只手比得够标准的 L，或者两只手大致框住 + 眯一只眼（默认）
+    //   'wink'   = 必须眯一只眼（手的形状按 keep 那样宽松判断）
+    //   'hands'  = 只看手（原来的方式）
+    trigger: 'either',
+    eye: {
+      closedMin: 0.5,       // 闭着的那只眼：eyeBlink ≥ 这个
+      openMax: 0.3,         // 睁着的那只眼：eyeBlink ≤ 这个
+    },
+    onMs: 300,              // 条件持续这么久，取景框才出现
+    offMs: 500,             // 手放下这么久后取景框消失（识别偶尔丢一两帧也不会闪）
     fadeMs: 120,            // 出现 / 消失的淡入淡出
     smoothingMs: 120,       // 框的位置平滑
     minSizePx: 40,          // 太小的框不算

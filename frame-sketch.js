@@ -1,15 +1,16 @@
 // 鸽子取景框（单独的页面）
-// 屏幕上一张鸽子很多的照片。两只手比 L 形取景框，框里放大看；过一阵子换下一张。
+// 屏幕上一张鸽子很多的照片。两只手比 L 形取景框（或者大致框住 + 眯一只眼），框里放大看；过一阵子换下一张。
 //
 // 按键：D 摄像头小窗（点小窗展开详细信息）· F 全屏 · → / ← 换照片
 //      Shift + 鼠标拖动：手动画一个取景框；Shift + 单击或 Esc 去掉
 
-import { classifyHand, createFrameState, updateFrame, zoomFor, drawFrameMarks, HAND_EDGES } from './frame.js';
-import { HandLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
+import { classifyHand, createFrameState, updateFrame, zoomFor, drawFrameMarks, isWink, HAND_EDGES } from './frame.js';
+import { FaceLandmarker, HandLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
 
 const C = window.CONFIG;
 const P = C.framePage;
 const MP_WASM = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm';
+const MP_FACE_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
 const MP_HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
 
 // ================================================================ 状态
@@ -29,6 +30,10 @@ const cam = {
   message: 'Opening camera…',
   lastVideoTime: -1,
   count: 0,
+  face: null,               // FaceLandmarker：只用来看是不是眯了一只眼
+  lastFaceTime: -1,
+  eyes: null,               // { left, right }：eyeBlink 0–1
+  wink: false,
 };
 
 const frame = createFrameState();
@@ -96,13 +101,45 @@ async function startCamera() {
     }
     cam.status = 'ready';
     cam.message = '';
+    if (C.frame.trigger !== 'hands') startFace(files);
   } catch (err) {
     cam.status = 'error';
     cam.message = 'Hand model failed to load: ' + (err && err.message ? err.message : err);
   }
 }
 
-// 这一页只跑手，可以每帧都算（framePage.everyNFrames）
+// 眯一只眼要用人脸模型的 blendshapes（eyeBlinkLeft / eyeBlinkRight）
+async function startFace(files) {
+  const options = (delegate) => ({
+    baseOptions: { modelAssetPath: MP_FACE_MODEL, delegate },
+    runningMode: 'VIDEO',
+    numFaces: 1,
+    outputFaceBlendshapes: true,
+  });
+  try {
+    try {
+      cam.face = await FaceLandmarker.createFromOptions(files, options('GPU'));
+    } catch {
+      cam.face = await FaceLandmarker.createFromOptions(files, options('CPU'));
+    }
+  } catch (err) {
+    cam.message = 'Face model failed to load: ' + (err && err.message ? err.message : err);
+  }
+}
+
+function detectEyes(now) {
+  if (!cam.face || !cam.video || cam.video.readyState < 2) return;
+  if (cam.video.currentTime === cam.lastFaceTime) return;
+  cam.lastFaceTime = cam.video.currentTime;
+  const res = cam.face.detectForVideo(cam.video, now);
+  const bs = res.faceBlendshapes && res.faceBlendshapes[0];
+  if (!bs) { cam.eyes = null; cam.wink = false; return; }
+  const get = (name) => (bs.categories.find((c) => c.categoryName === name) || {}).score;
+  cam.eyes = { left: get('eyeBlinkLeft'), right: get('eyeBlinkRight') };
+  cam.wink = isWink(cam.eyes.left, cam.eyes.right, C.frame.eye);
+}
+
+// 手：可以每帧都算（framePage.everyNFrames）
 function detectHands(now) {
   if (!cam.landmarker || !cam.video || cam.video.readyState < 2) return null;
   if (cam.video.currentTime === cam.lastVideoTime) return null;
@@ -169,7 +206,8 @@ new p5((p) => {
     const W = p.width;
     const H = p.height;
 
-    updateFrame(frame, detectHands(now), now, dt, { cfg: C.frame, video: cam.video, W, H });
+    detectEyes(now);
+    updateFrame(frame, detectHands(now), now, dt, { cfg: C.frame, video: cam.video, W, H, wink: cam.wink });
 
     // 自动换下一张：取景框在用的时候不换，用完再等 holdAfterFrameSec
     if (frame.active) show.holdUntil = now + P.holdAfterFrameSec * 1000;
@@ -322,6 +360,7 @@ function drawDebug(ctx) {
   const left = Math.max(0, P.intervalSec * 1000 - (performance.now() - show.switchedAt));
   const rows = [
     ['Hands', !cam.landmarker ? '—' : frame.hands.length ? frame.hands.map((h) => (h.info.isL ? 'L' : '·') + ` ${Math.round(h.info.angle)}°`).join('   ') : 'none'],
+    ['Eyes', cam.eyes ? `L ${cam.eyes.left.toFixed(2)}   R ${cam.eyes.right.toFixed(2)}${cam.wink ? '   wink' : ''}` : cam.face ? 'no face' : '—'],
     ['Frame', frame.active && frame.rect ? `on   ${(frame.zoom || 1).toFixed(1)}×` : 'off'],
     ['Photo', photo ? `${show.index + 1} / ${photos.length}   (← →)` : '—'],
     ['Birds', photo ? String(photo.info.bird_count) : '—'],
