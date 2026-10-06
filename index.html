@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鸽子视线实验</title>
+<style>
+  /* 字体文件放在 fonts/；换字体只要替换文件或改这里的路径 */
+  @font-face {
+    font-family: "TWK Everett";
+    src: url("fonts/TWKEverett-Regular.otf") format("opentype");
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: "TWK Everett Mono";
+    src: url("fonts/TWKEverettMono-Regular.otf") format("opentype");
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: "TWK Everett Mono Light";
+    src: url("fonts/TWKEverettMono-Light.otf") format("opentype");
+    font-weight: normal;
+  }
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  canvas { display: block; }
+  video { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+</style>
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script type="module" src="sketch.js"></script>
+</head>
+<body>
+</body>
+</html>

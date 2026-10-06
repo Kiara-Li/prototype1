@@ -1,0 +1,5053 @@
+{
+ "source": "book.pdf",
+ "units": "pt；跨页坐标，原点在左页裁切框左上角",
+ "spread": {
+  "w": 828.0,
+  "h": 702.0,
+  "gutter_x": 414.0
+ },
+ "groups": [
+  {
+   "id": "01",
+   "pdf_pages": [
+    2,
+    3
+   ],
+   "baseline_y": 670.17,
+   "baseline_frac": 0.0453,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.47,
+    "y": 659.25,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/01_01.jpg",
+     "x": 22.5,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 83.0,
+     "px_pdf": [
+      207,
+      116
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Asphalt / Metropolitan Ave & Lorimer St / Mar. 2026",
+     "caption_raw": "Asphalt / Metropolitan Ave & Lorimer St / Mar. 2026",
+     "caption_x": 172.03,
+     "caption_bottom": 669.08,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_asphalt_metropolitan-ave-lorimer_2026-03_01.jpg",
+      "component": "Roadway, asphalt",
+      "location": "Near 565 Lorimer St, Williamsburg, Brooklyn",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      845,
+      474
+     ],
+     "original": {
+      "filename": "0000_asphalt_metropolitan-ave-lorimer_2026-03_01.jpg",
+      "method": "sift",
+      "inliers": 80,
+      "similarity": 0.965
+     }
+    },
+    {
+     "file": "img/01_02.jpg",
+     "x": 181.5,
+     "y": 267.5,
+     "w": 148.5,
+     "h": 403.0,
+     "px_pdf": [
+      188,
+      511
+     ],
+     "source_px_per_pt": 1.27,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Alice Austen / Postman / 1896 / NYPL",
+     "caption_raw": "Alice Austen / Postman / 1896 / NYPLlorimer_2026-03_01.jpg",
+     "caption_x": 330.79,
+     "caption_bottom": 669.08,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      188,
+      511
+     ],
+     "original": null
+    },
+    {
+     "file": "img/01_03.jpg",
+     "x": 340.0,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 83.0,
+     "px_pdf": [
+      207,
+      116
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Asphalt / Metropolitan Ave & Lorimer St / Mar. 2026",
+     "caption_raw": "Asphalt / Metropolitan Ave & Lorimer St / Mar. 2026",
+     "caption_x": 489.55,
+     "caption_bottom": 669.08,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_asphalt_stuy-town_2026-09_04.jpg",
+      "component": "Roadway, asphalt",
+      "location": "Stuyvesant Town — near 536 E 14th St, East Village, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1074,
+      602
+     ],
+     "original": {
+      "filename": "0000_asphalt_stuy-town_2026-09_04.jpg",
+      "method": "sift",
+      "inliers": 84,
+      "similarity": 0.973
+     },
+     "record_text_match": "0000_asphalt_metropolitan-ave-lorimer_2026-03_01.jpg"
+    },
+    {
+     "file": "img/01_04.jpg",
+     "x": 499.0,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 83.0,
+     "px_pdf": [
+      207,
+      116
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Plastic bag on asphalt / 536 E 14th St / Sept. 2026",
+     "caption_raw": "Plastic bag on asphalt / 536 E 14th St / Sept. 2026",
+     "caption_x": 648.31,
+     "caption_bottom": 669.08,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_asphalt_stuy-town_2026-09_04.jpg",
+      "component": "Roadway, asphalt",
+      "location": "Stuyvesant Town — near 536 E 14th St, East Village, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1018,
+      571
+     ],
+     "original": {
+      "filename": "0000_asphalt_stuy-town_2026-09_04.jpg",
+      "method": "sift",
+      "inliers": 70,
+      "similarity": 0.949
+     },
+     "record_text_match": "0000_asphalt_stuy-town_2026-09_01.jpg"
+    },
+    {
+     "file": "img/01_05.jpg",
+     "x": 658.0,
+     "y": 587.5,
+     "w": 148.0,
+     "h": 83.0,
+     "px_pdf": [
+      206,
+      116
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Asphalt / 5th Ave & W 14th St / Jan. 2024",
+     "caption_raw": "Asphalt / 5th Ave & W 14th St / Jan. 2024",
+     "caption_x": 806.96,
+     "caption_bottom": 669.08,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_asphalt_5th-ave-14th-st_2024-01_01.jpg",
+      "component": "Roadway, asphalt",
+      "location": "5th Ave at W 14th St (near 80 5th Ave), Greenwich Village, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1532,
+      864
+     ],
+     "original": {
+      "filename": "0000_asphalt_5th-ave-14th-st_2024-01_01.jpg",
+      "method": "sift",
+      "inliers": 45,
+      "similarity": 0.941
+     }
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0
+   ]
+  },
+  {
+   "id": "03",
+   "pdf_pages": [
+    4,
+    5
+   ],
+   "baseline_y": 670.5,
+   "baseline_frac": 0.0449,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.47,
+    "y": 658.94,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/03_01.jpg",
+     "x": 22.5,
+     "y": 588.0,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Asphalt / 541 E 14th St / Sept. 2026",
+     "caption_raw": "Asphalt / 541 E 14th St / Sept. 2026",
+     "caption_x": 172.03,
+     "caption_bottom": 670.25,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_asphalt_stuy-town_2026-09_05.jpg",
+      "component": "Roadway, asphalt",
+      "location": "Stuyvesant Town — near 541 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      798,
+      444
+     ],
+     "original": {
+      "filename": "0000_asphalt_stuy-town_2026-09_05.jpg",
+      "method": "sift",
+      "inliers": 33,
+      "similarity": 0.959
+     }
+    },
+    {
+     "file": "img/03_02.jpg",
+     "x": 181.5,
+     "y": 305.0,
+     "w": 227.5,
+     "h": 365.5,
+     "px_pdf": [
+      457,
+      734
+     ],
+     "source_px_per_pt": 2.01,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "John Vachon / Steam Rising from the Pavement on a Rainy Day / 1943 / Library of Congress",
+     "caption_raw": "John Vachon / Steam Rising from the Pavement on a Rainy Day / 1943 / Library of Congresslorimer_2026 03_01.jpg",
+     "caption_x": 410.17,
+     "caption_bottom": 670.5,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      457,
+      734
+     ],
+     "original": null
+    },
+    {
+     "file": "img/03_03.jpg",
+     "x": 419.5,
+     "y": 305.0,
+     "w": 228.0,
+     "h": 365.5,
+     "px_pdf": [
+      317,
+      508
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Tom Arndt / Street Workers, New York City / 1979 / Les Douches la Galerie",
+     "caption_raw": "Tom Arndt / Street Workers, New York City / 1979 / Les Douches la Galerie",
+     "caption_x": 648.31,
+     "caption_bottom": 670.5,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      317,
+      508
+     ],
+     "original": null
+    },
+    {
+     "file": "img/03_04.jpg",
+     "x": 657.5,
+     "y": 588.0,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Asphalt / 536 E 14th St / Sept. 2026",
+     "caption_raw": "Asphalt / 536 E 14th St / Sept. 2026",
+     "caption_x": 807.07,
+     "caption_bottom": 670.25,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_asphalt_stuy-town_2026-09_03.jpg",
+      "component": "Roadway, asphalt",
+      "location": "Stuyvesant Town — near 536 E 14th St, East Village, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1233,
+      685
+     ],
+     "original": {
+      "filename": "0000_asphalt_stuy-town_2026-09_03.jpg",
+      "method": "sift",
+      "inliers": 68,
+      "similarity": 0.967
+     },
+     "record_text_match": "0000_asphalt_stuy-town_2026-09_01.jpg"
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0
+   ]
+  },
+  {
+   "id": "05",
+   "pdf_pages": [
+    6,
+    7
+   ],
+   "baseline_y": 670.5,
+   "baseline_frac": 0.0449,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.47,
+    "y": 659.53,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/05_01.jpg",
+     "x": 22.5,
+     "y": 258.0,
+     "w": 386.5,
+     "h": 412.5,
+     "px_pdf": [
+      386,
+      412
+     ],
+     "source_px_per_pt": 0.94,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Alice Austen / Immigrants / 1896 / NYPL",
+     "caption_raw": "Alice Austen / Immigrants / 1896 / NYPLlorimer_2026 03_01.jpg",
+     "caption_x": 410.17,
+     "caption_bottom": 670.25,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      386,
+      412
+     ],
+     "original": null
+    },
+    {
+     "file": "img/05_02.jpg",
+     "x": 419.5,
+     "y": 540.0,
+     "w": 228.0,
+     "h": 130.5,
+     "px_pdf": [
+      317,
+      181
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Belgian Block / 439 E 14th St / Sept. 2026",
+     "caption_raw": "Belgian Block / 439 E 14th St / Sept. 2026",
+     "caption_x": 648.31,
+     "caption_bottom": 670.25,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_belgian-block_e14th-st-ave-a_2026-09_07.jpg",
+      "component": "Granite block pavers (Belgian block)",
+      "location": "Near 439 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      914
+     ],
+     "original": {
+      "filename": "0000_belgian-block_e14th-st-ave-a_2026-09_07.jpg",
+      "method": "sift",
+      "inliers": 120,
+      "similarity": 0.981
+     },
+     "record_text_match": "0000_belgian-block_e14th-st-ave-a_2026-09_05.jpg"
+    },
+    {
+     "file": "img/05_03.jpg",
+     "x": 657.5,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 83.0,
+     "px_pdf": [
+      207,
+      116
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Belgian Block / 439 E 14th St / Sept. 2026",
+     "caption_raw": "Belgian Block / 439 E 14th St / Sept. 2026",
+     "caption_x": 807.07,
+     "caption_bottom": 670.25,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_belgian-block_e14th-st-ave-a_2026-09_05.jpg",
+      "component": "Granite block pavers (Belgian block)",
+      "location": "Near 439 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "选用",
+      "match_score": 1.02,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0000_belgian-block_e14th-st-ave-a_2026-09_04.jpg",
+        "height_in": "0",
+        "score": 1.0
+       },
+       {
+        "filename": "0000_belgian-block_e14th-st-ave-a_2026-09_06.jpg",
+        "height_in": "0",
+        "score": 1.0
+       },
+       {
+        "filename": "0000_belgian-block_e14th-st-ave-a_2026-09_07.jpg",
+        "height_in": "0",
+        "score": 1.0
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      207,
+      116
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0
+   ]
+  },
+  {
+   "id": "07",
+   "pdf_pages": [
+    8,
+    9
+   ],
+   "baseline_y": 670.25,
+   "baseline_frac": 0.0452,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.47,
+    "y": 659.28,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/07_01.jpg",
+     "x": 22.5,
+     "y": 399.0,
+     "w": 386.5,
+     "h": 271.0,
+     "px_pdf": [
+      538,
+      377
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Belgian Block / E 14th St & Ave B / Aug. 2025",
+     "caption_raw": "Belgian Block / E 14th St & Ave B / Aug. 2025lorimer_2026 03_01.jpg",
+     "caption_x": 410.17,
+     "caption_bottom": 669.28,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_belgian-block_stuy-town_2025-08_01.jpg",
+      "component": "Granite block pavers (Belgian block)",
+      "location": "Stuyvesant Town — E 14th St at Ave B (near 541 E 14th St), Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1122
+     ],
+     "original": {
+      "filename": "0000_belgian-block_stuy-town_2025-08_01.jpg",
+      "method": "sift",
+      "inliers": 468,
+      "similarity": 0.989
+     }
+    },
+    {
+     "file": "img/07_02.jpg",
+     "x": 419.5,
+     "y": 258.0,
+     "w": 386.5,
+     "h": 412.0,
+     "px_pdf": [
+      436,
+      465
+     ],
+     "source_px_per_pt": 1.13,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Alice Austen / Policeman / 1896 / NYPL",
+     "caption_raw": "Alice Austen / Policeman / 1896 / NYPLlorimer_2026-03_01.jpg",
+     "caption_x": 807.07,
+     "caption_bottom": 669.28,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      436,
+      465
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0
+   ]
+  },
+  {
+   "id": "09",
+   "pdf_pages": [
+    10,
+    11
+   ],
+   "baseline_y": 670.25,
+   "baseline_frac": 0.0452,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.47,
+    "y": 659.28,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/09_01.jpg",
+     "x": 22.5,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Painted Curb / E 14th St & 1st Ave / Aug. 2026",
+     "caption_raw": "Painted Curb / E 14th St & 1st Ave / Aug. 2026",
+     "caption_x": 172.03,
+     "caption_bottom": 669.79,
+     "kind": "own",
+     "height_in": 6.0,
+     "record": {
+      "filename": "0006_curb_e14th-st-1st-ave_2026-08_06.jpg",
+      "component": "Curb",
+      "location": "E 14th St near 1st Ave / Lt. Manuel Del Valle Sr. St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      890
+     ],
+     "original": {
+      "filename": "0006_curb_e14th-st-1st-ave_2026-08_06.jpg",
+      "method": "sift",
+      "inliers": 66,
+      "similarity": 0.986
+     },
+     "record_text_match": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg"
+    },
+    {
+     "file": "img/09_02.jpg",
+     "x": 181.5,
+     "y": 247.0,
+     "w": 148.5,
+     "h": 423.0,
+     "px_pdf": [
+      309,
+      881
+     ],
+     "source_px_per_pt": 2.08,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Sam Shaw / Marilyn Monroe Filming The Seven Year Itch / 1954 / Associated Press",
+     "caption_raw": "Sam Shaw / Marilyn Monroe Filming The Seven Year Itch / 1954 / Associated Presslorimer_2026-03_01.jpg",
+     "caption_x": 330.79,
+     "caption_bottom": 669.79,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      309,
+      881
+     ],
+     "original": null
+    },
+    {
+     "file": "img/09_03.jpg",
+     "x": 340.0,
+     "y": 359.0,
+     "w": 148.5,
+     "h": 311.0,
+     "px_pdf": [
+      230,
+      482
+     ],
+     "source_px_per_pt": 1.55,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Photographer Unknown / Boys Fishing for Coins Through Subway Grates, Eighth Avenue / 1970s / History of New York",
+     "caption_raw": "Photographer Unknown / Boys Fishing for Coins Through Subway Grates, Eighth Avenue / 1970s / History of New York",
+     "caption_x": 489.55,
+     "caption_bottom": 669.79,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      230,
+      482
+     ],
+     "original": null
+    },
+    {
+     "file": "img/09_04.jpg",
+     "x": 499.0,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Subway Grate / E 14th St & 1st Ave / Aug. 2026",
+     "caption_raw": "Subway Grate / E 14th St & 1st Ave / Aug. 2026lorimer_2026-03_01.jpg",
+     "caption_x": 648.31,
+     "caption_bottom": 669.79,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_subway-grate_e14th-st-1st-ave_2026-08_01.jpg",
+      "component": "Sidewalk ventilation grate",
+      "location": "E 14th St near 1st Ave / Lt. Manuel Del Valle Sr. St, East Village, Manhattan",
+      "height_source": "datum",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      891
+     ],
+     "original": {
+      "filename": "0000_subway-grate_e14th-st-1st-ave_2026-08_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.939
+     }
+    },
+    {
+     "file": "img/09_05.jpg",
+     "x": 657.5,
+     "y": 587.5,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      183,
+      101
+     ],
+     "source_px_per_pt": 1.23,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Sidewalk Concrete / E 14th St & 1st Ave / Aug. 2026",
+     "caption_raw": "Sidewalk Concrete / E 14th St & 1st Ave / Aug. 2026",
+     "caption_x": 807.07,
+     "caption_bottom": 669.79,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_sidewalk-concrete_e14th-st-1st-ave_2026-08_01.jpg",
+      "component": "Sidewalk, concrete",
+      "location": "E 14th St near 1st Ave / Lt. Manuel Del Valle Sr. St, East Village, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "match_score": 1.0,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0000_sidewalk-concrete_e14th-st-ave-a_2026-08_01.jpg",
+        "height_in": "0",
+        "score": 0.89
+       },
+       {
+        "filename": "0000_subway-grate_e14th-st-1st-ave_2026-08_01.jpg",
+        "height_in": "0",
+        "score": 0.8
+       },
+       {
+        "filename": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg",
+        "height_in": "6",
+        "score": 0.57
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      183,
+      101
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0,
+    6.0
+   ]
+  },
+  {
+   "id": "11",
+   "pdf_pages": [
+    12,
+    13
+   ],
+   "baseline_y": 670.25,
+   "baseline_frac": 0.0452,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.47,
+    "y": 659.28,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/11_01.jpg",
+     "x": 22.5,
+     "y": 211.0,
+     "w": 228.0,
+     "h": 459.0,
+     "px_pdf": [
+      257,
+      517
+     ],
+     "source_px_per_pt": 1.13,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Alice Austen / Snow Removal / 1896 / New York Public Library",
+     "caption_raw": "Alice Austen / Snow Removal / 1896 / New York Public Librarylorimer_2026-03_01.jpg",
+     "caption_x": 251.41,
+     "caption_bottom": 669.08,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      257,
+      517
+     ],
+     "original": null
+    },
+    {
+     "file": "img/11_02.jpg",
+     "x": 260.5,
+     "y": 493.0,
+     "w": 148.5,
+     "h": 177.0,
+     "px_pdf": [
+      207,
+      247
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Sidewalk Concrete / University Pl & E 13th St / Feb. 2025",
+     "caption_raw": "Sidewalk Concrete / University Pl & E 13th St / Feb. 2025lorimer_2026 03_01.jpg",
+     "caption_x": 410.17,
+     "caption_bottom": 669.08,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_sidewalk-concrete_univ-pl-e13th_2025-02_03.jpg",
+      "component": "Sidewalk, concrete",
+      "location": "Near 5 E 14th St, Chelsea, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1341,
+      1600
+     ],
+     "original": {
+      "filename": "0000_sidewalk-concrete_univ-pl-e13th_2025-02_03.jpg",
+      "method": "sift",
+      "inliers": 118,
+      "similarity": 0.99
+     },
+     "record_text_match": "0000_sidewalk-concrete_univ-pl-e13th_2025-02_01.jpg"
+    },
+    {
+     "file": "img/11_03.jpg",
+     "x": 419.5,
+     "y": 69.5,
+     "w": 386.5,
+     "h": 600.5,
+     "px_pdf": [
+      537,
+      835
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Sidewalk Concrete / 5th Ave & E 14th St / Feb. 2024",
+     "caption_raw": "Sidewalk Concrete / 5th Ave & E 14th St / Feb. 2024lorimer_2026-03_01.jpg",
+     "caption_x": 807.07,
+     "caption_bottom": 669.08,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_sidewalk-concrete_5th-ave-14th-st_2024-02_01.jpg",
+      "component": "Sidewalk, concrete",
+      "location": "E 14th St at 5th Ave (near 8 E 14th St), Greenwich Village, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      898,
+      1395
+     ],
+     "original": {
+      "filename": "0000_sidewalk-concrete_5th-ave-14th-st_2024-02_01.jpg",
+      "method": "sift",
+      "inliers": 273,
+      "similarity": 0.985
+     }
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0
+   ]
+  },
+  {
+   "id": "13",
+   "pdf_pages": [
+    14,
+    15
+   ],
+   "baseline_y": 670.25,
+   "baseline_frac": 0.0452,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 659.28,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/13_01.jpg",
+     "x": 22.5,
+     "y": 587.5,
+     "w": 69.0,
+     "h": 82.5,
+     "px_pdf": [
+      97,
+      115
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Lawn / Madison Square Park / Aug. 2023",
+     "caption_raw": "Lawn / Madison Square Park / Aug. 2023",
+     "caption_x": 92.65,
+     "caption_bottom": 670.0,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_lawn_madison-sq_2023-08_01.jpg",
+      "component": "Lawn",
+      "location": "Madison Square Park — near Madison Ave at E 24th St, Flatiron District, Manhattan",
+      "height_source": "datum",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      954,
+      1129
+     ],
+     "original": {
+      "filename": "0000_lawn_madison-sq_2023-08_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.903
+     }
+    },
+    {
+     "file": "img/13_02.jpg",
+     "x": 102.0,
+     "y": 587.5,
+     "w": 69.0,
+     "h": 82.5,
+     "px_pdf": [
+      97,
+      115
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2025",
+     "caption_raw": "Wood Mulch / E 14th St & Ave A / Sept. 2025lorimer_2026-03_01.jpg",
+     "caption_x": 172.03,
+     "caption_bottom": 670.0,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_04.jpg",
+      "component": "Wood-mulch tree pit",
+      "location": "E 14th St at Ave A (near 439 E 14th St), Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1348,
+      1600
+     ],
+     "original": {
+      "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_04.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.923
+     },
+     "record_text_match": "0000_wood-mulch_e14th-st-ave-a_2025-09_02.jpg"
+    },
+    {
+     "file": "img/13_03.jpg",
+     "x": 181.5,
+     "y": 586.5,
+     "w": 69.0,
+     "h": 83.5,
+     "px_pdf": [
+      97,
+      117
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2025",
+     "caption_raw": "Wood Mulch / E 14th St & Ave A / Sept. 2025lorimer_2026-03_01.jpg",
+     "caption_x": 251.41,
+     "caption_bottom": 670.0,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_02.jpg",
+      "component": "Wood-mulch tree pit",
+      "location": "E 14th St at Ave A (near 439 E 14th St), Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "选用",
+      "match_score": 1.02,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_01.jpg",
+        "height_in": "0",
+        "score": 1.0
+       },
+       {
+        "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_03.jpg",
+        "height_in": "0",
+        "score": 1.0
+       },
+       {
+        "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_04.jpg",
+        "height_in": "0",
+        "score": 1.0
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      97,
+      117
+     ],
+     "original": null
+    },
+    {
+     "file": "img/13_04.jpg",
+     "x": 260.5,
+     "y": 586.5,
+     "w": 69.5,
+     "h": 83.5,
+     "px_pdf": [
+      97,
+      117
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2026",
+     "caption_raw": "Wood Mulch / E 14th St & Ave A / Sept. 2026lorimer_2026-03_01.jpg",
+     "caption_x": 330.79,
+     "caption_bottom": 670.0,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_wood-mulch_e14th-st-ave-a_2026-09_03.jpg",
+      "component": "Wood-mulch tree pit",
+      "location": "Near 439 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      937,
+      1130
+     ],
+     "original": {
+      "filename": "0000_wood-mulch_e14th-st-ave-a_2026-09_03.jpg",
+      "method": "sift",
+      "inliers": 33,
+      "similarity": 0.948
+     },
+     "record_text_match": "0000_wood-mulch_e14th-st-ave-a_2026-09_01.jpg"
+    },
+    {
+     "file": "img/13_05.jpg",
+     "x": 340.0,
+     "y": 446.0,
+     "w": 386.5,
+     "h": 224.0,
+     "px_pdf": [
+      537,
+      311
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Parent Infant Center / Children Playing in the Magic Circle Nature Playground / n.d. / Philadelphia",
+     "caption_raw": "Parent Infant Center / Children Playing in the Magic Circle Nature Playground / n.d. / Philadelphialorimer_2026-03_01.jpg",
+     "caption_x": 727.69,
+     "caption_bottom": 670.0,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      537,
+      311
+     ],
+     "original": null
+    },
+    {
+     "file": "img/13_06.jpg",
+     "x": 737.0,
+     "y": 587.5,
+     "w": 69.0,
+     "h": 82.5,
+     "px_pdf": [
+      97,
+      115
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2025",
+     "caption_raw": "Wood Mulch / E 14th St & Ave A / Sept. 2025lorimer_2026-03_01.jpg",
+     "caption_x": 807.07,
+     "caption_bottom": 670.0,
+     "kind": "own",
+     "height_in": 0.0,
+     "record": {
+      "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_02.jpg",
+      "component": "Wood-mulch tree pit",
+      "location": "E 14th St at Ave A (near 439 E 14th St), Stuyvesant Town, Manhattan",
+      "height_source": "datum",
+      "status": "选用",
+      "match_score": 1.02,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_01.jpg",
+        "height_in": "0",
+        "score": 1.0
+       },
+       {
+        "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_03.jpg",
+        "height_in": "0",
+        "score": 1.0
+       },
+       {
+        "filename": "0000_wood-mulch_e14th-st-ave-a_2025-09_04.jpg",
+        "height_in": "0",
+        "score": 1.0
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      97,
+      115
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 0.0,
+   "height_source": "records",
+   "height_values": [
+    0.0
+   ]
+  },
+  {
+   "id": "15",
+   "pdf_pages": [
+    16,
+    17
+   ],
+   "baseline_y": 664.31,
+   "baseline_frac": 0.0537,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 654.0,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/15_01.jpg",
+     "x": 22.5,
+     "y": 164.0,
+     "w": 625.0,
+     "h": 500.0,
+     "px_pdf": [
+      1303,
+      1042
+     ],
+     "source_px_per_pt": 2.08,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Mary French / Reburial Site, Washington Square Park / 2021 / New York City Cemetery Project",
+     "caption_raw": "Mary French / Reburial Site, Washington Square Park / 2021 / New York City Cemetery Projectlorimer_2026-03_01.jpg",
+     "caption_x": 648.31,
+     "caption_bottom": 663.4,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      1303,
+      1042
+     ],
+     "original": null
+    },
+    {
+     "file": "img/15_02.jpg",
+     "x": 657.5,
+     "y": 540.0,
+     "w": 148.5,
+     "h": 124.0,
+     "px_pdf": [
+      207,
+      172
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Granite Edging / Washington Square Park, W 4th St / Nov. 2024",
+     "caption_raw": "Granite Edging / Washington Square Park, W 4th St / Nov. 2024",
+     "caption_x": 807.07,
+     "caption_bottom": 663.4,
+     "kind": "own",
+     "height_in": 4.0,
+     "record": {
+      "filename": "0004_granite-edging_washington-sq_2024-11_01.jpg",
+      "component": "Planting bed edging, granite",
+      "location": "Washington Square Park — near Washington Square West at W 4th St, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1328
+     ],
+     "original": {
+      "filename": "0004_granite-edging_washington-sq_2024-11_01.jpg",
+      "method": "sift",
+      "inliers": 204,
+      "similarity": 0.98
+     }
+    }
+   ],
+   "height_in": 4.0,
+   "height_source": "records",
+   "height_values": [
+    4.0
+   ]
+  },
+  {
+   "id": "17",
+   "pdf_pages": [
+    18,
+    19
+   ],
+   "baseline_y": 658.37,
+   "baseline_frac": 0.0621,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 647.86,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/17_01.jpg",
+     "x": 22.5,
+     "y": 446.0,
+     "w": 228.0,
+     "h": 212.0,
+     "px_pdf": [
+      317,
+      295
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Yellow-Painted Concrete Curb / E 14th St & 1st Ave / Aug. 2026",
+     "caption_raw": "Yellow-Painted Concrete Curb / E 14th St & 1st Ave / Aug. 2026",
+     "caption_x": 251.41,
+     "caption_bottom": 658.12,
+     "kind": "own",
+     "height_in": 6.0,
+     "record": {
+      "filename": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg",
+      "component": "Curb",
+      "location": "E 14th St near 1st Ave / Lt. Manuel Del Valle Sr. St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1489
+     ],
+     "original": {
+      "filename": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg",
+      "method": "sift",
+      "inliers": 236,
+      "similarity": 0.987
+     }
+    },
+    {
+     "file": "img/17_02.jpg",
+     "x": 260.5,
+     "y": 446.0,
+     "w": 228.0,
+     "h": 212.0,
+     "px_pdf": [
+      317,
+      295
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Concrete Curb / E 14th St & 1st Ave / Aug. 2026",
+     "caption_raw": "Concrete Curb / E 14th St & 1st Ave / Aug. 2026",
+     "caption_x": 489.55,
+     "caption_bottom": 658.12,
+     "kind": "own",
+     "height_in": 6.0,
+     "record": {
+      "filename": "0006_curb_e14th-st-1st-ave_2026-08_02.jpg",
+      "component": "Curb",
+      "location": "E 14th St near 1st Ave / Lt. Manuel Del Valle Sr. St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1489
+     ],
+     "original": {
+      "filename": "0006_curb_e14th-st-1st-ave_2026-08_02.jpg",
+      "method": "sift",
+      "inliers": 283,
+      "similarity": 0.977
+     },
+     "record_text_match": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg"
+    },
+    {
+     "file": "img/17_03.jpg",
+     "x": 499.0,
+     "y": 69.5,
+     "w": 307.0,
+     "h": 588.5,
+     "px_pdf": [
+      637,
+      1221
+     ],
+     "source_px_per_pt": 2.07,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Helen Levitt / New York / 1938 / The Museum of Modern Art",
+     "caption_raw": "Helen Levitt / New York / 1938 / The Museum of Modern Art",
+     "caption_x": 807.07,
+     "caption_bottom": 658.12,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      637,
+      1221
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 6.0,
+   "height_source": "records",
+   "height_values": [
+    6.0
+   ]
+  },
+  {
+   "id": "19",
+   "pdf_pages": [
+    20,
+    21
+   ],
+   "baseline_y": 658.37,
+   "baseline_frac": 0.0621,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 648.11,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/19_01.jpg",
+     "x": 22.5,
+     "y": 352.0,
+     "w": 148.5,
+     "h": 306.5,
+     "px_pdf": [
+      207,
+      426
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Sergei M. Eisenstein / Battleship Potemkin, Odessa Steps Sequence / 1925 / Encyclopaedia Britannica",
+     "caption_raw": "Sergei M. Eisenstein / Battleship Potemkin, Odessa Steps Sequence / 1925 / Encyclopaedia Britannica",
+     "caption_x": 172.11,
+     "caption_bottom": 658.12,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      207,
+      426
+     ],
+     "original": null
+    },
+    {
+     "file": "img/19_02.jpg",
+     "x": 181.5,
+     "y": 540.0,
+     "w": 148.5,
+     "h": 118.5,
+     "px_pdf": [
+      207,
+      165
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Concrete Step / E 14th St & 5th Ave / Sept. 2026",
+     "caption_raw": "Concrete Step / E 14th St & 5th Ave / Sept. 2026",
+     "caption_x": 330.87,
+     "caption_bottom": 658.12,
+     "kind": "own",
+     "height_in": 6.0,
+     "record": {
+      "filename": "0006_step_5th-ave-14th-st_2026-09_01.jpg",
+      "component": "Step",
+      "location": "E 14th St at 5th Ave (near 1 E 14th St), Chelsea, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1275
+     ],
+     "original": {
+      "filename": "0006_step_5th-ave-14th-st_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 71,
+      "similarity": 0.981
+     }
+    },
+    {
+     "file": "img/19_03.jpg",
+     "x": 340.0,
+     "y": 351.0,
+     "w": 465.5,
+     "h": 307.5,
+     "px_pdf": [
+      647,
+      428
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Yellow-Painted Step / Stuyvesant Town, E 14th St / Jan. 2026",
+     "caption_raw": "Yellow-Painted Step / Stuyvesant Town, E 14th St / Jan. 2026",
+     "caption_x": 807.07,
+     "caption_bottom": 658.12,
+     "kind": "own",
+     "height_in": 6.0,
+     "record": {
+      "filename": "0006_step_stuy-town_2026-01_01.jpg",
+      "component": "Step",
+      "location": "Stuyvesant Town — near 541 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1058
+     ],
+     "original": {
+      "filename": "0006_step_stuy-town_2026-01_01.jpg",
+      "method": "sift",
+      "inliers": 328,
+      "similarity": 0.987
+     }
+    }
+   ],
+   "height_in": 6.0,
+   "height_source": "records",
+   "height_values": [
+    6.0
+   ]
+  },
+  {
+   "id": "21",
+   "pdf_pages": [
+    22,
+    23
+   ],
+   "baseline_y": 652.29,
+   "baseline_frac": 0.0708,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 12.0,
+    "y": 642.03,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/21_01.jpg",
+     "x": 22.5,
+     "y": 283.5,
+     "w": 625.0,
+     "h": 368.5,
+     "px_pdf": [
+      869,
+      512
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Stone Sundial Wall / Stuyvesant St & 3rd Ave / Sept. 2025",
+     "caption_raw": "Stone Sundial Wall / Stuyvesant St & 3rd Ave / Sept. 2025",
+     "caption_x": 648.39,
+     "caption_bottom": 651.33,
+     "kind": "own",
+     "height_in": 18.0,
+     "record": {
+      "filename": "0018_sundial-wall_e9th-st-3rd-ave_2025-09_04.jpg",
+      "component": "Sundial basin wall",
+      "location": "Stuyvesant St at 3rd Ave (near 8 Stuyvesant St), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      943
+     ],
+     "original": {
+      "filename": "0018_sundial-wall_e9th-st-3rd-ave_2025-09_04.jpg",
+      "method": "sift",
+      "inliers": 503,
+      "similarity": 0.977
+     },
+     "record_text_match": "0018_sundial-wall_e9th-st-3rd-ave_2025-09_03.jpg"
+    },
+    {
+     "file": "img/21_02.jpg",
+     "x": 657.5,
+     "y": 446.0,
+     "w": 148.5,
+     "h": 206.0,
+     "px_pdf": [
+      206,
+      286
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer Unknown / The Waldo Hutchins Bench / n.d. / Traveler Lifes, via Flickr",
+     "caption_raw": "Photographer Unknown / The Waldo Hutchins Bench / n.d. / Traveler Lifes, via Flickr",
+     "caption_x": 807.15,
+     "caption_bottom": 651.33,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      206,
+      286
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 18.0,
+   "height_source": "records",
+   "height_values": [
+    18.0
+   ]
+  },
+  {
+   "id": "23",
+   "pdf_pages": [
+    24,
+    25
+   ],
+   "baseline_y": 626.1,
+   "baseline_frac": 0.1081,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 615.35,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/23_01.jpg",
+     "x": 22.5,
+     "y": 249.0,
+     "w": 386.5,
+     "h": 377.0,
+     "px_pdf": [
+      538,
+      524
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Steel Park Fence / Tompkins Square Park, Ave B & E 9th St / Sept. 2026",
+     "caption_raw": "Steel Park Fence / Tompkins Square Park, Ave B & E 9th St / Sept. 2026",
+     "caption_x": 409.63,
+     "caption_bottom": 625.85,
+     "kind": "own",
+     "height_in": 42.0,
+     "record": {
+      "filename": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+      "component": "Park fence, steel",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1559
+     ],
+     "original": {
+      "filename": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 368,
+      "similarity": 0.942
+     }
+    },
+    {
+     "file": "img/23_02.jpg",
+     "x": 419.5,
+     "y": 164.0,
+     "w": 148.5,
+     "h": 462.0,
+     "px_pdf": [
+      148,
+      462
+     ],
+     "source_px_per_pt": 0.66,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer Unknown / Tompkins Square Park Riot / 1988 / Streets of New York, NYU Journalism",
+     "caption_raw": "Photographer Unknown / Tompkins Square Park Riot / 1988 / Streets of New York, NYU Journalism",
+     "caption_x": 569.01,
+     "caption_bottom": 625.85,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      148,
+      462
+     ],
+     "original": null
+    },
+    {
+     "file": "img/23_03.jpg",
+     "x": 578.5,
+     "y": 247.0,
+     "w": 227.5,
+     "h": 379.0,
+     "px_pdf": [
+      316,
+      527
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Steel Park Fence / Tompkins Square Park, Ave B & E 9th St / Sept. 2026",
+     "caption_raw": "Steel Park Fence / Tompkins Square Park, Ave B & E 9th St / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 625.85,
+     "kind": "own",
+     "height_in": 42.0,
+     "record": {
+      "filename": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+      "component": "Park fence, steel",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      960,
+      1600
+     ],
+     "original": {
+      "filename": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 235,
+      "similarity": 0.97
+     }
+    }
+   ],
+   "height_in": 42.0,
+   "height_source": "records",
+   "height_values": [
+    42.0
+   ]
+  },
+  {
+   "id": "25",
+   "pdf_pages": [
+    26,
+    27
+   ],
+   "baseline_y": 621.31,
+   "baseline_frac": 0.1149,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 610.56,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/25_01.jpg",
+     "x": 24.0,
+     "y": 446.0,
+     "w": 544.0,
+     "h": 175.0,
+     "px_pdf": [
+      756,
+      243
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Helen Levitt / New York (Kids over Doorway) / 1940 / The Photographers’ Gallery",
+     "caption_raw": "Helen Levitt / New York (Kids over Doorway) / 1940 / The Photographers’ Gallery",
+     "caption_x": 569.01,
+     "caption_bottom": 620.36,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      756,
+      243
+     ],
+     "original": null
+    },
+    {
+     "file": "img/25_02.jpg",
+     "x": 578.5,
+     "y": 446.0,
+     "w": 227.5,
+     "h": 175.0,
+     "px_pdf": [
+      317,
+      244
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Steel Police Barricade / St. Patrick’s Cathedral, Fifth Ave between E 50th and E 51st St / Feb. 2024",
+     "caption_raw": "Steel Police Barricade / St. Patrick’s Cathedral, Fifth Ave between E 50th and E 51st St / Feb. 2024",
+     "caption_x": 807.15,
+     "caption_bottom": 620.36,
+     "kind": "own",
+     "height_in": 43.0,
+     "record": {
+      "filename": "0043_barricade_st-patricks_2024-02_01.jpg",
+      "component": "Police barricade, steel",
+      "location": "St. Patrick's Cathedral — 5th Ave between E 50th and E 51st St, Midtown, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1231
+     ],
+     "original": {
+      "filename": "0043_barricade_st-patricks_2024-02_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.954
+     }
+    }
+   ],
+   "height_in": 43.0,
+   "height_source": "records",
+   "height_values": [
+    43.0
+   ]
+  },
+  {
+   "id": "27",
+   "pdf_pages": [
+    28,
+    29
+   ],
+   "baseline_y": 608.48,
+   "baseline_frac": 0.1332,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 597.72,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/27_01.jpg",
+     "x": 20.0,
+     "y": 493.0,
+     "w": 310.0,
+     "h": 115.5,
+     "px_pdf": [
+      431,
+      161
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Chain-Link Park Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+     "caption_raw": "Chain-Link Park Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+     "caption_x": 330.87,
+     "caption_bottom": 607.52,
+     "kind": "own",
+     "height_in": 48.0,
+     "record": {
+      "filename": "0048_fence-park_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+      "component": "Park fence, chain-link",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      599
+     ],
+     "original": {
+      "filename": "0048_fence-park_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 295,
+      "similarity": 0.965
+     }
+    },
+    {
+     "file": "img/27_02.jpg",
+     "x": 340.0,
+     "y": 493.0,
+     "w": 466.0,
+     "h": 115.5,
+     "px_pdf": [
+      650,
+      161
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Stephen Harmon / Spectators Watch a Game at West 4th Street / 1970s / Village Preservation",
+     "caption_raw": "Stephen Harmon / Spectators Watch a Game at West 4th Street / 1970s / Village Preservation",
+     "caption_x": 807.15,
+     "caption_bottom": 607.52,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      650,
+      161
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 48.0,
+   "height_source": "records",
+   "height_values": [
+    48.0
+   ]
+  },
+  {
+   "id": "29",
+   "pdf_pages": [
+    30,
+    31
+   ],
+   "baseline_y": 602.55,
+   "baseline_frac": 0.1417,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 12.0,
+    "y": 591.79,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/29_01.jpg",
+     "x": 22.5,
+     "y": 294.0,
+     "w": 783.5,
+     "h": 308.5,
+     "px_pdf": [
+      1053,
+      415
+     ],
+     "source_px_per_pt": 1.34,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Stone Base Course / St. Patrick’s Cathedral, Fifth Ave between E 50th and E 51st St / Feb. 2024",
+     "caption_raw": "Stone Base Course / St. Patrick’s Cathedral, Fifth Ave between E 50th and E 51st St / Feb. 2024",
+     "caption_x": 807.6,
+     "caption_bottom": 602.3,
+     "kind": "own",
+     "height_in": 66.0,
+     "record": {
+      "filename": "0066_stone-ledge_st-patricks_2024-02_03.jpg",
+      "component": "Stone base course, cathedral wall",
+      "location": "St. Patrick's Cathedral — 5th Ave between E 50th and E 51st St, Midtown, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "match_score": 1.02,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0066_stone-ledge_st-patricks_2024-02_01.jpg",
+        "height_in": "66",
+        "score": 1.0
+       },
+       {
+        "filename": "0066_stone-ledge_st-patricks_2024-02_02.jpg",
+        "height_in": "66",
+        "score": 1.0
+       },
+       {
+        "filename": "0066_stone-ledge_st-patricks_2024-02_04.jpg",
+        "height_in": "66",
+        "score": 1.0
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      1053,
+      415
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 66.0,
+   "height_source": "records",
+   "height_values": [
+    66.0
+   ]
+  },
+  {
+   "id": "31",
+   "pdf_pages": [
+    32,
+    33
+   ],
+   "baseline_y": 602.55,
+   "baseline_frac": 0.1417,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 9.88,
+    "y": 591.79,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/31_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 386.5,
+     "h": 580.0,
+     "px_pdf": [
+      537,
+      806
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Decorative Steel Railing / Stuyvesant St and Third Ave / Aug. 2025",
+     "caption_raw": "Decorative Steel Railing / Stuyvesant St and Third Ave / Aug. 2025",
+     "caption_x": 410.25,
+     "caption_bottom": 601.69,
+     "kind": "own",
+     "height_in": 72.0,
+     "record": {
+      "filename": "0072_fence-park_e9th-st-3rd-ave_2025-08_01.jpg",
+      "component": "Park fence, steel",
+      "location": "3rd Ave at Stuyvesant St (near 29 3rd Ave), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1066,
+      1600
+     ],
+     "original": {
+      "filename": "0072_fence-park_e9th-st-3rd-ave_2025-08_01.jpg",
+      "method": "sift",
+      "inliers": 1234,
+      "similarity": 0.963
+     }
+    },
+    {
+     "file": "img/31_02.jpg",
+     "x": 419.5,
+     "y": 22.5,
+     "w": 386.5,
+     "h": 580.0,
+     "px_pdf": [
+      593,
+      890
+     ],
+     "source_px_per_pt": 1.53,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Jacob August Riis / Bandits’ Roost, 59 1/2 Mulberry Street / 1888 / The Museum of Modern Art, New York",
+     "caption_raw": "Jacob August Riis / Bandits’ Roost, 59 1/2 Mulberry Street / 1888 / The Museum of Modern Art, New York",
+     "caption_x": 807.15,
+     "caption_bottom": 601.69,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      593,
+      890
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 72.0,
+   "height_source": "records",
+   "height_values": [
+    72.0
+   ]
+  },
+  {
+   "id": "33",
+   "pdf_pages": [
+    34,
+    35
+   ],
+   "baseline_y": 596.62,
+   "baseline_frac": 0.1501,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 585.86,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/33_01.jpg",
+     "x": 22.5,
+     "y": 399.0,
+     "w": 386.5,
+     "h": 197.5,
+     "px_pdf": [
+      537,
+      275
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Temporary Welded-Wire Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+     "caption_raw": "Temporary Welded-Wire Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 596.37,
+     "kind": "own",
+     "height_in": 72.0,
+     "record": {
+      "filename": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+      "component": "Temporary wire fence",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      821
+     ],
+     "original": {
+      "filename": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.917
+     },
+     "record_text_match": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_01.jpg"
+    },
+    {
+     "file": "img/33_02.jpg",
+     "x": 419.5,
+     "y": 351.0,
+     "w": 148.5,
+     "h": 245.5,
+     "px_pdf": [
+      207,
+      342
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Temporary Welded-Wire Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+     "caption_raw": "Temporary Welded-Wire Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+     "caption_x": 569.01,
+     "caption_bottom": 596.37,
+     "kind": "own",
+     "height_in": 72.0,
+     "record": {
+      "filename": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+      "component": "Temporary wire fence",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      970,
+      1600
+     ],
+     "original": {
+      "filename": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.822
+     },
+     "record_text_match": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_01.jpg"
+    },
+    {
+     "file": "img/33_03.jpg",
+     "x": 578.5,
+     "y": 22.5,
+     "w": 227.5,
+     "h": 574.0,
+     "px_pdf": [
+      260,
+      657
+     ],
+     "source_px_per_pt": 1.14,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Martha Cooper / Children Climbing a Fence, from Street Play / late 1970s–early 1980s / The New Yorker",
+     "caption_raw": "Martha Cooper / Children Climbing a Fence, from Street Play / late 1970s–early 1980s / The New Yorker",
+     "caption_x": 807.15,
+     "caption_bottom": 596.37,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      260,
+      657
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 72.0,
+   "height_source": "records",
+   "height_values": [
+    72.0
+   ]
+  },
+  {
+   "id": "35",
+   "pdf_pages": [
+    36,
+    37
+   ],
+   "baseline_y": 588.69,
+   "baseline_frac": 0.1614,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 578.09,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/35_01.jpg",
+     "x": 22.5,
+     "y": 506.0,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_raw": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_x": 172.11,
+     "caption_bottom": 588.44,
+     "kind": "own",
+     "height_in": 120.0,
+     "record": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_05.jpg",
+      "component": "Awning / canopy, metal",
+      "location": "Near 5 E 14th St, Chelsea, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      889
+     ],
+     "original": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_05.jpg",
+      "method": "sift",
+      "inliers": 45,
+      "similarity": 0.991
+     },
+     "record_text_match": "0120_awning_5th-ave-14th-st_2026-09_02.jpg"
+    },
+    {
+     "file": "img/35_02.jpg",
+     "x": 181.5,
+     "y": 506.0,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_raw": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_x": 330.87,
+     "caption_bottom": 588.44,
+     "kind": "own",
+     "height_in": 120.0,
+     "record": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_04.jpg",
+      "component": "Awning / canopy, metal",
+      "location": "Near 5 E 14th St, Chelsea, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      890
+     ],
+     "original": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_04.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.973
+     },
+     "record_text_match": "0120_awning_5th-ave-14th-st_2026-09_02.jpg"
+    },
+    {
+     "file": "img/35_03.jpg",
+     "x": 340.0,
+     "y": 506.0,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_raw": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_x": 489.63,
+     "caption_bottom": 588.44,
+     "kind": "own",
+     "height_in": 120.0,
+     "record": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_03.jpg",
+      "component": "Awning / canopy, metal",
+      "location": "Near 5 E 14th St, Chelsea, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      890
+     ],
+     "original": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_03.jpg",
+      "method": "sift",
+      "inliers": 55,
+      "similarity": 0.994
+     },
+     "record_text_match": "0120_awning_5th-ave-14th-st_2026-09_02.jpg"
+    },
+    {
+     "file": "img/35_04.jpg",
+     "x": 499.0,
+     "y": 24.0,
+     "w": 148.5,
+     "h": 565.0,
+     "px_pdf": [
+      177,
+      675
+     ],
+     "source_px_per_pt": 1.19,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Detroit Publishing Co. / Mulberry St., New York, N.Y. / c. 1900 / Library of Congress",
+     "caption_raw": "Detroit Publishing Co. / Mulberry St., New York, N.Y. / c. 1900 / Library of Congress",
+     "caption_x": 648.39,
+     "caption_bottom": 588.44,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      177,
+      675
+     ],
+     "original": null
+    },
+    {
+     "file": "img/35_05.jpg",
+     "x": 657.5,
+     "y": 506.0,
+     "w": 148.5,
+     "h": 82.5,
+     "px_pdf": [
+      207,
+      115
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_raw": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 588.44,
+     "kind": "own",
+     "height_in": 120.0,
+     "record": {
+      "filename": "0120_awning_5th-ave-14th-st_2026-09_02.jpg",
+      "component": "Awning / canopy, metal",
+      "location": "Near 5 E 14th St, Chelsea, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "match_score": 1.02,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0120_awning_5th-ave-14th-st_2026-09_03.jpg",
+        "height_in": "120",
+        "score": 1.0
+       },
+       {
+        "filename": "0120_awning_5th-ave-14th-st_2026-09_04.jpg",
+        "height_in": "120",
+        "score": 1.0
+       },
+       {
+        "filename": "0120_awning_5th-ave-14th-st_2026-09_05.jpg",
+        "height_in": "120",
+        "score": 1.0
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      207,
+      115
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 120.0,
+   "height_source": "records",
+   "height_values": [
+    120.0
+   ]
+  },
+  {
+   "id": "37",
+   "pdf_pages": [
+    38,
+    39
+   ],
+   "baseline_y": 546.56,
+   "baseline_frac": 0.2214,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 536.25,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/37_01.jpg",
+     "x": 22.5,
+     "y": 305.0,
+     "w": 386.5,
+     "h": 241.5,
+     "px_pdf": [
+      537,
+      336
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wall-Mounted Metal Bracket / Canal St near Essex St / Sept. 2026",
+     "caption_raw": "Wall-Mounted Metal Bracket / Canal St near Essex St / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 546.31,
+     "kind": "own",
+     "height_in": 120.0,
+     "record": {
+      "filename": "0120_wall-bracket_canal-st-essex-st_2026-09_01.jpg",
+      "component": "Wall-mounted utility bracket",
+      "location": "Canal St near Essex St (near 30–34 Canal St), Lower East Side, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1002
+     ],
+     "original": {
+      "filename": "0120_wall-bracket_canal-st-essex-st_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 571,
+      "similarity": 0.985
+     }
+    },
+    {
+     "file": "img/37_02.jpg",
+     "x": 419.5,
+     "y": 305.0,
+     "w": 386.5,
+     "h": 241.5,
+     "px_pdf": [
+      500,
+      312
+     ],
+     "source_px_per_pt": 1.29,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Lynn Saville / From Dark Cities / n.d. / Exibart Street",
+     "caption_raw": "Lynn Saville / From Dark Cities / n.d. / Exibart Street",
+     "caption_x": 807.15,
+     "caption_bottom": 546.31,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      500,
+      312
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 120.0,
+   "height_source": "records",
+   "height_values": [
+    120.0
+   ]
+  },
+  {
+   "id": "39",
+   "pdf_pages": [
+    40,
+    41
+   ],
+   "baseline_y": 522.11,
+   "baseline_frac": 0.2562,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 511.35,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/39_01.jpg",
+     "x": 22.5,
+     "y": 305.0,
+     "w": 69.0,
+     "h": 217.5,
+     "px_pdf": [
+      96,
+      304
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / 335 E 10th St near Avenue B / Sept. 2026",
+     "caption_raw": "Building ledge / 335 E 10th St near Avenue B / Sept. 2026",
+     "caption_x": 92.73,
+     "caption_bottom": 522.11,
+     "kind": "own",
+     "height_in": 144.0,
+     "record": {
+      "filename": "0144_building-ledge_e10th-st-ave-b_2026-09_02.jpg",
+      "component": "Building ledge",
+      "location": "335 E 10th St near Avenue B, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      506,
+      1600
+     ],
+     "original": {
+      "filename": "0144_building-ledge_e10th-st-ave-b_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 91,
+      "similarity": 0.976
+     },
+     "record_text_match": "0144_building-ledge_e10th-st-ave-b_2026-09_01.jpg"
+    },
+    {
+     "file": "img/39_02.jpg",
+     "x": 102.0,
+     "y": 352.0,
+     "w": 148.5,
+     "h": 170.5,
+     "px_pdf": [
+      207,
+      237
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / 339–341 E 10th St near Avenue B / Sept. 2026",
+     "caption_raw": "Building ledge / 339–341 E 10th St near Avenue B / Sept. 2026",
+     "caption_x": 251.49,
+     "caption_bottom": 522.11,
+     "kind": "own",
+     "height_in": 144.0,
+     "record": {
+      "filename": "0144_building-ledge_e10th-st-ave-b_2026-09_03.jpg",
+      "component": "Building ledge",
+      "location": "339–341 E 10th St near Avenue B, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1397,
+      1600
+     ],
+     "original": {
+      "filename": "0144_building-ledge_e10th-st-ave-b_2026-09_03.jpg",
+      "method": "sift",
+      "inliers": 284,
+      "similarity": 0.987
+     }
+    },
+    {
+     "file": "img/39_03.jpg",
+     "x": 260.5,
+     "y": 352.0,
+     "w": 228.0,
+     "h": 170.5,
+     "px_pdf": [
+      318,
+      238
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Helen Levitt / New York / c. 1938 / National Gallery of Art — Source",
+     "caption_raw": "Helen Levitt / New York / c. 1938 / National Gallery of Art — Source",
+     "caption_x": 489.63,
+     "caption_bottom": 522.11,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      318,
+      238
+     ],
+     "original": null
+    },
+    {
+     "file": "img/39_04.jpg",
+     "x": 499.0,
+     "y": 352.0,
+     "w": 148.5,
+     "h": 170.5,
+     "px_pdf": [
+      207,
+      237
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / Avenue B at E 13th St / Sept. 2026",
+     "caption_raw": "Building ledge / Avenue B at E 13th St / Sept. 2026",
+     "caption_x": 648.39,
+     "caption_bottom": 522.11,
+     "kind": "own",
+     "height_in": 144.0,
+     "record": {
+      "filename": "0144_building-ledge_ave-b-e13th-st_2026-09_02.jpg",
+      "component": "Building ledge",
+      "location": "Avenue B at E 13th St (near 210–212 Avenue B / 550 E 13th St), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1397,
+      1600
+     ],
+     "original": {
+      "filename": "0144_building-ledge_ave-b-e13th-st_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 107,
+      "similarity": 0.976
+     },
+     "record_text_match": "0144_building-ledge_ave-b-e13th-st_2026-09_01.jpg"
+    },
+    {
+     "file": "img/39_05.jpg",
+     "x": 657.5,
+     "y": 211.0,
+     "w": 148.5,
+     "h": 311.5,
+     "px_pdf": [
+      207,
+      434
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / Avenue B at E 13th St / Sept. 2026",
+     "caption_raw": "Building ledge / Avenue B at E 13th St / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 522.11,
+     "kind": "own",
+     "height_in": 144.0,
+     "record": {
+      "filename": "0144_building-ledge_ave-b-e13th-st_2026-09_01.jpg",
+      "component": "Building ledge",
+      "location": "Avenue B at E 13th St (near 210–212 Avenue B / 550 E 13th St), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "match_score": 1.0,
+      "ambiguous": false,
+      "alternatives": [
+       {
+        "filename": "0144_building-ledge_ave-b-e13th-st_2026-09_02.jpg",
+        "height_in": "144",
+        "score": 1.0
+       },
+       {
+        "filename": "0144_building-ledge_e10th-st-ave-b_2026-09_01.jpg",
+        "height_in": "144",
+        "score": 0.89
+       },
+       {
+        "filename": "0144_building-ledge_e10th-st-ave-b_2026-09_02.jpg",
+        "height_in": "144",
+        "score": 0.89
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      207,
+      434
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 144.0,
+   "height_source": "records",
+   "height_values": [
+    144.0
+   ]
+  },
+  {
+   "id": "41",
+   "pdf_pages": [
+    42,
+    43
+   ],
+   "baseline_y": 522.11,
+   "baseline_frac": 0.2562,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 511.35,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/41_01.jpg",
+     "x": 22.5,
+     "y": 258.0,
+     "w": 148.5,
+     "h": 264.0,
+     "px_pdf": [
+      207,
+      367
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wall-mounted light / Near 159 4th Ave / Feb. 2026",
+     "caption_raw": "Wall-mounted light / Near 159 4th Ave / Feb. 2026",
+     "caption_x": 172.11,
+     "caption_bottom": 521.72,
+     "kind": "own",
+     "height_in": 144.0,
+     "record": {
+      "filename": "0144_wall-light_e14th-st-4th-ave_2026-02_01.jpg",
+      "component": "Wall-mounted light",
+      "location": "Near 159 4th Ave, Gramercy, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      902,
+      1600
+     ],
+     "original": {
+      "filename": "0144_wall-light_e14th-st-4th-ave_2026-02_01.jpg",
+      "method": "sift",
+      "inliers": 153,
+      "similarity": 0.983
+     }
+    },
+    {
+     "file": "img/41_02.jpg",
+     "x": 181.5,
+     "y": 116.5,
+     "w": 624.5,
+     "h": 405.5,
+     "px_pdf": [
+      868,
+      564
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Lynn Saville / Rockefeller Center / 1993 / Daylight Books — Source",
+     "caption_raw": "Lynn Saville / Rockefeller Center / 1993 / Daylight Books — Source",
+     "caption_x": 807.15,
+     "caption_bottom": 521.72,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      868,
+      564
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 144.0,
+   "height_source": "records",
+   "height_values": [
+    144.0
+   ]
+  },
+  {
+   "id": "43",
+   "pdf_pages": [
+    44,
+    45
+   ],
+   "baseline_y": 522.11,
+   "baseline_frac": 0.2562,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 511.73,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/43_01.jpg",
+     "x": 22.5,
+     "y": 305.0,
+     "w": 386.5,
+     "h": 217.0,
+     "px_pdf": [
+      538,
+      302
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Glass canopy / Irving Pl at E 14th St / Sept. 2026",
+     "caption_raw": "Glass canopy / Irving Pl at E 14th St / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 521.86,
+     "kind": "own",
+     "height_in": 144.0,
+     "record": {
+      "filename": "0144_glass-canopy_e14th-st-3rd-ave_2026-09_02.jpg",
+      "component": "Storefront canopy, glass",
+      "location": "Irving Pl at E 14th St (near Irving Pl), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      898
+     ],
+     "original": {
+      "filename": "0144_glass-canopy_e14th-st-3rd-ave_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 438,
+      "similarity": 0.989
+     }
+    },
+    {
+     "file": "img/43_02.jpg",
+     "x": 419.5,
+     "y": 305.0,
+     "w": 386.5,
+     "h": 217.0,
+     "px_pdf": [
+      537,
+      302
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Michael Young / Zero Irving, 124 E 14th St / 2023 / New York YIMBY — Source",
+     "caption_raw": "Michael Young / Zero Irving, 124 E 14th St / 2023 / New York YIMBY — Source",
+     "caption_x": 807.15,
+     "caption_bottom": 521.86,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      537,
+      302
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 144.0,
+   "height_source": "records",
+   "height_values": [
+    144.0
+   ]
+  },
+  {
+   "id": "45",
+   "pdf_pages": [
+    46,
+    47
+   ],
+   "baseline_y": 485.43,
+   "baseline_frac": 0.3085,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 474.67,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/45_01.jpg",
+     "x": 22.5,
+     "y": 116.5,
+     "w": 228.0,
+     "h": 369.0,
+     "px_pdf": [
+      317,
+      513
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Projecting storefront sign / Near 424 E 14th St / Sept. 2026",
+     "caption_raw": "Projecting storefront sign / Near 424 E 14th St / Sept. 2026",
+     "caption_x": 251.49,
+     "caption_bottom": 485.18,
+     "kind": "own",
+     "height_in": 150.0,
+     "record": {
+      "filename": "0150_storefront-sign_e14th-st-ave-a_2026-09_01.jpg",
+      "component": "Projecting storefront sign",
+      "location": "Near 424 E 14th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      977,
+      1581
+     ],
+     "original": {
+      "filename": "0150_storefront-sign_e14th-st-ave-a_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 426,
+      "similarity": 0.98
+     }
+    },
+    {
+     "file": "img/45_02.jpg",
+     "x": 260.5,
+     "y": 351.0,
+     "w": 148.5,
+     "h": 134.5,
+     "px_pdf": [
+      207,
+      187
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Projecting storefront sign / Near 426 E 14th St / Sept. 2026",
+     "caption_raw": "Projecting storefront sign / Near 426 E 14th St / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 485.18,
+     "kind": "own",
+     "height_in": 150.0,
+     "record": {
+      "filename": "0150_storefront-sign_e14th-st-ave-a_2026-09_03.jpg",
+      "component": "Projecting storefront sign",
+      "location": "Near 426 E 14th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1445
+     ],
+     "original": {
+      "filename": "0150_storefront-sign_e14th-st-ave-a_2026-09_03.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.975
+     }
+    },
+    {
+     "file": "img/45_03.jpg",
+     "x": 419.5,
+     "y": 247.0,
+     "w": 228.0,
+     "h": 238.5,
+     "px_pdf": [
+      528,
+      552
+     ],
+     "source_px_per_pt": 2.31,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "James and Karla Murray / Portrait of James and Karla Murray / n.d. / Newcity Lit — Source",
+     "caption_raw": "James and Karla Murray / Portrait of James and Karla Murray / n.d. / Newcity Lit — Source",
+     "caption_x": 648.39,
+     "caption_bottom": 485.18,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      528,
+      552
+     ],
+     "original": null
+    },
+    {
+     "file": "img/45_04.jpg",
+     "x": 657.5,
+     "y": 247.0,
+     "w": 148.5,
+     "h": 238.5,
+     "px_pdf": [
+      207,
+      332
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Projecting storefront sign / European Wax Center, 428 E 14th St / Sept. 2026",
+     "caption_raw": "Projecting storefront sign / European Wax Center, 428 E 14th St / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 485.18,
+     "kind": "own",
+     "height_in": 150.0,
+     "record": {
+      "filename": "0150_storefront-sign_e14th-st-ave-a_2026-09_04.jpg",
+      "component": "Projecting storefront sign",
+      "location": "European Wax Center, 428 E 14th St near Avenue A, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      988,
+      1586
+     ],
+     "original": {
+      "filename": "0150_storefront-sign_e14th-st-ave-a_2026-09_04.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.991
+     }
+    }
+   ],
+   "height_in": 150.0,
+   "height_source": "records",
+   "height_values": [
+    150.0
+   ]
+  },
+  {
+   "id": "47",
+   "pdf_pages": [
+    48,
+    49
+   ],
+   "baseline_y": 478.59,
+   "baseline_frac": 0.3182,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 467.83,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/47_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 148.5,
+     "h": 456.0,
+     "px_pdf": [
+      207,
+      635
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+     "caption_raw": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+     "caption_x": 172.11,
+     "caption_bottom": 477.63,
+     "kind": "own",
+     "height_in": 150.0,
+     "record": {
+      "filename": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+      "component": "Streetlight",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "code",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      522,
+      1600
+     ],
+     "original": {
+      "filename": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 43,
+      "similarity": 0.946
+     }
+    },
+    {
+     "file": "img/47_02.jpg",
+     "x": 181.5,
+     "y": 164.0,
+     "w": 148.5,
+     "h": 314.5,
+     "px_pdf": [
+      207,
+      437
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+     "caption_raw": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+     "caption_x": 330.87,
+     "caption_bottom": 477.63,
+     "kind": "own",
+     "height_in": 162.0,
+     "record": {
+      "filename": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+      "component": "In flight",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      758,
+      1600
+     ],
+     "original": {
+      "filename": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.91
+     },
+     "record_text_match": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_01.jpg"
+    },
+    {
+     "file": "img/47_03.jpg",
+     "x": 340.0,
+     "y": 211.0,
+     "w": 148.5,
+     "h": 267.5,
+     "px_pdf": [
+      207,
+      373
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+     "caption_raw": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+     "caption_x": 489.63,
+     "caption_bottom": 477.63,
+     "kind": "own",
+     "height_in": 150.0,
+     "record": {
+      "filename": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+      "component": "Streetlight",
+      "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+      "height_source": "code",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      889,
+      1600
+     ],
+     "original": {
+      "filename": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+      "method": "sift",
+      "inliers": 79,
+      "similarity": 0.986
+     },
+     "record_text_match": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_01.jpg"
+    },
+    {
+     "file": "img/47_04.jpg",
+     "x": 499.0,
+     "y": 305.0,
+     "w": 148.5,
+     "h": 173.5,
+     "px_pdf": [
+      148,
+      174
+     ],
+     "source_px_per_pt": 0.38,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer unknown / Type B Lamppost, 3rd Ave and E 46th St / n.d. / Forgotten New York — Source",
+     "caption_raw": "Photographer unknown / Type B Lamppost, 3rd Ave and E 46th St / n.d. / Forgotten New York — Source",
+     "caption_x": 648.39,
+     "caption_bottom": 477.63,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      148,
+      174
+     ],
+     "original": null
+    },
+    {
+     "file": "img/47_05.jpg",
+     "x": 657.5,
+     "y": 304.5,
+     "w": 148.5,
+     "h": 174.0,
+     "px_pdf": [
+      148,
+      174
+     ],
+     "source_px_per_pt": 0.66,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer unknown / Type B Lampposts with Tom Otterness’s The Real World, Nelson Rockefeller Park / n.d. / Forgotten New York — Source",
+     "caption_raw": "Photographer unknown / Type B Lampposts with Tom Otterness’s The Real World, Nelson Rockefeller Park / n.d. / Forgotten New York — Source",
+     "caption_x": 807.15,
+     "caption_bottom": 477.63,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      148,
+      174
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 150.0,
+   "height_source": "records",
+   "height_values": [
+    150.0,
+    162.0
+   ]
+  },
+  {
+   "id": "49",
+   "pdf_pages": [
+    50,
+    51
+   ],
+   "baseline_y": 472.62,
+   "baseline_frac": 0.3267,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 461.86,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/49_01.jpg",
+     "x": 22.5,
+     "y": 258.0,
+     "w": 386.5,
+     "h": 214.5,
+     "px_pdf": [
+      537,
+      298
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Fire escape / 339–341 E 10th St near Avenue B / Sept. 2026",
+     "caption_raw": "Fire escape / 339–341 E 10th St near Avenue B / Sept. 2026",
+     "caption_x": 410.81,
+     "caption_bottom": 472.37,
+     "kind": "own",
+     "height_in": 180.0,
+     "record": {
+      "filename": "0180_fire-escape_e10th-st-ave-b_2026-09_04.jpg",
+      "component": "Fire escape",
+      "location": "339–341 E 10th St near Avenue B, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      888
+     ],
+     "original": {
+      "filename": "0180_fire-escape_e10th-st-ave-b_2026-09_04.jpg",
+      "method": "sift",
+      "inliers": 602,
+      "similarity": 0.984
+     },
+     "record_text_match": "0180_fire-escape_e10th-st-ave-b_2026-09_02.jpg"
+    },
+    {
+     "file": "img/49_02.jpg",
+     "x": 419.5,
+     "y": 258.0,
+     "w": 386.5,
+     "h": 214.5,
+     "px_pdf": [
+      411,
+      228
+     ],
+     "source_px_per_pt": 1.06,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "New York City Tenement House Department / Rear of Tenements, People Sitting on Fire Escape: Manhattan / 1934 / New York Public Library — Source",
+     "caption_raw": "New York City Tenement House Department / Rear of Tenements, People Sitting on Fire Escape: Manhattan / 1934 / New York Public Library — Source",
+     "caption_x": 806.6,
+     "caption_bottom": 472.37,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      411,
+      228
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 180.0,
+   "height_source": "records",
+   "height_values": [
+    180.0
+   ]
+  },
+  {
+   "id": "51",
+   "pdf_pages": [
+    52,
+    53
+   ],
+   "baseline_y": 460.11,
+   "baseline_frac": 0.3446,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 449.36,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/51_01.jpg",
+     "x": 22.5,
+     "y": 211.0,
+     "w": 386.5,
+     "h": 249.0,
+     "px_pdf": [
+      537,
+      346
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026",
+     "caption_raw": "Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 459.69,
+     "kind": "own",
+     "height_in": 168.0,
+     "record": {
+      "filename": "0168_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+      "component": "Projecting storefront sign",
+      "location": "Chipotle, 117 E 14th St at Irving Pl, Union Square, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1031
+     ],
+     "original": {
+      "filename": "0168_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 229,
+      "similarity": 0.993
+     }
+    },
+    {
+     "file": "img/51_02.jpg",
+     "x": 419.5,
+     "y": 211.0,
+     "w": 228.0,
+     "h": 249.0,
+     "px_pdf": [
+      317,
+      346
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026",
+     "caption_raw": "Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026",
+     "caption_x": 648.39,
+     "caption_bottom": 459.69,
+     "kind": "own",
+     "height_in": 168.0,
+     "record": {
+      "filename": "0168_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+      "component": "Projecting storefront sign",
+      "location": "Chipotle, 117 E 14th St at Irving Pl, Union Square, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "match_score": 1.0,
+      "ambiguous": true,
+      "alternatives": [
+       {
+        "filename": "0168_storefront-sign_e14th-irving-pl_2026-09_02.jpg",
+        "height_in": "168",
+        "score": 1.0
+       },
+       {
+        "filename": "0192_storefront-sign_e14th-irving-pl_2026-09_02.jpg",
+        "height_in": "192",
+        "score": 1.0
+       },
+       {
+        "filename": "0192_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+        "height_in": "192",
+        "score": 0.84
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      317,
+      346
+     ],
+     "original": null
+    },
+    {
+     "file": "img/51_03.jpg",
+     "x": 657.5,
+     "y": 211.0,
+     "w": 148.5,
+     "h": 249.0,
+     "px_pdf": [
+      207,
+      347
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Gnaphron / Hollywood Sign Overlooking Los Angeles / 2013 / Wikimedia Commons — Source",
+     "caption_raw": "Gnaphron / Hollywood Sign Overlooking Los Angeles / 2013 / Wikimedia Commons — Source",
+     "caption_x": 807.15,
+     "caption_bottom": 459.69,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      207,
+      347
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 168.0,
+   "height_source": "records",
+   "height_values": [
+    168.0
+   ]
+  },
+  {
+   "id": "53",
+   "pdf_pages": [
+    54,
+    55
+   ],
+   "baseline_y": 448.2,
+   "baseline_frac": 0.3615,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 437.44,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/53_01.jpg",
+     "x": 22.5,
+     "y": 258.0,
+     "w": 303.0,
+     "h": 190.5,
+     "px_pdf": [
+      421,
+      265
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Window sill / 428 E 14th St near Avenue A / Sept. 2026",
+     "caption_raw": "Window sill / 428 E 14th St near Avenue A / Sept. 2026",
+     "caption_x": 330.87,
+     "caption_bottom": 448.14,
+     "kind": "own",
+     "height_in": 180.0,
+     "record": {
+      "filename": "0180_window-sill_e14th-st-ave-a_2026-09_01.jpg",
+      "component": "Window sill",
+      "location": "428 E 14th St near Avenue A, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1008
+     ],
+     "original": {
+      "filename": "0180_window-sill_e14th-st-ave-a_2026-09_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.92
+     }
+    },
+    {
+     "file": "img/53_02.jpg",
+     "x": 340.0,
+     "y": 307.0,
+     "w": 69.0,
+     "h": 141.5,
+     "px_pdf": [
+      121,
+      248
+     ],
+     "source_px_per_pt": 1.76,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Samuel Walters / 6th Ave, Prospect Heights, Brooklyn / 2023 / CityNeighborhoods.NYC — Source",
+     "caption_raw": "Samuel Walters / 6th Ave, Prospect Heights, Brooklyn / 2023 / CityNeighborhoods.NYC — Source",
+     "caption_x": 410.25,
+     "caption_bottom": 447.95,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      121,
+      248
+     ],
+     "original": null
+    },
+    {
+     "file": "img/53_03.jpg",
+     "x": 419.5,
+     "y": 155.0,
+     "w": 228.0,
+     "h": 293.5,
+     "px_pdf": [
+      317,
+      409
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "André Kertész / Glass Bust on Window, New York / 1978 / Bruce Silverstein — Source",
+     "caption_raw": "André Kertész / Glass Bust on Window, New York / 1978 / Bruce Silverstein — Source",
+     "caption_x": 648.39,
+     "caption_bottom": 447.95,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      317,
+      409
+     ],
+     "original": null
+    },
+    {
+     "file": "img/53_04.jpg",
+     "x": 657.5,
+     "y": 353.0,
+     "w": 148.5,
+     "h": 95.5,
+     "px_pdf": [
+      207,
+      133
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Subway elevator headhouse / 1 Av L Station, E 14th St at Avenue A / Sept. 2026",
+     "caption_raw": "Subway elevator headhouse / 1 Av L Station, E 14th St at Avenue A / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 447.95,
+     "kind": "own",
+     "height_in": 180.0,
+     "record": {
+      "filename": "0180_storefront-transom_e14th-irving-pl_2026-09_01.jpg",
+      "component": "Storefront transom / mullion",
+      "location": "117 E 14th St at Irving Pl, Union Square, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1029
+     ],
+     "original": {
+      "filename": "0180_storefront-transom_e14th-irving-pl_2026-09_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.979
+     },
+     "record_text_match": "0180_subway-elevator-headhouse_e14th-st-ave-a_2026-09_01.jpg"
+    }
+   ],
+   "height_in": 180.0,
+   "height_source": "records",
+   "height_values": [
+    180.0
+   ]
+  },
+  {
+   "id": "55",
+   "pdf_pages": [
+    56,
+    57
+   ],
+   "baseline_y": 448.2,
+   "baseline_frac": 0.3615,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 437.77,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/55_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 228.0,
+     "h": 425.5,
+     "px_pdf": [
+      316,
+      589
+     ],
+     "source_px_per_pt": 1.38,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Banner bracket / Near 5 E 14th St / Sept. 2026",
+     "caption_raw": "Banner bracket / Near 5 E 14th St / Sept. 2026",
+     "caption_x": 251.49,
+     "caption_bottom": 447.57,
+     "kind": "own",
+     "height_in": 192.0,
+     "record": {
+      "filename": "0192_banner-bracket_univ-pl-e13th_2026-09_01.jpg",
+      "component": "Banner bracket",
+      "location": "Near 5 E 14th St, Chelsea, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      863,
+      1600
+     ],
+     "original": {
+      "filename": "0192_banner-bracket_univ-pl-e13th_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 490,
+      "similarity": 0.952
+     }
+    },
+    {
+     "file": "img/55_02.jpg",
+     "x": 260.5,
+     "y": 22.5,
+     "w": 228.0,
+     "h": 425.5,
+     "px_pdf": [
+      315,
+      588
+     ],
+     "source_px_per_pt": 1.38,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Projecting storefront sign / Subway, 113 E 14th St near Irving Pl / Sept. 2026",
+     "caption_raw": "Projecting storefront sign / Subway, 113 E 14th St near Irving Pl / Sept. 2026",
+     "caption_x": 489.63,
+     "caption_bottom": 447.57,
+     "kind": "own",
+     "height_in": 192.0,
+     "record": {
+      "filename": "0192_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+      "component": "Projecting storefront sign",
+      "location": "113 E 14th St near Irving Pl, Union Square, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      862,
+      1600
+     ],
+     "original": {
+      "filename": "0192_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 416,
+      "similarity": 0.893
+     }
+    },
+    {
+     "file": "img/55_03.jpg",
+     "x": 499.0,
+     "y": 22.5,
+     "w": 148.5,
+     "h": 425.5,
+     "px_pdf": [
+      205,
+      587
+     ],
+     "source_px_per_pt": 1.38,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Wall-mounted light / 113–117 E 14th St near Irving Pl / Sept. 2026",
+     "caption_raw": "Wall-mounted light / 113–117 E 14th St near Irving Pl / Sept. 2026",
+     "caption_x": 648.39,
+     "caption_bottom": 447.57,
+     "kind": "own",
+     "height_in": 264.0,
+     "record": {
+      "filename": "0264_wall-light_e14th-irving-pl_2026-09_01.jpg",
+      "component": "Wall-mounted light",
+      "location": "113–117 E 14th St near Irving Pl, Union Square, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      565,
+      1600
+     ],
+     "original": {
+      "filename": "0264_wall-light_e14th-irving-pl_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 118,
+      "similarity": 0.907
+     }
+    },
+    {
+     "file": "img/55_04.jpg",
+     "x": 657.5,
+     "y": 22.5,
+     "w": 148.5,
+     "h": 425.5,
+     "px_pdf": [
+      163,
+      468
+     ],
+     "source_px_per_pt": 1.1,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Berenice Abbott / Poultry Shop, Lower East Side, New York City / 1937 / Whitney Museum of American Art — Source",
+     "caption_raw": "Berenice Abbott / Poultry Shop, Lower East Side, New York City / 1937 / Whitney Museum of American Art — Source",
+     "caption_x": 807.15,
+     "caption_bottom": 447.57,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      163,
+      468
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 192.0,
+   "height_source": "records",
+   "height_values": [
+    192.0,
+    264.0
+   ]
+  },
+  {
+   "id": "57",
+   "pdf_pages": [
+    58,
+    59
+   ],
+   "baseline_y": 448.2,
+   "baseline_frac": 0.3615,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 437.63,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/57_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 466.0,
+     "h": 425.5,
+     "px_pdf": [
+      645,
+      589
+     ],
+     "source_px_per_pt": 1.38,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / E 14th St at Irving Pl, Manhattan / Sept. 2026",
+     "caption_raw": "Building ledge / E 14th St at Irving Pl, Manhattan / Sept. 2026",
+     "caption_x": 489.63,
+     "caption_bottom": 448.45,
+     "kind": "own",
+     "height_in": 180.0,
+     "record": {
+      "filename": "0180_subway-elevator-headhouse_e14th-st-ave-a_2026-09_01.jpg",
+      "component": "Subway elevator headhouse",
+      "location": "1 Av L station ADA elevator at E 14th St / Avenue A, East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1462
+     ],
+     "original": {
+      "filename": "0180_subway-elevator-headhouse_e14th-st-ave-a_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 378,
+      "similarity": 0.968
+     },
+     "record_text_match": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg"
+    },
+    {
+     "file": "img/57_02.jpg",
+     "x": 499.0,
+     "y": 22.5,
+     "w": 307.0,
+     "h": 425.5,
+     "px_pdf": [
+      307,
+      426
+     ],
+     "source_px_per_pt": 0.94,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer unknown / Musicians beside an accessible subway elevator / n.d. / Source image: 2023_38_cropped.jpg",
+     "caption_raw": "Photographer unknown / Musicians beside an accessible subway elevator / n.d. / Source image: 2023_38_cropped.jpg",
+     "caption_x": 807.15,
+     "caption_bottom": 448.45,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      307,
+      426
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 180.0,
+   "height_source": "records",
+   "height_values": [
+    180.0
+   ]
+  },
+  {
+   "id": "59",
+   "pdf_pages": [
+    60,
+    61
+   ],
+   "baseline_y": 448.2,
+   "baseline_frac": 0.3615,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 437.24,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/59_01.jpg",
+     "x": 22.5,
+     "y": 258.0,
+     "w": 386.5,
+     "h": 190.0,
+     "px_pdf": [
+      529,
+      260
+     ],
+     "source_px_per_pt": 1.37,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / Irving Pl at E 14th St, Manhattan / Sept. 2026",
+     "caption_raw": "Building ledge / Irving Pl at E 14th St, Manhattan / Sept. 2026",
+     "caption_x": 409.73,
+     "caption_bottom": 447.95,
+     "kind": "own",
+     "height_in": 180.0,
+     "record": {
+      "filename": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg",
+      "component": "Building ledge",
+      "location": "Irving Pl at E 14th St (near Irving Pl), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "match_score": 1.02,
+      "ambiguous": true,
+      "alternatives": [
+       {
+        "filename": "0180_building-ledge_e14th-st-3rd-ave_2026-09_01.jpg",
+        "height_in": "180",
+        "score": 1.0
+       },
+       {
+        "filename": "0180_building-ledge_e14th-st-3rd-ave_2026-09_06.jpg",
+        "height_in": "180",
+        "score": 1.0
+       },
+       {
+        "filename": "0600_building-ledge_con-ed-irving-pl_2026-09_01.jpg",
+        "height_in": "600",
+        "score": 1.0
+       }
+      ],
+      "matched_by": "text"
+     },
+     "px": [
+      529,
+      260
+     ],
+     "original": null
+    },
+    {
+     "file": "img/59_02.jpg",
+     "x": 419.5,
+     "y": 351.0,
+     "w": 69.0,
+     "h": 97.0,
+     "px_pdf": [
+      95,
+      133
+     ],
+     "source_px_per_pt": 1.37,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Building ledge / 3rd Ave at Cus D’Amato Way, Manhattan / Sept. 2026",
+     "caption_raw": "Building ledge / 3rd Ave at Cus D’Amato Way, Manhattan / Sept. 2026",
+     "caption_x": 489.63,
+     "caption_bottom": 447.95,
+     "kind": "own",
+     "height_in": 180.0,
+     "record": {
+      "filename": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg",
+      "component": "Building ledge",
+      "location": "Irving Pl at E 14th St (near Irving Pl), East Village, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      914,
+      1284
+     ],
+     "original": {
+      "filename": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.923
+     },
+     "record_text_match": "0180_building-ledge_e14th-st-3rd-ave_2026-09_02.jpg"
+    },
+    {
+     "file": "img/59_03.jpg",
+     "x": 499.0,
+     "y": 305.0,
+     "w": 307.0,
+     "h": 143.0,
+     "px_pdf": [
+      362,
+      168
+     ],
+     "source_px_per_pt": 1.18,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer unknown / Academy of Music marquee, East 14th Street / c. 1950s / Village Preservation",
+     "caption_raw": "Photographer unknown / Academy of Music marquee, East 14th Street / c. 1950s / Village Preservation",
+     "caption_x": 807.15,
+     "caption_bottom": 447.95,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      362,
+      168
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 180.0,
+   "height_source": "records",
+   "height_values": [
+    180.0
+   ]
+  },
+  {
+   "id": "61",
+   "pdf_pages": [
+    62,
+    63
+   ],
+   "baseline_y": 423.24,
+   "baseline_frac": 0.3971,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 412.31,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/61_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 783.5,
+     "h": 400.5,
+     "px_pdf": [
+      1089,
+      557
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Overhead utility / signal wire / Manhattan Bridge approach at Forsyth St and Eldridge St, Manhattan / Sept. 2026",
+     "caption_raw": "Overhead utility / signal wire / Manhattan Bridge approach at Forsyth St and Eldridge St, Manhattan / Sept. 2026",
+     "caption_x": 807.6,
+     "caption_bottom": 423.49,
+     "kind": "own",
+     "height_in": 216.0,
+     "record": {
+      "filename": "0216_overhead-wire_manhattan-bridge-forsyth-st_2026-09_01.jpg",
+      "component": "Overhead utility / signal wire",
+      "location": "Manhattan Bridge approach / underside at Forsyth St and Eldridge St (near 3–10 Eldridge/Forsyth St), Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      819
+     ],
+     "original": {
+      "filename": "0216_overhead-wire_manhattan-bridge-forsyth-st_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 841,
+      "similarity": 0.994
+     }
+    }
+   ],
+   "height_in": 216.0,
+   "height_source": "records",
+   "height_values": [
+    216.0
+   ]
+  },
+  {
+   "id": "63",
+   "pdf_pages": [
+    64,
+    65
+   ],
+   "baseline_y": 398.35,
+   "baseline_frac": 0.4325,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 388.3,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/63_01.jpg",
+     "x": 22.5,
+     "y": 23.0,
+     "w": 228.0,
+     "h": 375.0,
+     "px_pdf": [
+      317,
+      521
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Traffic signal mast arm / Kimlau Square, Oliver St at St James Pl, Manhattan / July 2026",
+     "caption_raw": "Traffic signal mast arm / Kimlau Square, Oliver St at St James Pl, Manhattan / July 2026",
+     "caption_x": 251.49,
+     "caption_bottom": 398.1,
+     "kind": "own",
+     "height_in": 216.0,
+     "record": {
+      "filename": "0216_signal-mast-arm_e-houston-clinton-st_2026-09_01.jpg",
+      "component": "Traffic signal on mast arm",
+      "location": "E Houston St at Avenue B / Clinton St (near 2–7 Clinton St), Lower East Side, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      974,
+      1600
+     ],
+     "original": {
+      "filename": "0216_signal-mast-arm_e-houston-clinton-st_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 215,
+      "similarity": 0.966
+     },
+     "record_text_match": "0216_signal-mast-arm_oliver-st_2026-07_03.jpg"
+    },
+    {
+     "file": "img/63_02.jpg",
+     "x": 260.5,
+     "y": 23.0,
+     "w": 387.0,
+     "h": 375.0,
+     "px_pdf": [
+      538,
+      521
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Traffic signal mast arm / Kimlau Square, Oliver St at St James Pl, Manhattan / July 2026",
+     "caption_raw": "Traffic signal mast arm / Kimlau Square, Oliver St at St James Pl, Manhattan / July 2026",
+     "caption_x": 648.39,
+     "caption_bottom": 398.1,
+     "kind": "own",
+     "height_in": 216.0,
+     "record": {
+      "filename": "0216_signal-mast-arm_oliver-st_2026-07_02.jpg",
+      "component": "Traffic signal on mast arm",
+      "location": "Kimlau Square — Oliver St at St James Pl, Chinatown, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1548
+     ],
+     "original": {
+      "filename": "0216_signal-mast-arm_oliver-st_2026-07_02.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.878
+     },
+     "record_text_match": "0216_signal-mast-arm_oliver-st_2026-07_03.jpg"
+    },
+    {
+     "file": "img/63_03.jpg",
+     "x": 658.0,
+     "y": 211.5,
+     "w": 147.5,
+     "h": 186.5,
+     "px_pdf": [
+      205,
+      260
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Lonnie Wilson / A Man Straddles a Traffic Light at the Corner of Haste Street and Telegraph Avenue / 1968 / Oakland Museum of California",
+     "caption_raw": "Lonnie Wilson / A Man Straddles a Traffic Light at the Corner of Haste Street and Telegraph Avenue / 1968 / Oakland Museum of California",
+     "caption_x": 807.15,
+     "caption_bottom": 398.1,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      205,
+      260
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 216.0,
+   "height_source": "records",
+   "height_values": [
+    216.0
+   ]
+  },
+  {
+   "id": "65",
+   "pdf_pages": [
+    66,
+    67
+   ],
+   "baseline_y": 360.72,
+   "baseline_frac": 0.4862,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 350.92,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/65_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 386.5,
+     "h": 338.0,
+     "px_pdf": [
+      538,
+      470
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Roof edge / parapet / 198 200 E 3rd St at Avenue B, Manhattan / Sept. 2026",
+     "caption_raw": "Roof edge / parapet / 198 200 E 3rd St at Avenue B, Manhattan / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 358.64,
+     "kind": "own",
+     "height_in": 292.0,
+     "record": {
+      "filename": "0292_roof-edge_e3rd-st-ave-b_2026-09_02.jpg",
+      "component": "Roof edge / parapet",
+      "location": "198–200 E 3rd St / 34 Avenue B, East Village, Manhattan",
+      "height_source": "measured",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1398
+     ],
+     "original": {
+      "filename": "0292_roof-edge_e3rd-st-ave-b_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 120,
+      "similarity": 0.989
+     },
+     "record_text_match": "0292_roof-edge_e3rd-st-ave-b_2026-09_01.jpg"
+    },
+    {
+     "file": "img/65_02.jpg",
+     "x": 419.5,
+     "y": 22.5,
+     "w": 386.5,
+     "h": 338.0,
+     "px_pdf": [
+      774,
+      677
+     ],
+     "source_px_per_pt": 2.0,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Berenice Abbott / Court of the First Model Tenements in New York City, 361–365 East 71st Street, Manhattan / 1936 / Museum of Modern Art",
+     "caption_raw": "Berenice Abbott / Court of the First Model Tenements in New York City, 361–365 East 71st Street, Manhattan / 1936 / Museum of Modern Art",
+     "caption_x": 807.15,
+     "caption_bottom": 358.64,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      774,
+      677
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 292.0,
+   "height_source": "records",
+   "height_values": [
+    292.0
+   ]
+  },
+  {
+   "id": "67",
+   "pdf_pages": [
+    68,
+    69
+   ],
+   "baseline_y": 360.72,
+   "baseline_frac": 0.4862,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 350.46,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/67_01.jpg",
+     "x": 22.5,
+     "y": 22.0,
+     "w": 228.0,
+     "h": 338.5,
+     "px_pdf": [
+      453,
+      672
+     ],
+     "source_px_per_pt": 1.99,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Weegee / Heat Spell, Children Sleeping on the Fire Escape, the Lower East Side / c. 1938 / J. Paul Getty Museum",
+     "caption_raw": "Weegee / Heat Spell, Children Sleeping on the Fire Escape, the Lower East Side / c. 1938 / J. Paul Getty Museum",
+     "caption_x": 251.49,
+     "caption_bottom": 360.97,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      453,
+      672
+     ],
+     "original": null
+    },
+    {
+     "file": "img/67_02.jpg",
+     "x": 260.5,
+     "y": 22.0,
+     "w": 545.5,
+     "h": 338.5,
+     "px_pdf": [
+      758,
+      470
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Fire escape / Near 409 E 14th St, Manhattan / Sept. 2026",
+     "caption_raw": "Fire escape / Near 409 E 14th St, Manhattan / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 360.97,
+     "kind": "own",
+     "height_in": 300.0,
+     "record": {
+      "filename": "0300_fire-escape_e14th-st-ave-a_2026-09_01.jpg",
+      "component": "Fire escape",
+      "location": "Near 409 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      992
+     ],
+     "original": {
+      "filename": "0300_fire-escape_e14th-st-ave-a_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 1227,
+      "similarity": 0.99
+     }
+    }
+   ],
+   "height_in": 300.0,
+   "height_source": "records",
+   "height_values": [
+    300.0
+   ]
+  },
+  {
+   "id": "69",
+   "pdf_pages": [
+    70,
+    71
+   ],
+   "baseline_y": 346.7,
+   "baseline_frac": 0.5061,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 335.95,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/69_01.jpg",
+     "x": 22.5,
+     "y": 23.0,
+     "w": 386.5,
+     "h": 324.5,
+     "px_pdf": [
+      537,
+      451
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Fire escape / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_raw": "Fire escape / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 345.71,
+     "kind": "own",
+     "height_in": 300.0,
+     "record": {
+      "filename": "0300_fire-escape_e-houston-attorney-st_2026-09_01.jpg",
+      "component": "Fire escape",
+      "location": "E Houston St at Attorney St (near 174–175 Attorney St / 315–321 E Houston St), Lower East Side, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      1343
+     ],
+     "original": {
+      "filename": "0300_fire-escape_e-houston-attorney-st_2026-09_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.879
+     }
+    },
+    {
+     "file": "img/69_02.jpg",
+     "x": 419.5,
+     "y": 22.5,
+     "w": 386.5,
+     "h": 324.5,
+     "px_pdf": [
+      417,
+      350
+     ],
+     "source_px_per_pt": 1.08,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Photographer unknown / Men Balancing between a Fire Escape and Utility Line / n.d. / Source image: 2017_47_1.jpg",
+     "caption_raw": "Photographer unknown / Men Balancing between a Fire Escape and Utility Line / n.d. / Source image: 2017_47_1.jpg",
+     "caption_x": 807.15,
+     "caption_bottom": 345.71,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      417,
+      350
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 300.0,
+   "height_source": "records",
+   "height_values": [
+    300.0
+   ]
+  },
+  {
+   "id": "71",
+   "pdf_pages": [
+    72,
+    73
+   ],
+   "baseline_y": 324.51,
+   "baseline_frac": 0.5377,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 313.75,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/71_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 228.0,
+     "h": 303.0,
+     "px_pdf": [
+      317,
+      421
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / Near 409 E 14th St, Manhattan / Sept. 2026",
+     "caption_raw": "Streetlight / Near 409 E 14th St, Manhattan / Sept. 2026",
+     "caption_x": 251.49,
+     "caption_bottom": 322.84,
+     "kind": "own",
+     "height_in": 183.0,
+     "record": {
+      "filename": "0183_streetlight_e14th-st-ave-a_2026-09_01.jpg",
+      "component": "Streetlight",
+      "location": "Near 409 E 14th St, Stuyvesant Town, Manhattan",
+      "height_source": "estimated",
+      "status": "选用",
+      "matched_by": "image"
+     },
+     "px": [
+      1205,
+      1600
+     ],
+     "original": {
+      "filename": "0183_streetlight_e14th-st-ave-a_2026-09_01.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.954
+     }
+    },
+    {
+     "file": "img/71_02.jpg",
+     "x": 260.5,
+     "y": 22.5,
+     "w": 228.0,
+     "h": 302.5,
+     "px_pdf": [
+      317,
+      421
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Seattle City Light Worker Changing Streetlight / c. 1930s / Seattle Municipal Archives",
+     "caption_raw": "Seattle City Light Worker Changing Streetlight / c. 1930s / Seattle Municipal Archives",
+     "caption_x": 489.63,
+     "caption_bottom": 322.84,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      317,
+      421
+     ],
+     "original": null
+    },
+    {
+     "file": "img/71_03.jpg",
+     "x": 499.0,
+     "y": 22.5,
+     "w": 307.0,
+     "h": 302.5,
+     "px_pdf": [
+      390,
+      385
+     ],
+     "source_px_per_pt": 1.27,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "PECO Lamp Trimmer Servicing an Arc Lamp / c. 1910 / Old Images of Philadelphia",
+     "caption_raw": "PECO Lamp Trimmer Servicing an Arc Lamp / c. 1910 / Old Images of Philadelphia",
+     "caption_x": 807.15,
+     "caption_bottom": 322.84,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      390,
+      385
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 183.0,
+   "height_source": "records",
+   "height_values": [
+    183.0
+   ]
+  },
+  {
+   "id": "73",
+   "pdf_pages": [
+    74,
+    75
+   ],
+   "baseline_y": 312.53,
+   "baseline_frac": 0.5548,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 301.77,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/73_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 307.5,
+     "h": 290.0,
+     "px_pdf": [
+      428,
+      403
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Mark Handforth / Lamppost / 2003 / Public Art Fund",
+     "caption_raw": "Mark Handforth / Lamppost / 2003 / Public Art Fund",
+     "caption_x": 330.87,
+     "caption_bottom": 311.57,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      428,
+      403
+     ],
+     "original": null
+    },
+    {
+     "file": "img/73_02.jpg",
+     "x": 340.0,
+     "y": 23.0,
+     "w": 228.0,
+     "h": 289.5,
+     "px_pdf": [
+      318,
+      404
+     ],
+     "source_px_per_pt": 1.4,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Donald Deskey Streetlight, New York City / c. 1960s / Forgotten New York",
+     "caption_raw": "Donald Deskey Streetlight, New York City / c. 1960s / Forgotten New York",
+     "caption_x": 569.01,
+     "caption_bottom": 311.57,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      318,
+      404
+     ],
+     "original": null
+    },
+    {
+     "file": "img/73_03.jpg",
+     "x": 578.5,
+     "y": 22.5,
+     "w": 227.5,
+     "h": 290.0,
+     "px_pdf": [
+      316,
+      403
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_raw": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 311.57,
+     "kind": "own",
+     "height_in": 356.0,
+     "record": {
+      "filename": "0356_streetlight_e-houston-attorney-st_2026-09_03.jpg",
+      "component": "Streetlight",
+      "location": "E Houston St at Attorney St (near 174–175 Attorney St / 315–321 E Houston St), Lower East Side, Manhattan",
+      "height_source": "code",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1255,
+      1600
+     ],
+     "original": {
+      "filename": "0356_streetlight_e-houston-attorney-st_2026-09_03.jpg",
+      "method": "sift",
+      "inliers": 655,
+      "similarity": 0.977
+     },
+     "record_text_match": "0348_streetlight_e-houston-attorney-st_2026-09_01.jpg"
+    }
+   ],
+   "height_in": 356.0,
+   "height_source": "records",
+   "height_values": [
+    356.0
+   ]
+  },
+  {
+   "id": "75",
+   "pdf_pages": [
+    76,
+    77
+   ],
+   "baseline_y": 299.59,
+   "baseline_frac": 0.5732,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 288.83,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/75_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 228.0,
+     "h": 277.0,
+     "px_pdf": [
+      317,
+      385
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_raw": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_x": 251.49,
+     "caption_bottom": 298.63,
+     "kind": "own",
+     "height_in": 348.0,
+     "record": {
+      "filename": "0348_streetlight_e-houston-attorney-st_2026-09_01.jpg",
+      "component": "Streetlight",
+      "location": "E Houston St at Attorney St (near 174–175 Attorney St / 315–321 E Houston St), Lower East Side, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1318,
+      1600
+     ],
+     "original": {
+      "filename": "0348_streetlight_e-houston-attorney-st_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 66,
+      "similarity": 0.966
+     }
+    },
+    {
+     "file": "img/75_02.jpg",
+     "x": 260.5,
+     "y": 22.5,
+     "w": 307.5,
+     "h": 277.0,
+     "px_pdf": [
+      428,
+      385
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Alexander Rodchenko / Fire Escape, from the series Building on Miasnitskaia Street / 1925",
+     "caption_raw": "Alexander Rodchenko / Fire Escape, from the series Building on Miasnitskaia Street / 1925",
+     "caption_x": 569.01,
+     "caption_bottom": 298.65,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      428,
+      385
+     ],
+     "original": null
+    },
+    {
+     "file": "img/75_03.jpg",
+     "x": 578.5,
+     "y": 22.5,
+     "w": 227.5,
+     "h": 277.0,
+     "px_pdf": [
+      316,
+      385
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_raw": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 298.65,
+     "kind": "own",
+     "height_in": 348.0,
+     "record": {
+      "filename": "0348_streetlight_e-houston-attorney-st_2026-09_02.jpg",
+      "component": "Streetlight",
+      "location": "E Houston St at Attorney St (near 174–175 Attorney St / 315–321 E Houston St), Lower East Side, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1313,
+      1600
+     ],
+     "original": {
+      "filename": "0348_streetlight_e-houston-attorney-st_2026-09_02.jpg",
+      "method": "sift",
+      "inliers": 114,
+      "similarity": 0.989
+     },
+     "record_text_match": "0348_streetlight_e-houston-attorney-st_2026-09_01.jpg"
+    }
+   ],
+   "height_in": 348.0,
+   "height_source": "records",
+   "height_values": [
+    348.0
+   ]
+  },
+  {
+   "id": "77",
+   "pdf_pages": [
+    78,
+    79
+   ],
+   "baseline_y": 250.66,
+   "baseline_frac": 0.6429,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 239.9,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/77_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 386.5,
+     "h": 228.0,
+     "px_pdf": [
+      538,
+      317
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Streetlight / E Houston St at Avenue B–Clinton St, Manhattan / Sept. 2026",
+     "caption_raw": "Streetlight / E Houston St at Avenue B–Clinton St, Manhattan / Sept. 2026",
+     "caption_x": 410.25,
+     "caption_bottom": 249.39,
+     "kind": "own",
+     "height_in": 348.0,
+     "record": {
+      "filename": "0348_streetlight_e-houston-clinton-st_2026-09_03.jpg",
+      "component": "Streetlight",
+      "location": "E Houston St at Avenue B / Clinton St (near 2–7 Clinton St), Lower East Side, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      943
+     ],
+     "original": {
+      "filename": "0348_streetlight_e-houston-clinton-st_2026-09_03.jpg",
+      "method": "template",
+      "inliers": 0,
+      "similarity": 0.922
+     },
+     "record_text_match": "0348_streetlight_e-houston-clinton-st_2026-09_01.jpg"
+    },
+    {
+     "file": "img/77_02.jpg",
+     "x": 420.5,
+     "y": 22.5,
+     "w": 385.5,
+     "h": 228.0,
+     "px_pdf": [
+      536,
+      317
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Lewis Wickes Hine / Icarus, Empire State Building / 1930–31 / Metropolitan Museum of Art",
+     "caption_raw": "Lewis Wickes Hine / Icarus, Empire State Building / 1930–31 / Metropolitan Museum of Art",
+     "caption_x": 808.23,
+     "caption_bottom": 249.39,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      536,
+      317
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 348.0,
+   "height_source": "records",
+   "height_values": [
+    348.0
+   ]
+  },
+  {
+   "id": "79",
+   "pdf_pages": [
+    80,
+    81
+   ],
+   "baseline_y": 114.27,
+   "baseline_frac": 0.8372,
+   "baseline_width": 0.5,
+   "number_pos": {
+    "x": 10.05,
+    "y": 103.82,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/79_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 228.0,
+     "h": 91.5,
+     "px_pdf": [
+      476,
+      191
+     ],
+     "source_px_per_pt": 2.09,
+     "crosses_gutter": false,
+     "bottom_on_baseline": true,
+     "caption": "Lunch Atop a Skyscraper / 1932",
+     "caption_raw": "Lunch Atop a Skyscraper / 1932",
+     "caption_x": 251.49,
+     "caption_bottom": 112.5,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      476,
+      191
+     ],
+     "original": null
+    },
+    {
+     "file": "img/79_02.jpg",
+     "x": 260.5,
+     "y": 22.5,
+     "w": 545.5,
+     "h": 91.5,
+     "px_pdf": [
+      760,
+      128
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "Building-mounted flagpole / 2026",
+     "caption_raw": "Building-mounted flagpole / 2026",
+     "caption_x": 807.15,
+     "caption_bottom": 112.5,
+     "kind": "own",
+     "height_in": 540.0,
+     "record": {
+      "filename": "0540_flagpole_univ-pl-e14th_2026-09_01.jpg",
+      "component": "Building-mounted flagpole",
+      "location": "5 E 14th St at University Pl, Union Square, Manhattan",
+      "height_source": "estimated",
+      "status": "候选",
+      "matched_by": "image"
+     },
+     "px": [
+      1600,
+      270
+     ],
+     "original": {
+      "filename": "0540_flagpole_univ-pl-e14th_2026-09_01.jpg",
+      "method": "sift",
+      "inliers": 97,
+      "similarity": 0.997
+     }
+    }
+   ],
+   "height_in": 540.0,
+   "height_source": "records",
+   "height_values": [
+    540.0
+   ]
+  },
+  {
+   "id": "81",
+   "pdf_pages": [
+    82,
+    83
+   ],
+   "baseline_y": 53.07,
+   "baseline_frac": 0.9244,
+   "baseline_width": 1.0,
+   "number_pos": {
+    "x": 10.05,
+    "y": 42.06,
+    "w": 9.55,
+    "h": 9.8
+   },
+   "images": [
+    {
+     "file": "img/81_01.jpg",
+     "x": 22.5,
+     "y": 22.5,
+     "w": 783.5,
+     "h": 30.5,
+     "px_pdf": [
+      1092,
+      42
+     ],
+     "source_px_per_pt": 1.39,
+     "crosses_gutter": true,
+     "bottom_on_baseline": true,
+     "caption": "In flight",
+     "caption_raw": "In flight",
+     "caption_x": 806.16,
+     "caption_bottom": 52.57,
+     "kind": "historical",
+     "height_in": null,
+     "record": null,
+     "px": [
+      1092,
+      42
+     ],
+     "original": null
+    }
+   ],
+   "height_in": 540.0,
+   "height_source": "baseline"
+  }
+ ]
+}

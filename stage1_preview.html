@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阶段 1 核对</title>
+<style>
+  body { margin: 0; padding: 24px 16px 80px; background: #eee; font: 12px/1.4 ui-monospace, Menlo, monospace; color: #111; }
+  h1 { font-size: 13px; font-weight: normal; margin: 0 0 16px; }
+  .row { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 28px; }
+  .meta { width: 200px; flex: none; }
+  .meta b { font-size: 20px; font-weight: normal; display: block; }
+  .meta .warn { color: #b00; }
+  .spread { position: relative; flex: 1; max-width: 960px; aspect-ratio: 828 / 702; background: #fff; container-type: inline-size; }
+  .spread .gutter { position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px dashed #ddd; }
+  .spread img { position: absolute; display: block; }
+  .spread .base { position: absolute; left: 0; right: 0; border-top: 1px solid #000; }
+  .spread .cap { position: absolute; transform-origin: 0 0; transform: rotate(-90deg); white-space: nowrap;
+                 font: calc(5 / 828 * 100cqw) / 1 Helvetica, Arial, sans-serif; }
+  .spread .num { position: absolute; transform-origin: 0 0; transform: rotate(-90deg);
+                 font: calc(7 / 828 * 100cqw) / 1 ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<h1>阶段 1 核对：每一行是书里的一个跨页（按 data/groups.json 重新排出来的），左边是组号和高度。</h1>
+<div id="list"></div>
+<script>
+const pct = (v, total) => (v / total * 100) + '%';
+fetch('data/groups.json').then(r => r.json()).then(data => {
+  const W = data.spread.w, H = data.spread.h;
+  const list = document.getElementById('list');
+  for (const g of data.groups) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const unsure = g.height_source !== 'records' || g.images.some(im => im.record && im.record.ambiguous);
+    row.innerHTML = `<div class="meta"><b>${g.id}</b>${g.height_in}″ <span class="${g.height_source === 'records' ? '' : 'warn'}">(${g.height_source})</span>
+      ${g.height_values && g.height_values.length > 1 ? `<br>本组有多个高度：${g.height_values.join(' / ')}` : ''}
+      <br>${g.images.length} 张图<br>PDF 第 ${g.pdf_pages.join('–')} 页${unsure ? '<br><span class="warn">有待确认项</span>' : ''}</div>`;
+    const sp = document.createElement('div');
+    sp.className = 'spread';
+    sp.innerHTML = '<div class="gutter"></div>';
+    for (const im of g.images) {
+      const img = new Image();
+      img.src = 'data/' + im.file;
+      Object.assign(img.style, { left: pct(im.x, W), top: pct(im.y, H), width: pct(im.w, W), height: pct(im.h, H) });
+      sp.appendChild(img);
+      if (im.caption) {
+        const c = document.createElement('div');
+        c.className = 'cap';
+        c.textContent = im.caption;
+        // 竖排，从下往上读，底端对齐基线，贴在图片右边
+        Object.assign(c.style, { left: pct(im.x + im.w + 0.6, W), top: pct(g.baseline_y - 0.5, H) });
+        sp.appendChild(c);
+      }
+    }
+    const base = document.createElement('div');
+    base.className = 'base';
+    base.style.top = pct(g.baseline_y, H);
+    sp.appendChild(base);
+    const n = document.createElement('div');
+    n.className = 'num';
+    n.textContent = g.id;
+    Object.assign(n.style, { left: pct(g.number_pos.x, W), top: pct(g.number_pos.y + g.number_pos.h, H) });
+    sp.appendChild(n);
+    row.appendChild(sp);
+    list.appendChild(row);
+  }
+});
+</script>
+</body>
+</html>
