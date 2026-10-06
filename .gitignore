@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .claude/
+
+# GitHub 克隆下来的空文件夹
+prototype1/
