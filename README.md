@@ -12,10 +12,11 @@ python3 -m http.server 8000
 
 然后用 Chrome 打开 <http://localhost:8000>。允许使用摄像头。
 
+- `http://localhost:8000/frame.html`：**取景框页面**（单独试手势）：一张鸽子很多的照片，两只手比 L 形框住放大看，30 秒换下一张
 - `http://localhost:8000/?debug`：一打开就展开详细调试信息
 - `http://localhost:8000/stage1_preview.html`：41 组全部排出来的核对页
 
-第一次打开会从网上下载 MediaPipe 和人脸模型，大约 13MB，需要联网。
+第一次打开会从网上下载 MediaPipe、人脸模型和手部模型，大约 21MB，需要联网。
 
 ## 按键
 
@@ -27,6 +28,15 @@ python3 -m http.server 8000
 | `G` | 切换角度 → 高度的算法：对照表 / 几何（60 + 240 × tan） |
 | `↑` `↓` | 手动模拟抬头、低头，每次 2°。没有摄像头时也能看效果 |
 | `M` | 退出手动模拟，回到摄像头 |
+
+取景框页面 `frame.html`：
+
+| 键 | 作用 |
+|---|---|
+| 两只手比 L 形 | 取景框：框外变淡，框里放大看；框越小放得越大 |
+| `Shift` + 鼠标拖动 | 手动画一个取景框（没有摄像头或调参数时用），`Shift` + 单击或 `Esc` 去掉 |
+| `→` / `←` | 换下一张 / 上一张照片 |
+| `D` / `F` | 摄像头小窗（点开看手的判定）/ 全屏 |
 
 ## 调参数
 
@@ -43,6 +53,8 @@ python3 -m http.server 8000
 - `rulers`：两边刻度的长短、粗细、标记大小。左边是英尺尺，右边是每组基线的高度（标组号）；两边的黑色标记是你现在看的位置，跟着头部实时移动
 - `elevation`：背景里的街道立面（试验），`show: false` 关掉；颜色也在这里调
 - `layout.baselineFullWidth`：基线是否贯穿整个屏幕
+- `framePage`：取景框页面。`intervalSec` 多久换下一张（0 = 不自动换），`holdAfterFrameSec` 用完取景框后多久才换，`fadeMs` 换图的淡入淡出
+- `frame`：取景框手势（两个页面共用）。`onMainPage: true` 可以在主页面上也开取景框。`lShape` 里是 L 形的判定阈值（拇指 / 食指伸直程度、其余手指弯曲、夹角 60°–120°）；`onMs` / `offMs` 出现和消失的延迟；`outsideFade` 框外变淡多少；`zoomMin` / `zoomMax` 放大倍数范围；`everyNFrames` 手部每几帧算一次（卡就调大）
 
 ## 文件
 
@@ -51,6 +63,10 @@ index.html            页面
 sketch.js             p5.js 画面 + MediaPipe 头部追踪
 config.js             可调参数
 elevation.js          背景街道立面（长椅、门、雨棚、窗台、消防梯、路灯、树、信号灯、檐口）
+frame.html            取景框页面
+frame-sketch.js       取景框页面的画面 + 手部识别
+frame.js              取景框手势：L 形判定、取景框位置、放大倍数、框线（两个页面共用）
+data/frame/           取景框页面用的照片 + photos.json（换照片改这里）
 fonts/                TWK Everett Regular / Mono Regular / Mono Light（换字体就替换这里的文件）
 data/groups.json      从书里拆出的 41 组：每张图的位置、大小、图注、基线、高度
 data/cover.json       封面勒口上的刻度（从 bookcover.pdf 取出）
@@ -60,6 +76,7 @@ data/stage1_report.md 阶段 1 核对清单
 tools/extract_book.py 从 book.pdf 重新生成 data/（pip install pymupdf pillow numpy opencv-python-headless）
 tools/originals.py    书里的图去原图文件夹里找对应的照片（图像比对）
 tools/extract_cover.py 从 bookcover.pdf 取刻度
+tools/make_frame_photos.py 按记录表 bird_count 挑鸽子最多的 8 张照片给取景框页面
 stage1_preview.html   核对页
 ```
 
@@ -82,7 +99,20 @@ python3 tools/extract_cover.py
 4. 每组在轴上的位置 = 按高度算的位置 × 0.5 + 按书里顺序均分的位置 × 0.5。这样同样高度的几组（比如 0″ 有 7 组）也能按书的先后分开。
 5. 选离当前位置最近的组；新组要比当前组明显更近才会切换（回滞）。
 
+## 取景框（阶段 4）怎么试
+
+打开 `http://localhost:8000/frame.html`。
+
+1. 站在电脑前，两只手各比一个 L：拇指和食指伸直、成直角，中指、无名指、小指弯起来。一只正一只反，合成一个长方形。
+2. 保持约 0.3 秒，屏幕上出现取景框：细黑线 + 四角 L 形裁切线。框外变淡，框里放大。
+3. 手往前伸（框变小）放得更大，最多 4×；手往回收（框变大）放得小一点，最少 1.5×。
+4. 手放下约 0.3 秒后取景框消失。
+5. 照片每 30 秒换一张；正在用取景框时不换，用完再等 5 秒。
+6. 识别不准时按 `D`，点开摄像头小窗：手的骨架实线 = 判定为 L，虚线 = 不是；面板里 `Hands` 一行是每只手的判定和拇指 / 食指夹角，`Frame` 一行是取景框是否生效和当前倍数。阈值在 `config.js` 的 `frame.lShape` 里调。
+
 ## 还没做 / 待确认
+
+- **阶段 5（声音）还没做**：取景框框住声音 label 时播放声音，要等阶段 5。
 
 - **组 81（飞行）的高度**：那张图几乎全是天空，找不到原图，暂用 960″，在 `config.js` 的 `heightOverrides` 里改。（组 79 旗杆已经通过图像比对确认是 540″。）
 - **图片清晰度**：118 张里 64 张已换成原图重切。你拍的照片里有 10 张没找到原图（列在 `data/extract_issues.txt`），历史照片没有原图，这些用的都是书里的低清版本。

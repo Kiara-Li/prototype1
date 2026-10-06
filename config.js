@@ -106,6 +106,47 @@ window.CONFIG = {
     ground: '#f6f6f6',    // 0′ 以下的地面
   },
 
+  // ---------------------------------------------------------------- 阶段 4：取景框手势
+  // 两只手各比一个 L（拇指、食指伸直约 90°，其余三指弯），合起来是取景框；框里放大看
+  // 取景框现在在单独的页面 frame.html 上试；下面的判定、放大、框线设置两个页面共用
+  frame: {
+    onMainPage: false,      // true = 主页面（视线）上也开取景框
+    everyNFrames: 2,        // 主页面上手部每几帧算一次（和人脸一起跑，太卡就调大）
+    lShape: {
+      thumbStraightMin: 0.88,  // 拇指伸直程度（1 = 完全直）
+      indexStraightMin: 0.90,  // 食指伸直程度
+      curledStraightMax: 0.75, // 中指 / 无名指 / 小指低于这个算弯曲
+      minCurled: 2,            // 三根里至少几根弯曲
+      angleMin: 60,            // 拇指和食指的夹角范围（度）
+      angleMax: 120,
+    },
+    onMs: 300,              // 两只手都是 L 持续这么久，取景框才出现
+    offMs: 300,             // 手放下这么久后取景框消失
+    fadeMs: 120,            // 出现 / 消失的淡入淡出
+    smoothingMs: 120,       // 框的位置平滑
+    minSizePx: 40,          // 太小的框不算
+    includeVertex: false,   // true = 长方形也算上两只手 L 的拐角，不只是拇指尖和食指尖
+    outsideFade: 0.45,      // 框外变淡多少（0 = 不变，1 = 全白）
+    zoomMin: 1.5,           // 框大时的放大倍数
+    zoomMax: 4,             // 框小时的放大倍数
+    sizeSmall: 0.15,        // 框的边长占屏幕比例 ≤ 这个时用 zoomMax
+    sizeLarge: 0.6,         // ≥ 这个时用 zoomMin
+    lineWidthPx: 1,         // 框线粗细
+    cornerLenPx: 18,        // 四角 L 形裁切线的长度
+    cornerGapPx: 6,         // 裁切线离框角的空隙
+  },
+
+  // 取景框页面 frame.html：一张鸽子很多的照片，过一阵子换下一张
+  // 照片列表在 data/frame/photos.json（tools/make_frame_photos.py 生成，按记录表 bird_count 挑的）
+  framePage: {
+    intervalSec: 30,        // 多久换下一张（0 = 不自动换，只用 ← → 换）
+    holdAfterFrameSec: 5,   // 取景框用完后再等这么久才自动换
+    fadeMs: 900,            // 换照片时的交叉淡入淡出
+    marginPx: 48,           // 照片四周留白
+    baselineWidthPx: 1,     // 照片底下那条贯穿屏幕的细线
+    everyNFrames: 1,        // 这一页只跑手，每帧都算
+  },
+
   // 调试：D 显示 / 隐藏；显示时只有左上角摄像头小窗，点一下展开详细信息（英文）
   debug: {
     show: true,

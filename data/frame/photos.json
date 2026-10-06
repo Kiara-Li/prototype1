@@ -1,0 +1,100 @@
+{
+ "photos": [
+  {
+   "file": "frame/0600_building-ledge_con-ed-irving-pl_2026-09_01.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 16,
+   "height_in": "600",
+   "component": "Building ledge",
+   "location": "Con Edison Building, 4 Irving Pl / 121 E 14th St, Gramercy, Manhattan",
+   "date": "2026-09"
+  },
+  {
+   "file": "frame/0000_sidewalk-concrete_5th-ave-14th-st_2024-02_01.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 15,
+   "height_in": "0",
+   "component": "Sidewalk, concrete",
+   "location": "E 14th St at 5th Ave (near 8 E 14th St), Greenwich Village, Manhattan",
+   "date": "2024-02"
+  },
+  {
+   "file": "frame/0048_fence-park_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 14,
+   "height_in": "48",
+   "component": "Park fence, steel",
+   "location": "Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan",
+   "date": "2026-09"
+  },
+  {
+   "file": "frame/0348_streetlight_e-houston-clinton-st_2026-09_03.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 13,
+   "height_in": "348",
+   "component": "Streetlight",
+   "location": "E Houston St at Avenue B / Clinton St (near 2–7 Clinton St), Lower East Side, Manhattan",
+   "date": "2026-09"
+  },
+  {
+   "file": "frame/0006_step_stuy-town_2026-01_01.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 12,
+   "height_in": "6",
+   "component": "Step",
+   "location": "Stuyvesant Town — near 541 E 14th St, Stuyvesant Town, Manhattan",
+   "date": "2026-01"
+  },
+  {
+   "file": "frame/0358_roof-ridge_columbus-park-bayard-st_2026-09_01.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 12,
+   "height_in": "358",
+   "component": "Roof ridge",
+   "location": "Columbus Park, Bayard St / Mulberry St side (near 94–95 Bayard St), Chinatown, Manhattan",
+   "date": "2026-09"
+  },
+  {
+   "file": "frame/0000_sidewalk-concrete_univ-pl-e13th_2025-02_03.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 10,
+   "height_in": "0",
+   "component": "Sidewalk, concrete",
+   "location": "Near 5 E 14th St, Chelsea, Manhattan",
+   "date": "2025-02"
+  },
+  {
+   "file": "frame/0144_glass-canopy_e14th-st-3rd-ave_2026-09_01.jpg",
+   "px": [
+    3200,
+    2400
+   ],
+   "bird_count": 10,
+   "height_in": "144",
+   "component": "Storefront canopy, glass",
+   "location": "Irving Pl at E 14th St (near Irving Pl), East Village, Manhattan",
+   "date": "2026-09"
+  }
+ ]
+}

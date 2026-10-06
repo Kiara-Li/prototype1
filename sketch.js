@@ -1,15 +1,20 @@
 // 鸽子视线实验
 // 摄像头读头部俯仰角 → 换算成高度 → 翻到书里对应高度的那一组。
 //
+// 两只手比 L 形取景框 → 框里放大看（阶段 4；默认在单独的 frame.html 上，config.frame.onMainPage 打开主页面上的）。
+//
 // 按键：D 调试窗口 · F 全屏 · C 校准 · G 切换角度→高度算法
 //      ↑ / ↓ 手动模拟抬头低头（没有摄像头时也能看效果）· M 回到摄像头
+//      Shift + 鼠标拖动：手动画一个取景框
 
 import { drawElevation } from './elevation.js';
-import { FaceLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
+import { classifyHand, createFrameState, updateFrame, zoomFor, drawFrameMarks, HAND_EDGES } from './frame.js';
+import { FaceLandmarker, HandLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
 
 const C = window.CONFIG;
 const MP_WASM = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm';
 const MP_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+const MP_HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
 const DEG = 180 / Math.PI;
 const CALIB_KEY = 'pigeon-calibration-v1';
 
@@ -32,7 +37,13 @@ const tracker = {
   manual: false,
   manualPitch: 0,
   heightMode: C.heightMode,
+  handLandmarker: null,
+  handFrameCount: 0,
+  lastHandVideoTime: -1,
 };
+
+// 取景框（阶段 4）
+const frame = createFrameState();
 
 const calib = Object.assign({ zero: 0, maxUp: null, invert: false }, loadCalib());
 const calibRun = { phase: null, start: 0, samples: [], doneAt: 0 };
@@ -46,6 +57,9 @@ const view = {
   switchedAt: -1e9,
   baselineY: null,     // 当前基线在屏幕上的 y（px）
 };
+
+// 浏览器控制台里可以看：window.pigeon.frame / .tracker / .view
+window.pigeon = { book, tracker, frame, view, calib };
 
 // ================================================================ 读取书的数据
 
@@ -187,10 +201,45 @@ async function startTracking() {
     }
     tracker.status = 'lost';
     tracker.message = '';
+    if (C.frame.onMainPage) startHands(files);
   } catch (err) {
     tracker.status = 'error';
     tracker.message = 'Face model failed to load: ' + (err && err.message ? err.message : err);
   }
+}
+
+async function startHands(files) {
+  const options = (delegate) => ({
+    baseOptions: { modelAssetPath: MP_HAND_MODEL, delegate },
+    runningMode: 'VIDEO',
+    numHands: 2,
+  });
+  try {
+    try {
+      tracker.handLandmarker = await HandLandmarker.createFromOptions(files, options('GPU'));
+    } catch {
+      tracker.handLandmarker = await HandLandmarker.createFromOptions(files, options('CPU'));
+    }
+  } catch (err) {
+    tracker.message = 'Hand model failed to load: ' + (err && err.message ? err.message : err);
+  }
+}
+
+// 手：隔 everyNFrames 帧算一次。返回这一帧新算出的手，没算就返回 null。
+function detectHands(now) {
+  const tk = tracker;
+  if (!tk.handLandmarker || !tk.video || tk.video.readyState < 2) return null;
+  if (tk.video.currentTime === tk.lastHandVideoTime) return null;
+  tk.handFrameCount++;
+  if (tk.handFrameCount % Math.max(1, C.frame.everyNFrames) !== 0) return null;
+  tk.lastHandVideoTime = tk.video.currentTime;
+  const res = tk.handLandmarker.detectForVideo(tk.video, now);
+  const hands = [];
+  (res.landmarks || []).forEach((lm, i) => {
+    const world = (res.worldLandmarks && res.worldLandmarks[i]) || lm;
+    hands.push({ landmarks: lm, world, info: classifyHand(world, C.frame.lShape) });
+  });
+  return hands;
 }
 
 // 从 4×4 变换矩阵（列主序）求绕 X 轴的旋转 = 俯仰角
@@ -355,41 +404,53 @@ new p5((p) => {
     const axis = axisFromHeight(height);
     if (book.groups.length && (tracker.pitch !== null || view.current === null)) chooseGroup(axis, now);
 
-    // ---- 版面：背景立面 → 两边刻度 → 书的一组 → 基线
-    ctx.save();
-    ctx.fillStyle = C.layout.background;
-    ctx.fillRect(0, 0, p.width, p.height);
+    // ---- 动画状态（每帧只更新一次；画面可能画两遍：整屏一遍、取景框里放大一遍）
     const L = layout(p.width, p.height);
-    if (C.elevation.show && book.cover) {
-      drawElevation(ctx, L, p.width, p.height, book.cover, { ...C.elevation, background: C.layout.background });
-    }
-    drawRulers(ctx, L, p.width, axis);
-
     if (view.current !== null) {
       const g = book.groups[view.current];
       const targetY = L.oy + g.baseline_y * L.s;
       if (view.baselineY === null) view.baselineY = targetY;
       const a = 1 - Math.exp(-dt / Math.max(1, C.animation.baselineMs / 3));
       view.baselineY += (targetY - view.baselineY) * a;
+      if (view.previous !== null && now - view.switchedAt >= C.animation.fadeOutMs) view.previous = null;
+    }
 
-      const since = now - view.switchedAt;
-      const { fadeOutMs, fadeInMs, fadeInDelayMs } = C.animation;
-      if (view.previous !== null) {
-        const outA = 1 - clamp01(since / fadeOutMs);
-        if (outA > 0) drawGroup(ctx, book.groups[view.previous], L, view.baselineY, outA);
-        else view.previous = null;
-      }
-      const inA = clamp01((since - fadeInDelayMs) / fadeInMs);
-      drawGroup(ctx, g, L, view.baselineY, inA);
+    // ---- 取景框
+    updateFrame(frame, detectHands(now), now, dt, { cfg: C.frame, video: tracker.video, W: p.width, H: p.height });
 
-      // 基线：从屏幕最左贯穿到最右，把左右两边的刻度连起来
-      ctx.strokeStyle = C.layout.ink;
-      ctx.lineWidth = Math.max(0.5, g.baseline_width * L.s);
-      const y = Math.round(view.baselineY * 2) / 2;
+    ctx.save();
+    drawScene(ctx, p.width, p.height, L, axis, now);
+
+    if (frame.alpha > 0 && frame.rect) {
+      const r = frame.rect;
+      // 框外稍微变淡
+      ctx.save();
+      ctx.globalAlpha = C.frame.outsideFade * frame.alpha;
+      ctx.fillStyle = C.layout.background;
       ctx.beginPath();
-      if (C.layout.baselineFullWidth) { ctx.moveTo(0, y); ctx.lineTo(p.width, y); }
-      else { ctx.moveTo(L.ox, y); ctx.lineTo(L.ox + L.w, y); }
-      ctx.stroke();
+      ctx.rect(0, 0, p.width, p.height);
+      ctx.rect(r.x, r.y, r.w, r.h);
+      ctx.fill('evenodd');
+      ctx.restore();
+      // 框里放大：以框的中心为中心，框越小放得越大；图片用原图，放大不糊
+      const m = zoomFor(r, p.width, p.height, C.frame);
+      frame.zoom = m;
+      const cx = r.x + r.w / 2;
+      const cy = r.y + r.h / 2;
+      ctx.save();
+      ctx.globalAlpha = frame.alpha;
+      ctx.beginPath();
+      ctx.rect(r.x, r.y, r.w, r.h);
+      ctx.clip();
+      ctx.translate(cx, cy);
+      ctx.scale(m, m);
+      ctx.translate(-cx, -cy);
+      drawScene(ctx, p.width, p.height, L, axis, now);
+      ctx.restore();
+      ctx.save();
+      ctx.globalAlpha = frame.alpha;
+      drawFrameMarks(ctx, r, C.frame, C.layout.ink);
+      ctx.restore();
     }
 
     // 提示文字；校准时总是显示校准提示
@@ -406,8 +467,33 @@ new p5((p) => {
     if (view.debug) drawDebug(ctx, p, { pitch, height, axis, L });
   };
 
+  // Shift + 鼠标拖动：手动画一个取景框，松开后留着；Shift + 单击（或 Esc）去掉。
+  // 没有摄像头、或者想慢慢看放大效果 / 调参数时用。
+  let dragFrom = null;
+  const dragRect = () => ({
+    x: Math.min(dragFrom[0], p.mouseX), y: Math.min(dragFrom[1], p.mouseY),
+    w: Math.abs(p.mouseX - dragFrom[0]), h: Math.abs(p.mouseY - dragFrom[1]),
+  });
+  p.mouseDragged = () => {
+    if (!dragFrom) return;
+    const r = dragRect();
+    if (r.w < C.frame.minSizePx || r.h < C.frame.minSizePx) return;
+    frame.target = r;
+    if (!frame.rect) frame.rect = { ...r };
+    frame.active = true;
+    frame.lastBoth = Infinity;            // 手动框不会自己消失
+  };
+  p.mouseReleased = () => {
+    if (dragFrom) {
+      const r = dragRect();
+      if (r.w < C.frame.minSizePx || r.h < C.frame.minSizePx) frame.lastBoth = -1e9;   // Shift + 单击：去掉
+    }
+    dragFrom = null;
+  };
+
   // 点摄像头小窗：展开 / 收起详细信息
-  p.mousePressed = () => {
+  p.mousePressed = (e) => {
+    if (C.frame.onMainPage && ((e && e.shiftKey) || p.keyIsDown(p.SHIFT))) { dragFrom = [p.mouseX, p.mouseY]; return; }
     if (!view.debug) return;
     const r = debugCameraRect();
     if (p.mouseX >= r.x && p.mouseX <= r.x + r.w && p.mouseY >= r.y && p.mouseY <= r.y + r.h) {
@@ -423,6 +509,7 @@ new p5((p) => {
     else if (k === 'g') tracker.heightMode = tracker.heightMode === 'table' ? 'geometry' : 'table';
     else if (k === 'm') tracker.manual = false;
     else if (p.keyCode === p.ESCAPE && calibRun.phase === 'up') finishUp();
+    else if (p.keyCode === p.ESCAPE && frame.lastBoth === Infinity) frame.lastBoth = -1e9;   // 去掉手动框
     else if (p.keyCode === p.UP_ARROW || p.keyCode === p.DOWN_ARROW) {
       if (!tracker.manual) { tracker.manual = true; tracker.manualPitch = tracker.pitch ?? 0; }
       tracker.manualPitch = Math.max(-40, Math.min(50, tracker.manualPitch + (p.keyCode === p.UP_ARROW ? 2 : -2)));
@@ -430,6 +517,36 @@ new p5((p) => {
     }
   };
 });
+
+// 背景立面 → 两边刻度 → 书的一组 → 基线。只画，不改状态。
+function drawScene(ctx, W, H, L, axis, now) {
+  ctx.fillStyle = C.layout.background;
+  ctx.fillRect(0, 0, W, H);
+  if (C.elevation.show && book.cover) {
+    drawElevation(ctx, L, W, H, book.cover, { ...C.elevation, background: C.layout.background });
+  }
+  drawRulers(ctx, L, W, axis);
+  if (view.current === null) return;
+  const g = book.groups[view.current];
+  const since = now - view.switchedAt;
+  const { fadeOutMs, fadeInMs, fadeInDelayMs } = C.animation;
+  if (view.previous !== null) {
+    const outA = 1 - clamp01(since / fadeOutMs);
+    if (outA > 0) drawGroup(ctx, book.groups[view.previous], L, view.baselineY, outA);
+  }
+  drawGroup(ctx, g, L, view.baselineY, clamp01((since - fadeInDelayMs) / fadeInMs));
+
+  // 基线：从屏幕最左贯穿到最右，把左右两边的刻度连起来
+  ctx.save();
+  ctx.strokeStyle = C.layout.ink;
+  ctx.lineWidth = Math.max(0.5, g.baseline_width * L.s);
+  const y = Math.round(view.baselineY * 2) / 2;
+  ctx.beginPath();
+  if (C.layout.baselineFullWidth) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+  else { ctx.moveTo(L.ox, y); ctx.lineTo(L.ox + L.w, y); }
+  ctx.stroke();
+  ctx.restore();
+}
 
 // 跨页（828 × 702pt）居中；左右两边至少留出 sideMinPt 给刻度
 function layout(W, H) {
@@ -630,6 +747,10 @@ function drawDebug(ctx, p, { pitch, height, axis }) {
     ['Max up', calib.maxUp ? `${fmt(calib.maxUp)}°` : '—'],
     ['Direction', calib.invert ? 'Inverted' : 'Normal'],
   ];
+  if (C.frame.onMainPage) {
+    rows.push(['Hands', !tk.handLandmarker ? '—' : frame.hands.length ? frame.hands.map((h) => (h.info.isL ? 'L' : '·') + ` ${Math.round(h.info.angle)}°`).join('   ') : 'none']);
+    rows.push(['Frame', frame.active && frame.rect ? `on   ${(frame.zoom || 1).toFixed(1)}×` : 'off']);
+  }
   if (tk.message) rows.push(['Note', tk.message]);
 
   // 排版：摄像头右边一栏，上面两行大字（角度、高度），下面标签 / 数值两列
@@ -686,7 +807,42 @@ function drawCamera(ctx, x0, y0, vw, vh) {
       ctx.fillStyle = '#00ff66';
       for (const pt of tk.landmarks) ctx.fillRect(pt.x * vw - 0.6, pt.y * vh - 0.6, 1.2, 1.2);
     }
+    // 手：骨架线；判定为 L 的手用实线，不是的用虚线
+    for (const h of frame.hands) {
+      ctx.strokeStyle = '#00ff66';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash(h.info.isL ? [] : [2, 2]);
+      ctx.beginPath();
+      for (const [a, b] of HAND_EDGES) {
+        ctx.moveTo(h.landmarks[a].x * vw, h.landmarks[a].y * vh);
+        ctx.lineTo(h.landmarks[b].x * vw, h.landmarks[b].y * vh);
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    // 当前取景框（拇指尖、食指尖围出的长方形）
+    if (frame.active && frame.hands.length >= 2) {
+      const ids = C.frame.includeVertex ? [4, 8, 2, 5] : [4, 8];
+      const pts = frame.hands.slice(0, 2).flatMap((h) => ids.map((i) => h.landmarks[i]));
+      const xs = pts.map((q) => q.x * vw);
+      const ys = pts.map((q) => q.y * vh);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    }
     ctx.restore();
+    // 每只手旁边标 L / ·（文字不镜像）
+    ctx.font = `bold 13px ${C.fonts.mono}`;
+    ctx.textBaseline = 'middle';
+    for (const h of frame.hands) {
+      const w = h.landmarks[0];
+      const sx = x0 + (C.tracking.mirrorVideo ? 1 - w.x : w.x) * vw;
+      const sy = y0 + w.y * vh;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(sx - 9, sy + 4, 18, 16);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(h.info.isL ? 'L' : '·', sx - 4, sy + 12);
+    }
   } else {
     ctx.fillStyle = '#eee';
     ctx.fillRect(x0, y0, vw, vh);
