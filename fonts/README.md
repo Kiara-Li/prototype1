@@ -1,10 +1,9 @@
 # 字体
 
-网页用的是 TWK Everett（商业授权字体），字体文件不放进仓库。
-把下面三个文件放进这个文件夹即可：
+网页用的是 TWK Everett（已购买授权）：
 
-- `TWKEverett-Regular.otf`
-- `TWKEverettMono-Regular.otf`
-- `TWKEverettMono-Light.otf`
+- `TWKEverett-Regular.otf`：图注、提示文字
+- `TWKEverettMono-Regular.otf`：页码、调试窗口
+- `TWKEverettMono-Light.otf`：两边刻度上的数字
 
-没有这些文件时，网页会自动退回系统的无衬线 / 等宽字体。
+换字体只要替换这里的文件，或改 `index.html` 里的 `@font-face` 路径。

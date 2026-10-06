@@ -51,7 +51,7 @@ index.html            页面
 sketch.js             p5.js 画面 + MediaPipe 头部追踪
 config.js             可调参数
 elevation.js          背景街道立面（长椅、门、雨棚、窗台、消防梯、路灯、树、信号灯、檐口）
-fonts/                TWK Everett Regular / Mono Regular（换字体就替换这里的文件）
+fonts/                TWK Everett Regular / Mono Regular / Mono Light（换字体就替换这里的文件）
 data/groups.json      从书里拆出的 41 组：每张图的位置、大小、图注、基线、高度
 data/cover.json       封面勒口上的刻度（从 bookcover.pdf 取出）
 data/img/             网页用的图：找得到原图的用原图重切，找不到的用书里的版本
