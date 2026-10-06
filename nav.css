@@ -1,0 +1,22 @@
+/* 右上角切换三个页面的标签：等宽小字，当前页黑色 + 细下划线，其余灰色 */
+nav.pages {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  gap: 22px;
+  font: 12px/1 "TWK Everett Mono", "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+nav.pages a {
+  color: #999;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+}
+nav.pages a:hover { color: #000; }
+nav.pages a[aria-current="page"] {
+  color: #000;
+  border-bottom-color: #000;
+}

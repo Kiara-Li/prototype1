@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>鸽子取景框</title>
+<title>Pigeon Viewfinder</title>
 <style>
   @font-face {
     font-family: "TWK Everett";
@@ -19,10 +19,16 @@
   canvas { display: block; }
   video { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 </style>
+<link rel="stylesheet" href="nav.css">
 <script src="config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script type="module" src="frame-sketch.js"></script>
 </head>
 <body>
+<nav class="pages">
+  <a href="index.html">Sightline</a>
+  <a href="frame.html" aria-current="page">Viewfinder</a>
+  <a href="sound.html">Sound</a>
+</nav>
 </body>
 </html>

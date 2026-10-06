@@ -502,7 +502,7 @@ new p5((p) => {
   };
 
   p.mousePressed = (e) => {
-    if (e && e.target && e.target.tagName === 'INPUT') return;
+    if (e && e.target && (e.target.tagName === 'INPUT' || e.target.closest('nav'))) return;
     if (state.mode !== 'idle') return;
     if (state.hoverLabel) { play(state.hoverLabel); return; }
     const pg = pigeonAt(p.mouseX, p.mouseY, layout(p.width, p.height));

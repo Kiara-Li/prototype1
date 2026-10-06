@@ -493,6 +493,7 @@ new p5((p) => {
 
   // 点摄像头小窗：展开 / 收起详细信息
   p.mousePressed = (e) => {
+    if (e && e.target && e.target.closest && e.target.closest('nav')) return;   // 点的是右上角的页面标签
     if (C.frame.onMainPage && ((e && e.shiftKey) || p.keyIsDown(p.SHIFT))) { dragFrom = [p.mouseX, p.mouseY]; return; }
     if (!view.debug) return;
     const r = debugCameraRect();

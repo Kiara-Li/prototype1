@@ -170,8 +170,8 @@ window.CONFIG = {
     askForWords: false,     // false = 录完直接保存；true = 录完先写「什么动物 / 怎么叫」再保存
     consentText: 'Your voice will stay here. Others will hear it.',
     recordHint: 'Hold space to leave a sound for this pigeon.',
-    animalPlaceholder: 'what animal?  pigeon / 鸽子 / squirrel',
-    textPlaceholder: 'how does it sound?  咕咕 / coo coo / 구구',
+    animalPlaceholder: 'what animal?  pigeon / squirrel / sparrow',
+    textPlaceholder: 'how does it sound?  coo coo / chirp',
     ambientCount: 2,        // 翻到一张照片时随机放几段已有的声音
     ambientVolume: 0.25,    // 那几段的音量（0–1）
     ambientDelayMs: 600,    // 翻过来后多久开始放
