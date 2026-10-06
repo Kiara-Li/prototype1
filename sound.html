@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鸽子的声音</title>
+<style>
+  @font-face {
+    font-family: "TWK Everett";
+    src: url("fonts/TWKEverett-Regular.otf") format("opentype");
+    font-weight: normal;
+  }
+  @font-face {
+    font-family: "TWK Everett Mono";
+    src: url("fonts/TWKEverettMono-Regular.otf") format("opentype");
+    font-weight: normal;
+  }
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  canvas { display: block; }
+  /* 录完后的两个输入框：等宽小字，只有一条底线 */
+  #naming {
+    position: fixed; left: 48px; bottom: 14px;
+    display: none; gap: 20px;
+  }
+  #naming input {
+    width: 200px;
+    font: 12px "TWK Everett Mono", "SF Mono", Menlo, monospace;
+    color: #000; background: transparent;
+    border: 0; border-bottom: 1px solid #000; border-radius: 0;
+    padding: 2px 0; outline: none;
+  }
+  #naming input::placeholder { color: #999; }
+  #import { display: none; }
+</style>
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script type="module" src="sound-sketch.js"></script>
+</head>
+<body>
+<input id="import" type="file" accept="application/json,.json">
+</body>
+</html>

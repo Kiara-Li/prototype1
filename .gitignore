@@ -5,3 +5,6 @@ __pycache__/
 
 # GitHub 克隆下来的空文件夹
 prototype1/
+
+# 声音页面分割的检查图
+data/sound/_check/

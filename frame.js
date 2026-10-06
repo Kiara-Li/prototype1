@@ -149,8 +149,11 @@ export function drawFrameMarks(ctx, r, cfg, ink) {
   const l = cfg.cornerLenPx;
   ctx.save();
   ctx.strokeStyle = ink;
-  ctx.lineWidth = cfg.lineWidthPx;
-  ctx.strokeRect(r.x, r.y, r.w, r.h);
+  if (cfg.lineWidthPx > 0) {                     // lineWidthPx = 0：只画四角，不画框线
+    ctx.lineWidth = cfg.lineWidthPx;
+    ctx.strokeRect(r.x, r.y, r.w, r.h);
+  }
+  ctx.lineWidth = cfg.lineWidthPx > 0 ? cfg.lineWidthPx : 1;
   ctx.beginPath();
   for (const [cx, cy, dx, dy] of [[r.x, r.y, -1, -1], [r.x + r.w, r.y, 1, -1], [r.x, r.y + r.h, -1, 1], [r.x + r.w, r.y + r.h, 1, 1]]) {
     ctx.moveTo(cx + dx * g, cy); ctx.lineTo(cx + dx * (g + l), cy);   // 横向

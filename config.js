@@ -99,7 +99,7 @@ window.CONFIG = {
 
   // 背景里的街道立面（试验）：和刻度同一比例，长椅、门、雨棚、窗台、消防梯、路灯、树、信号灯、檐口
   elevation: {
-    show: true,
+    show: false,          // 先隐藏；改成 true 就显示
     fill: '#f0f0f0',      // 实心浅灰
     accent: '#e4e4e4',    // 雨棚、窗台、信号灯头等稍深一点
     line: '#d4d4d4',      // 消防梯、树枝这类细线
@@ -161,6 +161,33 @@ window.CONFIG = {
     marginPx: 48,           // 照片四周留白
     baselineWidthPx: 1,     // 照片底下那条贯穿屏幕的细线
     everyNFrames: 1,        // 这一页只跑手，每帧都算
+  },
+
+  // ---------------------------------------------------------------- 阶段 5：声音（sound.html）
+  // 照片里每只鸽子的剪影在 data/sound/photos.json（tools/segment_pigeons.py 生成）
+  sound: {
+    maxSeconds: 5,          // 一段录音最长几秒
+    askForWords: false,     // false = 录完直接保存；true = 录完先写「什么动物 / 怎么叫」再保存
+    consentText: 'Your voice will stay here. Others will hear it.',
+    recordHint: 'Hold space to leave a sound for this pigeon.',
+    animalPlaceholder: 'what animal?  pigeon / 鸽子 / squirrel',
+    textPlaceholder: 'how does it sound?  咕咕 / coo coo / 구구',
+    ambientCount: 2,        // 翻到一张照片时随机放几段已有的声音
+    ambientVolume: 0.25,    // 那几段的音量（0–1）
+    ambientDelayMs: 600,    // 翻过来后多久开始放
+    dimOthers: 0.5,         // 高亮一只鸽子时，照片其余部分变淡多少
+    outlinePx: 1,           // 高亮的鸽子描一圈细黑线（0 = 不描）
+    hitPaddingPx: 10,       // 小鸽子不好点：方框往外扩这么多也算点中
+    marginPx: 48,           // 照片四周留白
+    labelColumnPx: 260,     // 照片右边留给 label 的宽度
+    labelGapPx: 28,         // label 离照片右边的距离
+    labelPx: 11,            // label 字号（等宽）
+    promptPx: 12,           // 底部提示字号
+    bottomPx: 30,           // 录音时那条起伏的线离屏幕底边的距离
+    levelGain: 6,           // 音量放大多少（线起伏太小就调大）
+    levelHeightPx: 24,      // 线起伏的最大高度
+    inputWidthPx: 200,
+    fadeMs: 500,            // 换照片时淡入
   },
 
   // 调试：D 显示 / 隐藏；显示时只有左上角摄像头小窗，点一下展开详细信息（英文）

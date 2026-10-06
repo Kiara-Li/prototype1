@@ -13,6 +13,7 @@ python3 -m http.server 8000
 然后用 Chrome 打开 <http://localhost:8000>。允许使用摄像头。
 
 - `http://localhost:8000/frame.html`：**取景框页面**（单独试手势）：一张鸽子很多的照片，两只手比 L 形框住放大看，30 秒换下一张
+- `http://localhost:8000/sound.html`：**声音页面**：照片里的每只鸽子都能点，点一只给它留一段叫声
 - `http://localhost:8000/?debug`：一打开就展开详细调试信息
 - `http://localhost:8000/stage1_preview.html`：41 组全部排出来的核对页
 
@@ -39,6 +40,21 @@ python3 -m http.server 8000
 | `→` / `←` | 换下一张 / 上一张照片 |
 | `D` / `F` | 摄像头小窗（点开看手的判定）/ 全屏 |
 
+声音页面 `sound.html`：
+
+| 键 | 作用 |
+|---|---|
+| 鼠标移到鸽子上 | 这只鸽子高亮（照片其余部分变淡） |
+| 点一只鸽子 | 选中它，并播放它已有的声音；点右边的 label 只播那一段 |
+| 按住 `空格` | 给选中的鸽子录音，松开就自动保存，最长 5 秒。第一次录之前会先出现同意说明，按 `Enter` 同意 |
+| 保存后 | 右边出现这一段的 label：这只鸽子的第几段 + 时长，例如 `01   2.4″`，用细线连到鸽子 |
+| `←` / `→` | 换照片（翻过来时会随机、轻声地放一两段这张照片里已有的声音） |
+| `E` / `I` | 导出全部声音（一个 JSON，音频是 base64）/ 导入。每天备份一次 |
+| `X` | 清空全部声音（会再问一次，按 `Y` 才删） |
+| `D` / `F` | 显示所有鸽子的剪影和编号（检查抠得对不对）/ 全屏 |
+
+声音存在这台电脑的浏览器里（IndexedDB），换浏览器或清除网站数据就没了，所以要经常按 `E` 导出。
+
 ## 调参数
 
 所有参数都在 [`config.js`](config.js) 里，改完刷新即可：
@@ -52,9 +68,11 @@ python3 -m http.server 8000
 - `heightOverrides`：手动指定某一组的高度
 - `text.showCaptions` / `showNumbers` / `showHint` / `showRulerLabels`：图注、页码、提示语现在隐藏；刻度上的数据（`showRulerLabels`）显示
 - `rulers`：两边刻度的长短、粗细、标记大小。左边是英尺尺，右边是每组基线的高度（标组号）；两边的黑色标记是你现在看的位置，跟着头部实时移动
-- `elevation`：背景里的街道立面（试验），`show: false` 关掉；颜色也在这里调
+- `elevation`：背景里的街道立面（试验，现在隐藏着），`show: true` 打开；颜色也在这里调
 - `layout.baselineFullWidth`：基线是否贯穿整个屏幕
 - `framePage`：取景框页面。`intervalSec` 多久换下一张（0 = 不自动换），`holdAfterFrameSec` 用完取景框后多久才换，`fadeMs` 换图的淡入淡出
+- `sound.askForWords`：`true` 时录完先写「什么动物 / 叫声怎么写」再保存，label 变成 `pigeon — 咕咕`（现在关着）
+- `sound`：声音页面。录音最长秒数、同意说明和提示的文字、翻页时自动播放几段和音量、高亮时其余部分变淡多少、label 字号和位置
 - `frame.trigger`：怎样打开取景框。`'either'`（默认）= 手比得标准，或者手大致框住 + 眯一只眼；`'wink'` = 必须眯一只眼；`'hands'` = 只看手。`frame.eye` 是眯眼的阈值
 - `frame`：取景框手势（两个页面共用）。`onMainPage: true` 可以在主页面上也开取景框。`lShape` 里是 L 形的判定阈值（拇指 / 食指伸直程度、其余手指弯曲、夹角 60°–120°）；`onMs` / `offMs` 出现和消失的延迟；`outsideFade` 框外变淡多少；`zoomMin` / `zoomMax` 放大倍数范围；`everyNFrames` 手部每几帧算一次（卡就调大）
 
@@ -69,6 +87,10 @@ frame.html            取景框页面
 frame-sketch.js       取景框页面的画面 + 手部识别
 frame.js              取景框手势：L 形判定、取景框位置、放大倍数、框线（两个页面共用）
 data/frame/           取景框页面用的照片 + photos.json（换照片改这里）
+sound.html            声音页面
+sound-sketch.js       声音页面：高亮、选中、录音、写下来、label、播放
+sound-store.js        声音存储（IndexedDB）、导出、导入
+data/sound/           声音页面用的照片 + photos.json（每只鸽子的剪影）
 fonts/                TWK Everett Regular / Mono Regular / Mono Light（换字体就替换这里的文件）
 data/groups.json      从书里拆出的 41 组：每张图的位置、大小、图注、基线、高度
 data/cover.json       封面勒口上的刻度（从 bookcover.pdf 取出）
@@ -79,6 +101,7 @@ tools/extract_book.py 从 book.pdf 重新生成 data/（pip install pymupdf pill
 tools/originals.py    书里的图去原图文件夹里找对应的照片（图像比对）
 tools/extract_cover.py 从 bookcover.pdf 取刻度
 tools/make_frame_photos.py 按记录表 bird_count 挑鸽子最多的 8 张照片给取景框页面
+tools/segment_pigeons.py  给声音页面的照片抠鸽子剪影（YOLO 分割，离线跑一次；pip install ultralytics）
 stage1_preview.html   核对页
 ```
 
@@ -114,7 +137,7 @@ python3 tools/extract_cover.py
 
 ## 还没做 / 待确认
 
-- **阶段 5（声音）还没做**：取景框框住声音 label 时播放声音，要等阶段 5。
+- **声音页面和视线、取景框还没连起来**：brief 里写的「声音挂在当前那一组」「取景框框住 label 就播放」，现在改成了挂在照片里的某只鸽子上，在单独的页面。
 
 - **组 81（飞行）的高度**：那张图几乎全是天空，找不到原图，暂用 960″，在 `config.js` 的 `heightOverrides` 里改。（组 79 旗杆已经通过图像比对确认是 540″。）
 - **图片清晰度**：118 张里 64 张已换成原图重切。你拍的照片里有 10 张没找到原图（列在 `data/extract_issues.txt`），历史照片没有原图，这些用的都是书里的低清版本。
