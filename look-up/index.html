@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Look Up</title>
+<style>
+  @font-face { font-family: "TWK Everett Mono"; src: url("../fonts/TWKEverettMono-Regular.otf") format("opentype"); }
+  html, body { margin: 0; background: #fff; color: #000; font: 12px/1.7 "TWK Everett Mono", "SF Mono", Menlo, monospace; }
+  main { padding: 48px; max-width: 640px; }
+  h1 { font-weight: normal; font-size: 12px; margin: 0 0 32px; }
+  a { color: #000; text-decoration: none; border-bottom: 1px solid #000; }
+  p { margin: 0 0 6px; }
+  .mute { color: #8a8a8a; }
+</style>
+<script src="content.js"></script>
+</head>
+<body>
+<main>
+  <h1 id="name">Look Up</h1>
+  <p class="mute">Stage A — data and marking. The ascent is built in stage B.</p>
+  <p><a href="tools/mark.html">Mark pigeons</a></p>
+  <p><a href="data/photos_report.md">Photo list</a></p>
+</main>
+<script>
+  document.title = CONTENT.name;
+  document.getElementById('name').textContent = CONTENT.name;
+</script>
+</body>
+</html>

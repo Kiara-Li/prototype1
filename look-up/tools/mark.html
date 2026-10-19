@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Look Up · Mark pigeons</title>
+<style>
+  @font-face { font-family: "TWK Everett Mono"; src: url("../../fonts/TWKEverettMono-Regular.otf") format("opentype"); }
+  :root { --ink: #000; --mute: #8a8a8a; --hair: 1px solid #000; }
+  html, body { margin: 0; height: 100%; background: #fff; color: var(--ink); overflow: hidden;
+               font: 12px/1.5 "TWK Everett Mono", "SF Mono", Menlo, monospace; }
+  header { position: fixed; top: 0; left: 0; right: 0; height: 64px; padding: 12px 20px; box-sizing: border-box;
+           display: flex; gap: 28px; align-items: flex-start; border-bottom: var(--hair); background: #fff; z-index: 2; }
+  header .id { font-size: 20px; line-height: 1; min-width: 70px; }
+  header .meta { flex: 1; min-width: 0; }
+  header .meta div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .mute, .mute { color: var(--mute); }
+  header nav { display: flex; gap: 16px; white-space: nowrap; }
+  header a { color: var(--ink); text-decoration: none; border-bottom: var(--hair); cursor: pointer; }
+  header a:hover { color: var(--mute); }
+  canvas { position: fixed; top: 64px; left: 0; display: block; }
+  footer { position: fixed; left: 20px; right: 20px; bottom: 10px; display: flex; justify-content: space-between; pointer-events: none; }
+  footer span { background: #fff; pointer-events: auto; }
+  #strip { position: fixed; right: 20px; top: 76px; width: 160px; bottom: 40px; overflow-y: auto; background: #fff; }
+  #strip div { display: flex; justify-content: space-between; cursor: pointer; padding: 1px 0; }
+  #strip div:hover { text-decoration: underline; }
+  #strip div.cur { font-weight: bold; }
+  #file { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="id" id="pid">—</div>
+  <div class="meta">
+    <div id="cap">—</div>
+    <div class="mute" id="info">—</div>
+  </div>
+  <nav>
+    <a id="bSave" title="Write to a file (Chrome asks where the first time)">Save file</a>
+    <a id="bExport">Download</a>
+    <a id="bImport">Import</a>
+    <a id="bReset" title="Replace what's in this browser with look-up/data/pigeons.json">Load data/</a>
+  </nav>
+</header>
+<canvas id="c"></canvas>
+<div id="strip"></div>
+<footer>
+  <span id="mode">—</span>
+  <span class="mute" id="keys">click: outline point · Enter / click 1st point: close · then click neck · ⌫ undo · Esc cancel · click pigeon: select · Del: delete · K: move neck · S: suggestions · D: photo done · ← →: photo · N: next unfinished · wheel: zoom · drag with Alt: pan</span>
+</footer>
+<input id="file" type="file" accept="application/json,.json">
+<script type="module" src="mark.js"></script>
+</body>
+</html>

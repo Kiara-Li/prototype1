@@ -1,0 +1,1394 @@
+{
+ "photos": [
+  {
+   "id": "01_01",
+   "src": "../data/img/01_01.jpg",
+   "src_hd": null,
+   "px": [
+    845,
+    474
+   ],
+   "group": "01",
+   "caption": "Asphalt / Metropolitan Ave & Lorimer St / Mar. 2026",
+   "original": "0000_asphalt_metropolitan-ave-lorimer_2026-03_01.jpg",
+   "record": "0000_asphalt_metropolitan-ave-lorimer_2026-03_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "01_03",
+   "src": "../data/img/01_03.jpg",
+   "src_hd": null,
+   "px": [
+    1074,
+    602
+   ],
+   "group": "01",
+   "caption": "Asphalt / Metropolitan Ave & Lorimer St / Mar. 2026",
+   "original": "0000_asphalt_stuy-town_2026-09_04.jpg",
+   "record": "0000_asphalt_stuy-town_2026-09_04.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record",
+   "same_original_as": [
+    "01_04"
+   ]
+  },
+  {
+   "id": "01_04",
+   "src": "../data/img/01_04.jpg",
+   "src_hd": null,
+   "px": [
+    1018,
+    571
+   ],
+   "group": "01",
+   "caption": "Plastic bag on asphalt / 536 E 14th St / Sept. 2026",
+   "original": "0000_asphalt_stuy-town_2026-09_04.jpg",
+   "record": "0000_asphalt_stuy-town_2026-09_04.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record",
+   "same_original_as": [
+    "01_03"
+   ]
+  },
+  {
+   "id": "01_05",
+   "src": "../data/img/01_05.jpg",
+   "src_hd": null,
+   "px": [
+    1532,
+    864
+   ],
+   "group": "01",
+   "caption": "Asphalt / 5th Ave & W 14th St / Jan. 2024",
+   "original": "0000_asphalt_5th-ave-14th-st_2024-01_01.jpg",
+   "record": "0000_asphalt_5th-ave-14th-st_2024-01_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "03_01",
+   "src": "../data/img/03_01.jpg",
+   "src_hd": null,
+   "px": [
+    798,
+    444
+   ],
+   "group": "03",
+   "caption": "Asphalt / 541 E 14th St / Sept. 2026",
+   "original": "0000_asphalt_stuy-town_2026-09_05.jpg",
+   "record": "0000_asphalt_stuy-town_2026-09_05.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "03_04",
+   "src": "../data/img/03_04.jpg",
+   "src_hd": null,
+   "px": [
+    1233,
+    685
+   ],
+   "group": "03",
+   "caption": "Asphalt / 536 E 14th St / Sept. 2026",
+   "original": "0000_asphalt_stuy-town_2026-09_03.jpg",
+   "record": "0000_asphalt_stuy-town_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "05_02",
+   "src": "../data/img/05_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    914
+   ],
+   "group": "05",
+   "caption": "Belgian Block / 439 E 14th St / Sept. 2026",
+   "original": "0000_belgian-block_e14th-st-ave-a_2026-09_07.jpg",
+   "record": "0000_belgian-block_e14th-st-ave-a_2026-09_07.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "05_03",
+   "src": "../data/img/05_03.jpg",
+   "src_hd": null,
+   "px": [
+    207,
+    116
+   ],
+   "group": "05",
+   "caption": "Belgian Block / 439 E 14th St / Sept. 2026",
+   "original": null,
+   "record": "0000_belgian-block_e14th-st-ave-a_2026-09_05.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "07_01",
+   "src": "../data/img/07_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1122
+   ],
+   "group": "07",
+   "caption": "Belgian Block / E 14th St & Ave B / Aug. 2025",
+   "original": "0000_belgian-block_stuy-town_2025-08_01.jpg",
+   "record": "0000_belgian-block_stuy-town_2025-08_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "09_04",
+   "src": "../data/img/09_04.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    891
+   ],
+   "group": "09",
+   "caption": "Subway Grate / E 14th St & 1st Ave / Aug. 2026",
+   "original": "0000_subway-grate_e14th-st-1st-ave_2026-08_01.jpg",
+   "record": "0000_subway-grate_e14th-st-1st-ave_2026-08_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "09_05",
+   "src": "../data/img/09_05.jpg",
+   "src_hd": null,
+   "px": [
+    183,
+    101
+   ],
+   "group": "09",
+   "caption": "Sidewalk Concrete / E 14th St & 1st Ave / Aug. 2026",
+   "original": null,
+   "record": "0000_sidewalk-concrete_e14th-st-1st-ave_2026-08_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "11_02",
+   "src": "../data/img/11_02.jpg",
+   "src_hd": null,
+   "px": [
+    1341,
+    1600
+   ],
+   "group": "11",
+   "caption": "Sidewalk Concrete / University Pl & E 13th St / Feb. 2025",
+   "original": "0000_sidewalk-concrete_univ-pl-e13th_2025-02_03.jpg",
+   "record": "0000_sidewalk-concrete_univ-pl-e13th_2025-02_03.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "11_03",
+   "src": "../data/img/11_03.jpg",
+   "src_hd": null,
+   "px": [
+    898,
+    1395
+   ],
+   "group": "11",
+   "caption": "Sidewalk Concrete / 5th Ave & E 14th St / Feb. 2024",
+   "original": "0000_sidewalk-concrete_5th-ave-14th-st_2024-02_01.jpg",
+   "record": "0000_sidewalk-concrete_5th-ave-14th-st_2024-02_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "13_01",
+   "src": "../data/img/13_01.jpg",
+   "src_hd": null,
+   "px": [
+    954,
+    1129
+   ],
+   "group": "13",
+   "caption": "Lawn / Madison Square Park / Aug. 2023",
+   "original": "0000_lawn_madison-sq_2023-08_01.jpg",
+   "record": "0000_lawn_madison-sq_2023-08_01.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "13_02",
+   "src": "../data/img/13_02.jpg",
+   "src_hd": null,
+   "px": [
+    1348,
+    1600
+   ],
+   "group": "13",
+   "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2025",
+   "original": "0000_wood-mulch_e14th-st-ave-a_2025-09_04.jpg",
+   "record": "0000_wood-mulch_e14th-st-ave-a_2025-09_04.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "13_03",
+   "src": "../data/img/13_03.jpg",
+   "src_hd": null,
+   "px": [
+    97,
+    117
+   ],
+   "group": "13",
+   "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2025",
+   "original": null,
+   "record": "0000_wood-mulch_e14th-st-ave-a_2025-09_02.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "13_04",
+   "src": "../data/img/13_04.jpg",
+   "src_hd": null,
+   "px": [
+    937,
+    1130
+   ],
+   "group": "13",
+   "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2026",
+   "original": "0000_wood-mulch_e14th-st-ave-a_2026-09_03.jpg",
+   "record": "0000_wood-mulch_e14th-st-ave-a_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "13_06",
+   "src": "../data/img/13_06.jpg",
+   "src_hd": null,
+   "px": [
+    97,
+    115
+   ],
+   "group": "13",
+   "caption": "Wood Mulch / E 14th St & Ave A / Sept. 2025",
+   "original": null,
+   "record": "0000_wood-mulch_e14th-st-ave-a_2025-09_02.jpg",
+   "rule": "caption",
+   "height_in": 0.0,
+   "height_source": "record"
+  },
+  {
+   "id": "15_02",
+   "src": "../data/img/15_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1328
+   ],
+   "group": "15",
+   "caption": "Granite Edging / Washington Square Park, W 4th St / Nov. 2024",
+   "original": "0004_granite-edging_washington-sq_2024-11_01.jpg",
+   "record": "0004_granite-edging_washington-sq_2024-11_01.jpg",
+   "rule": "caption",
+   "height_in": 4.0,
+   "height_source": "record"
+  },
+  {
+   "id": "09_01",
+   "src": "../data/img/09_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    890
+   ],
+   "group": "09",
+   "caption": "Painted Curb / E 14th St & 1st Ave / Aug. 2026",
+   "original": "0006_curb_e14th-st-1st-ave_2026-08_06.jpg",
+   "record": "0006_curb_e14th-st-1st-ave_2026-08_06.jpg",
+   "rule": "caption",
+   "height_in": 6.0,
+   "height_source": "record"
+  },
+  {
+   "id": "17_01",
+   "src": "../data/img/17_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1489
+   ],
+   "group": "17",
+   "caption": "Yellow-Painted Concrete Curb / E 14th St & 1st Ave / Aug. 2026",
+   "original": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg",
+   "record": "0006_curb_e14th-st-1st-ave_2026-08_04.jpg",
+   "rule": "caption",
+   "height_in": 6.0,
+   "height_source": "record"
+  },
+  {
+   "id": "17_02",
+   "src": "../data/img/17_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1489
+   ],
+   "group": "17",
+   "caption": "Concrete Curb / E 14th St & 1st Ave / Aug. 2026",
+   "original": "0006_curb_e14th-st-1st-ave_2026-08_02.jpg",
+   "record": "0006_curb_e14th-st-1st-ave_2026-08_02.jpg",
+   "rule": "caption",
+   "height_in": 6.0,
+   "height_source": "record"
+  },
+  {
+   "id": "19_02",
+   "src": "../data/img/19_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1275
+   ],
+   "group": "19",
+   "caption": "Concrete Step / E 14th St & 5th Ave / Sept. 2026",
+   "original": "0006_step_5th-ave-14th-st_2026-09_01.jpg",
+   "record": "0006_step_5th-ave-14th-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 6.0,
+   "height_source": "record"
+  },
+  {
+   "id": "19_03",
+   "src": "../data/img/19_03.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1058
+   ],
+   "group": "19",
+   "caption": "Yellow-Painted Step / Stuyvesant Town, E 14th St / Jan. 2026",
+   "original": "0006_step_stuy-town_2026-01_01.jpg",
+   "record": "0006_step_stuy-town_2026-01_01.jpg",
+   "rule": "caption",
+   "height_in": 6.0,
+   "height_source": "record"
+  },
+  {
+   "id": "21_01",
+   "src": "../data/img/21_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    943
+   ],
+   "group": "21",
+   "caption": "Stone Sundial Wall / Stuyvesant St & 3rd Ave / Sept. 2025",
+   "original": "0018_sundial-wall_e9th-st-3rd-ave_2025-09_04.jpg",
+   "record": "0018_sundial-wall_e9th-st-3rd-ave_2025-09_04.jpg",
+   "rule": "caption",
+   "height_in": 18.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0024_in-flight_stuy-town_2026-01_01",
+   "src": "data/img/0024_in-flight_stuy-town_2026-01_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / near 541 E 14th St, Stuyvesant Town, Manhattan / Jan. 2026",
+   "original": "0024_in-flight_stuy-town_2026-01_01.jpg",
+   "record": "0024_in-flight_stuy-town_2026-01_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 24.0,
+   "height_source": "record"
+  },
+  {
+   "id": "23_01",
+   "src": "../data/img/23_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1559
+   ],
+   "group": "23",
+   "caption": "Steel Park Fence / Tompkins Square Park, Ave B & E 9th St / Sept. 2026",
+   "original": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+   "record": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 42.0,
+   "height_source": "record",
+   "same_original_as": [
+    "23_03"
+   ]
+  },
+  {
+   "id": "23_03",
+   "src": "../data/img/23_03.jpg",
+   "src_hd": null,
+   "px": [
+    960,
+    1600
+   ],
+   "group": "23",
+   "caption": "Steel Park Fence / Tompkins Square Park, Ave B & E 9th St / Sept. 2026",
+   "original": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+   "record": "0042_fence-park_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 42.0,
+   "height_source": "record",
+   "same_original_as": [
+    "23_01"
+   ]
+  },
+  {
+   "id": "25_02",
+   "src": "../data/img/25_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1231
+   ],
+   "group": "25",
+   "caption": "Steel Police Barricade / St. Patrick’s Cathedral, Fifth Ave between E 50th and E 51st St / Feb. 2024",
+   "original": "0043_barricade_st-patricks_2024-02_01.jpg",
+   "record": "0043_barricade_st-patricks_2024-02_01.jpg",
+   "rule": "caption",
+   "height_in": 43.0,
+   "height_source": "record"
+  },
+  {
+   "id": "27_01",
+   "src": "../data/img/27_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    599
+   ],
+   "group": "27",
+   "caption": "Chain-Link Park Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+   "original": "0048_fence-park_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "record": "0048_fence-park_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 48.0,
+   "height_source": "record"
+  },
+  {
+   "id": "29_01",
+   "src": "../data/img/29_01.jpg",
+   "src_hd": null,
+   "px": [
+    1053,
+    415
+   ],
+   "group": "29",
+   "caption": "Stone Base Course / St. Patrick’s Cathedral, Fifth Ave between E 50th and E 51st St / Feb. 2024",
+   "original": null,
+   "record": "0066_stone-ledge_st-patricks_2024-02_03.jpg",
+   "rule": "caption",
+   "height_in": 66.0,
+   "height_source": "record"
+  },
+  {
+   "id": "31_01",
+   "src": "../data/img/31_01.jpg",
+   "src_hd": null,
+   "px": [
+    1066,
+    1600
+   ],
+   "group": "31",
+   "caption": "Decorative Steel Railing / Stuyvesant St and Third Ave / Aug. 2025",
+   "original": "0072_fence-park_e9th-st-3rd-ave_2025-08_01.jpg",
+   "record": "0072_fence-park_e9th-st-3rd-ave_2025-08_01.jpg",
+   "rule": "caption",
+   "height_in": 72.0,
+   "height_source": "record"
+  },
+  {
+   "id": "33_01",
+   "src": "../data/img/33_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    821
+   ],
+   "group": "33",
+   "caption": "Temporary Welded-Wire Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+   "original": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+   "record": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 72.0,
+   "height_source": "record"
+  },
+  {
+   "id": "33_02",
+   "src": "../data/img/33_02.jpg",
+   "src_hd": null,
+   "px": [
+    970,
+    1600
+   ],
+   "group": "33",
+   "caption": "Temporary Welded-Wire Fence / Tompkins Square Park, Ave B between E 9th and E 10th St / Sept. 2026",
+   "original": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+   "record": "0072_fence-temporary_tompkins-sq-ave-b-e9th_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 72.0,
+   "height_source": "record"
+  },
+  {
+   "id": "35_01",
+   "src": "../data/img/35_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    889
+   ],
+   "group": "35",
+   "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+   "original": "0120_awning_5th-ave-14th-st_2026-09_05.jpg",
+   "record": "0120_awning_5th-ave-14th-st_2026-09_05.jpg",
+   "rule": "caption",
+   "height_in": 120.0,
+   "height_source": "record"
+  },
+  {
+   "id": "35_02",
+   "src": "../data/img/35_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    890
+   ],
+   "group": "35",
+   "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+   "original": "0120_awning_5th-ave-14th-st_2026-09_04.jpg",
+   "record": "0120_awning_5th-ave-14th-st_2026-09_04.jpg",
+   "rule": "caption",
+   "height_in": 120.0,
+   "height_source": "record"
+  },
+  {
+   "id": "35_03",
+   "src": "../data/img/35_03.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    890
+   ],
+   "group": "35",
+   "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+   "original": "0120_awning_5th-ave-14th-st_2026-09_03.jpg",
+   "record": "0120_awning_5th-ave-14th-st_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 120.0,
+   "height_source": "record"
+  },
+  {
+   "id": "35_05",
+   "src": "../data/img/35_05.jpg",
+   "src_hd": null,
+   "px": [
+    207,
+    115
+   ],
+   "group": "35",
+   "caption": "Metal Awning / Near 5 E 14th St / Sept. 2026",
+   "original": null,
+   "record": "0120_awning_5th-ave-14th-st_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 120.0,
+   "height_source": "record"
+  },
+  {
+   "id": "37_01",
+   "src": "../data/img/37_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1002
+   ],
+   "group": "37",
+   "caption": "Wall-Mounted Metal Bracket / Canal St near Essex St / Sept. 2026",
+   "original": "0120_wall-bracket_canal-st-essex-st_2026-09_01.jpg",
+   "record": "0120_wall-bracket_canal-st-essex-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 120.0,
+   "height_source": "record"
+  },
+  {
+   "id": "39_01",
+   "src": "../data/img/39_01.jpg",
+   "src_hd": null,
+   "px": [
+    506,
+    1600
+   ],
+   "group": "39",
+   "caption": "Building ledge / 335 E 10th St near Avenue B / Sept. 2026",
+   "original": "0144_building-ledge_e10th-st-ave-b_2026-09_02.jpg",
+   "record": "0144_building-ledge_e10th-st-ave-b_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 144.0,
+   "height_source": "record"
+  },
+  {
+   "id": "39_02",
+   "src": "../data/img/39_02.jpg",
+   "src_hd": null,
+   "px": [
+    1397,
+    1600
+   ],
+   "group": "39",
+   "caption": "Building ledge / 339–341 E 10th St near Avenue B / Sept. 2026",
+   "original": "0144_building-ledge_e10th-st-ave-b_2026-09_03.jpg",
+   "record": "0144_building-ledge_e10th-st-ave-b_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 144.0,
+   "height_source": "record"
+  },
+  {
+   "id": "39_04",
+   "src": "../data/img/39_04.jpg",
+   "src_hd": null,
+   "px": [
+    1397,
+    1600
+   ],
+   "group": "39",
+   "caption": "Building ledge / Avenue B at E 13th St / Sept. 2026",
+   "original": "0144_building-ledge_ave-b-e13th-st_2026-09_02.jpg",
+   "record": "0144_building-ledge_ave-b-e13th-st_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 144.0,
+   "height_source": "record"
+  },
+  {
+   "id": "39_05",
+   "src": "../data/img/39_05.jpg",
+   "src_hd": null,
+   "px": [
+    207,
+    434
+   ],
+   "group": "39",
+   "caption": "Building ledge / Avenue B at E 13th St / Sept. 2026",
+   "original": null,
+   "record": "0144_building-ledge_ave-b-e13th-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 144.0,
+   "height_source": "record"
+  },
+  {
+   "id": "41_01",
+   "src": "../data/img/41_01.jpg",
+   "src_hd": null,
+   "px": [
+    902,
+    1600
+   ],
+   "group": "41",
+   "caption": "Wall-mounted light / Near 159 4th Ave / Feb. 2026",
+   "original": "0144_wall-light_e14th-st-4th-ave_2026-02_01.jpg",
+   "record": "0144_wall-light_e14th-st-4th-ave_2026-02_01.jpg",
+   "rule": "caption",
+   "height_in": 144.0,
+   "height_source": "record"
+  },
+  {
+   "id": "43_01",
+   "src": "../data/img/43_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    898
+   ],
+   "group": "43",
+   "caption": "Glass canopy / Irving Pl at E 14th St / Sept. 2026",
+   "original": "0144_glass-canopy_e14th-st-3rd-ave_2026-09_02.jpg",
+   "record": "0144_glass-canopy_e14th-st-3rd-ave_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 144.0,
+   "height_source": "record"
+  },
+  {
+   "id": "45_01",
+   "src": "../data/img/45_01.jpg",
+   "src_hd": null,
+   "px": [
+    977,
+    1581
+   ],
+   "group": "45",
+   "caption": "Projecting storefront sign / Near 424 E 14th St / Sept. 2026",
+   "original": "0150_storefront-sign_e14th-st-ave-a_2026-09_01.jpg",
+   "record": "0150_storefront-sign_e14th-st-ave-a_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 150.0,
+   "height_source": "record"
+  },
+  {
+   "id": "45_02",
+   "src": "../data/img/45_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1445
+   ],
+   "group": "45",
+   "caption": "Projecting storefront sign / Near 426 E 14th St / Sept. 2026",
+   "original": "0150_storefront-sign_e14th-st-ave-a_2026-09_03.jpg",
+   "record": "0150_storefront-sign_e14th-st-ave-a_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 150.0,
+   "height_source": "record"
+  },
+  {
+   "id": "45_04",
+   "src": "../data/img/45_04.jpg",
+   "src_hd": null,
+   "px": [
+    988,
+    1586
+   ],
+   "group": "45",
+   "caption": "Projecting storefront sign / European Wax Center, 428 E 14th St / Sept. 2026",
+   "original": "0150_storefront-sign_e14th-st-ave-a_2026-09_04.jpg",
+   "record": "0150_storefront-sign_e14th-st-ave-a_2026-09_04.jpg",
+   "rule": "caption",
+   "height_in": 150.0,
+   "height_source": "record"
+  },
+  {
+   "id": "47_01",
+   "src": "../data/img/47_01.jpg",
+   "src_hd": null,
+   "px": [
+    522,
+    1600
+   ],
+   "group": "47",
+   "caption": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+   "original": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "record": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 150.0,
+   "height_source": "record"
+  },
+  {
+   "id": "47_03",
+   "src": "../data/img/47_03.jpg",
+   "src_hd": null,
+   "px": [
+    889,
+    1600
+   ],
+   "group": "47",
+   "caption": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+   "original": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+   "record": "0150_streetlight_tompkins-sq-ave-b-e9th_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 150.0,
+   "height_source": "record"
+  },
+  {
+   "id": "47_02",
+   "src": "../data/img/47_02.jpg",
+   "src_hd": null,
+   "px": [
+    758,
+    1600
+   ],
+   "group": "47",
+   "caption": "Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026",
+   "original": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "record": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 162.0,
+   "height_source": "record"
+  },
+  {
+   "id": "51_01",
+   "src": "../data/img/51_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1031
+   ],
+   "group": "51",
+   "caption": "Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026",
+   "original": "0168_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+   "record": "0168_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 168.0,
+   "height_source": "record"
+  },
+  {
+   "id": "51_02",
+   "src": "../data/img/51_02.jpg",
+   "src_hd": null,
+   "px": [
+    317,
+    346
+   ],
+   "group": "51",
+   "caption": "Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026",
+   "original": null,
+   "record": "0168_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 168.0,
+   "height_source": "record"
+  },
+  {
+   "id": "49_01",
+   "src": "../data/img/49_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    888
+   ],
+   "group": "49",
+   "caption": "Fire escape / 339–341 E 10th St near Avenue B / Sept. 2026",
+   "original": "0180_fire-escape_e10th-st-ave-b_2026-09_04.jpg",
+   "record": "0180_fire-escape_e10th-st-ave-b_2026-09_04.jpg",
+   "rule": "caption",
+   "height_in": 180.0,
+   "height_source": "record"
+  },
+  {
+   "id": "53_01",
+   "src": "../data/img/53_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1008
+   ],
+   "group": "53",
+   "caption": "Window sill / 428 E 14th St near Avenue A / Sept. 2026",
+   "original": "0180_window-sill_e14th-st-ave-a_2026-09_01.jpg",
+   "record": "0180_window-sill_e14th-st-ave-a_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 180.0,
+   "height_source": "record"
+  },
+  {
+   "id": "53_04",
+   "src": "../data/img/53_04.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1029
+   ],
+   "group": "53",
+   "caption": "Subway elevator headhouse / 1 Av L Station, E 14th St at Avenue A / Sept. 2026",
+   "original": "0180_storefront-transom_e14th-irving-pl_2026-09_01.jpg",
+   "record": "0180_storefront-transom_e14th-irving-pl_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 180.0,
+   "height_source": "record"
+  },
+  {
+   "id": "57_01",
+   "src": "../data/img/57_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1462
+   ],
+   "group": "57",
+   "caption": "Building ledge / E 14th St at Irving Pl, Manhattan / Sept. 2026",
+   "original": "0180_subway-elevator-headhouse_e14th-st-ave-a_2026-09_01.jpg",
+   "record": "0180_subway-elevator-headhouse_e14th-st-ave-a_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 180.0,
+   "height_source": "record"
+  },
+  {
+   "id": "59_01",
+   "src": "../data/img/59_01.jpg",
+   "src_hd": null,
+   "px": [
+    529,
+    260
+   ],
+   "group": "59",
+   "caption": "Building ledge / Irving Pl at E 14th St, Manhattan / Sept. 2026",
+   "original": null,
+   "record": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg",
+   "rule": "caption",
+   "height_in": 180.0,
+   "height_source": "record"
+  },
+  {
+   "id": "59_02",
+   "src": "../data/img/59_02.jpg",
+   "src_hd": null,
+   "px": [
+    914,
+    1284
+   ],
+   "group": "59",
+   "caption": "Building ledge / 3rd Ave at Cus D’Amato Way, Manhattan / Sept. 2026",
+   "original": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg",
+   "record": "0180_building-ledge_e14th-st-3rd-ave_2026-09_07.jpg",
+   "rule": "caption",
+   "height_in": 180.0,
+   "height_source": "record"
+  },
+  {
+   "id": "71_01",
+   "src": "../data/img/71_01.jpg",
+   "src_hd": null,
+   "px": [
+    1205,
+    1600
+   ],
+   "group": "71",
+   "caption": "Streetlight / Near 409 E 14th St, Manhattan / Sept. 2026",
+   "original": "0183_streetlight_e14th-st-ave-a_2026-09_01.jpg",
+   "record": "0183_streetlight_e14th-st-ave-a_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 183.0,
+   "height_source": "record"
+  },
+  {
+   "id": "55_01",
+   "src": "../data/img/55_01.jpg",
+   "src_hd": null,
+   "px": [
+    863,
+    1600
+   ],
+   "group": "55",
+   "caption": "Banner bracket / Near 5 E 14th St / Sept. 2026",
+   "original": "0192_banner-bracket_univ-pl-e13th_2026-09_01.jpg",
+   "record": "0192_banner-bracket_univ-pl-e13th_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 192.0,
+   "height_source": "record"
+  },
+  {
+   "id": "55_02",
+   "src": "../data/img/55_02.jpg",
+   "src_hd": null,
+   "px": [
+    862,
+    1600
+   ],
+   "group": "55",
+   "caption": "Projecting storefront sign / Subway, 113 E 14th St near Irving Pl / Sept. 2026",
+   "original": "0192_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+   "record": "0192_storefront-sign_e14th-irving-pl_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 192.0,
+   "height_source": "record"
+  },
+  {
+   "id": "61_01",
+   "src": "../data/img/61_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    819
+   ],
+   "group": "61",
+   "caption": "Overhead utility / signal wire / Manhattan Bridge approach at Forsyth St and Eldridge St, Manhattan / Sept. 2026",
+   "original": "0216_overhead-wire_manhattan-bridge-forsyth-st_2026-09_01.jpg",
+   "record": "0216_overhead-wire_manhattan-bridge-forsyth-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 216.0,
+   "height_source": "record"
+  },
+  {
+   "id": "63_01",
+   "src": "../data/img/63_01.jpg",
+   "src_hd": null,
+   "px": [
+    974,
+    1600
+   ],
+   "group": "63",
+   "caption": "Traffic signal mast arm / Kimlau Square, Oliver St at St James Pl, Manhattan / July 2026",
+   "original": "0216_signal-mast-arm_e-houston-clinton-st_2026-09_01.jpg",
+   "record": "0216_signal-mast-arm_e-houston-clinton-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 216.0,
+   "height_source": "record"
+  },
+  {
+   "id": "63_02",
+   "src": "../data/img/63_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1548
+   ],
+   "group": "63",
+   "caption": "Traffic signal mast arm / Kimlau Square, Oliver St at St James Pl, Manhattan / July 2026",
+   "original": "0216_signal-mast-arm_oliver-st_2026-07_02.jpg",
+   "record": "0216_signal-mast-arm_oliver-st_2026-07_02.jpg",
+   "rule": "caption",
+   "height_in": 216.0,
+   "height_source": "record"
+  },
+  {
+   "id": "55_03",
+   "src": "../data/img/55_03.jpg",
+   "src_hd": null,
+   "px": [
+    565,
+    1600
+   ],
+   "group": "55",
+   "caption": "Wall-mounted light / 113–117 E 14th St near Irving Pl / Sept. 2026",
+   "original": "0264_wall-light_e14th-irving-pl_2026-09_01.jpg",
+   "record": "0264_wall-light_e14th-irving-pl_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 264.0,
+   "height_source": "record"
+  },
+  {
+   "id": "65_01",
+   "src": "../data/img/65_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1398
+   ],
+   "group": "65",
+   "caption": "Roof edge / parapet / 198 200 E 3rd St at Avenue B, Manhattan / Sept. 2026",
+   "original": "0292_roof-edge_e3rd-st-ave-b_2026-09_02.jpg",
+   "record": "0292_roof-edge_e3rd-st-ave-b_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 292.0,
+   "height_source": "record"
+  },
+  {
+   "id": "67_02",
+   "src": "../data/img/67_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    992
+   ],
+   "group": "67",
+   "caption": "Fire escape / Near 409 E 14th St, Manhattan / Sept. 2026",
+   "original": "0300_fire-escape_e14th-st-ave-a_2026-09_01.jpg",
+   "record": "0300_fire-escape_e14th-st-ave-a_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 300.0,
+   "height_source": "record"
+  },
+  {
+   "id": "69_01",
+   "src": "../data/img/69_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1343
+   ],
+   "group": "69",
+   "caption": "Fire escape / E Houston St at Attorney St, Manhattan / Sept. 2026",
+   "original": "0300_fire-escape_e-houston-attorney-st_2026-09_01.jpg",
+   "record": "0300_fire-escape_e-houston-attorney-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 300.0,
+   "height_source": "record"
+  },
+  {
+   "id": "75_01",
+   "src": "../data/img/75_01.jpg",
+   "src_hd": null,
+   "px": [
+    1318,
+    1600
+   ],
+   "group": "75",
+   "caption": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+   "original": "0348_streetlight_e-houston-attorney-st_2026-09_01.jpg",
+   "record": "0348_streetlight_e-houston-attorney-st_2026-09_01.jpg",
+   "rule": "caption",
+   "height_in": 348.0,
+   "height_source": "record"
+  },
+  {
+   "id": "75_03",
+   "src": "../data/img/75_03.jpg",
+   "src_hd": null,
+   "px": [
+    1313,
+    1600
+   ],
+   "group": "75",
+   "caption": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+   "original": "0348_streetlight_e-houston-attorney-st_2026-09_02.jpg",
+   "record": "0348_streetlight_e-houston-attorney-st_2026-09_02.jpg",
+   "rule": "caption",
+   "height_in": 348.0,
+   "height_source": "record"
+  },
+  {
+   "id": "77_01",
+   "src": "../data/img/77_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    943
+   ],
+   "group": "77",
+   "caption": "Streetlight / E Houston St at Avenue B–Clinton St, Manhattan / Sept. 2026",
+   "original": "0348_streetlight_e-houston-clinton-st_2026-09_03.jpg",
+   "record": "0348_streetlight_e-houston-clinton-st_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 348.0,
+   "height_source": "record"
+  },
+  {
+   "id": "73_03",
+   "src": "../data/img/73_03.jpg",
+   "src_hd": null,
+   "px": [
+    1255,
+    1600
+   ],
+   "group": "73",
+   "caption": "Streetlight / E Houston St at Attorney St, Manhattan / Sept. 2026",
+   "original": "0356_streetlight_e-houston-attorney-st_2026-09_03.jpg",
+   "record": "0356_streetlight_e-houston-attorney-st_2026-09_03.jpg",
+   "rule": "caption",
+   "height_in": 356.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0480_in-flight_west-st-hudson-river-pk_2024-04_01",
+   "src": "data/img/0480_in-flight_west-st-hudson-river-pk_2024-04_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / at Gansevoort St, West Village, Manhattan / Apr. 2024",
+   "original": "0480_in-flight_west-st-hudson-river-pk_2024-04_01.jpg",
+   "record": "0480_in-flight_west-st-hudson-river-pk_2024-04_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 480.0,
+   "height_source": "record"
+  },
+  {
+   "id": "79_02",
+   "src": "../data/img/79_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    270
+   ],
+   "group": "79",
+   "caption": "Building-mounted flagpole / 2026",
+   "original": "0540_flagpole_univ-pl-e14th_2026-09_01.jpg",
+   "record": "0540_flagpole_univ-pl-e14th_2026-09_01.jpg",
+   "rule": "image-match",
+   "needs_check": false,
+   "height_in": 540.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0600_in-flight_5th-ave-14th-st_2025-02_01",
+   "src": "data/img/0600_in-flight_5th-ave-14th-st_2025-02_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / E 14th St at 5th Ave (near 1 E 14th St), Chelsea, Manhattan / Feb. 2025",
+   "original": "0600_in-flight_5th-ave-14th-st_2025-02_01.jpg",
+   "record": "0600_in-flight_5th-ave-14th-st_2025-02_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 600.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0720_in-flight_5th-ave-14th-st_2024-02_01",
+   "src": "data/img/0720_in-flight_5th-ave-14th-st_2024-02_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / E 14th St at 5th Ave (near 1 E 14th St), Chelsea, Manhattan / Feb. 2024",
+   "original": "0720_in-flight_5th-ave-14th-st_2024-02_01.jpg",
+   "record": "0720_in-flight_5th-ave-14th-st_2024-02_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 720.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0720_in-flight_delancey-st-essex-st_2026-09_01",
+   "src": "data/img/0720_in-flight_delancey-st-essex-st_2026-09_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / Delancey St at Essex St / Norfolk St (near 122 Delancey St; Essex Street Station visible), Lower East Side, Manhattan / Sept. 2026",
+   "original": "0720_in-flight_delancey-st-essex-st_2026-09_01.jpg",
+   "record": "0720_in-flight_delancey-st-essex-st_2026-09_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 720.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0960_in-flight_times-sq_2023-09_01",
+   "src": "data/img/0960_in-flight_times-sq_2023-09_01.jpg",
+   "src_hd": null,
+   "px": [
+    1200,
+    1600
+   ],
+   "group": null,
+   "caption": "In flight / Broadway / 7th Ave near W 47th St, Manhattan / Sept. 2023",
+   "original": "0960_in-flight_times-sq_2023-09_01.jpg",
+   "record": "0960_in-flight_times-sq_2023-09_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 960.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0960_in-flight_univ-pl-e13th_2026-09_01",
+   "src": "data/img/0960_in-flight_univ-pl-e13th_2026-09_01.jpg",
+   "src_hd": null,
+   "px": [
+    1200,
+    1600
+   ],
+   "group": null,
+   "caption": "In flight / E 14th St at Union Square West (near 49 E 14th St), Chelsea, Manhattan / Sept. 2026",
+   "original": "0960_in-flight_univ-pl-e13th_2026-09_01.jpg",
+   "record": "0960_in-flight_univ-pl-e13th_2026-09_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 960.0,
+   "height_source": "record"
+  },
+  {
+   "id": "0960_in-flight_univ-pl-e13th_2026-09_02",
+   "src": "data/img/0960_in-flight_univ-pl-e13th_2026-09_02.jpg",
+   "src_hd": null,
+   "px": [
+    1200,
+    1600
+   ],
+   "group": null,
+   "caption": "In flight / E 14th St at Union Square West (near 49 E 14th St), Chelsea, Manhattan / Sept. 2026",
+   "original": "0960_in-flight_univ-pl-e13th_2026-09_02.jpg",
+   "record": "0960_in-flight_univ-pl-e13th_2026-09_02.jpg",
+   "rule": "records: in flight",
+   "height_in": 960.0,
+   "height_source": "record"
+  },
+  {
+   "id": "81_01",
+   "src": "../data/img/81_01.jpg",
+   "src_hd": null,
+   "px": [
+    1092,
+    42
+   ],
+   "group": "81",
+   "caption": "In flight",
+   "original": null,
+   "record": null,
+   "rule": "kept",
+   "needs_check": true,
+   "height_in": 960.0,
+   "height_source": "group"
+  },
+  {
+   "id": "1200_in-flight_herald-sq_2023-09_02",
+   "src": "data/img/1200_in-flight_herald-sq_2023-09_02.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / Broadway at W 34th St, Manhattan / Sept. 2023",
+   "original": "1200_in-flight_herald-sq_2023-09_02.jpg",
+   "record": "1200_in-flight_herald-sq_2023-09_02.jpg",
+   "rule": "records: in flight",
+   "height_in": 1200.0,
+   "height_source": "record"
+  },
+  {
+   "id": "1320_in-flight_herald-sq_2023-09_01",
+   "src": "data/img/1320_in-flight_herald-sq_2023-09_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / Broadway at W 34th St, Manhattan / Sept. 2023",
+   "original": "1320_in-flight_herald-sq_2023-09_01.jpg",
+   "record": "1320_in-flight_herald-sq_2023-09_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 1320.0,
+   "height_source": "record"
+  },
+  {
+   "id": "1680_in-flight_univ-pl-e13th_2025-02_02",
+   "src": "data/img/1680_in-flight_univ-pl-e13th_2025-02_02.jpg",
+   "src_hd": null,
+   "px": [
+    1200,
+    1600
+   ],
+   "group": null,
+   "caption": "In flight / E 14th St at Union Square West (near 49 E 14th St), Chelsea, Manhattan / Feb. 2025",
+   "original": "1680_in-flight_univ-pl-e13th_2025-02_02.jpg",
+   "record": "1680_in-flight_univ-pl-e13th_2025-02_02.jpg",
+   "rule": "records: in flight",
+   "height_in": 1680.0,
+   "height_source": "record"
+  },
+  {
+   "id": "1800_in-flight_univ-pl-e13th_2025-02_01",
+   "src": "data/img/1800_in-flight_univ-pl-e13th_2025-02_01.jpg",
+   "src_hd": null,
+   "px": [
+    1600,
+    1200
+   ],
+   "group": null,
+   "caption": "In flight / E 14th St at Union Square West (near 49 E 14th St), Chelsea, Manhattan / Feb. 2025",
+   "original": "1800_in-flight_univ-pl-e13th_2025-02_01.jpg",
+   "record": "1800_in-flight_univ-pl-e13th_2025-02_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 1800.0,
+   "height_source": "record"
+  }
+ ]
+}
