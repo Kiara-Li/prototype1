@@ -40,7 +40,7 @@ function estimateNeck(poly) {
   const ys = poly.map((p) => p[1]);
   const cx = poly.reduce((s, p) => s + p[0], 0) / poly.length;
   const h = Math.max(...ys) - Math.min(...ys);
-  return [top[0] + (cx - top[0]) * 0.2, top[1] + h * 0.22];
+  return [top[0] + (cx - top[0]) * 0.18, top[1] + h * 0.3];
 }
 
 export const pigeonsOf = (photoId) => pigeonsByPhoto.get(photoId) || [];
@@ -130,7 +130,11 @@ function sampleNeck(item, pigeon) {
   ];
 }
 
-// ================================================================ 被找到的鸽子（参考图 07）
+// ================================================================ 被找到的鸽子（参考图 07：riso 印的鸽子）
+// 干净的外轮廓；里面是喷枪一样柔和的明暗（浅灰身体、背上一团深灰）；
+// 脖子两条糊开的色带（上薄荷绿、下粉）；粉脚；浅色小嘴；细颗粒。
+
+export const STYLE = () => L().observe.silhouette;
 
 function silhouetteFor(item, index, pigeon, hsl) {
   const key = `${item.photo.id}#${index}`;
@@ -142,92 +146,119 @@ function silhouetteFor(item, index, pigeon, hsl) {
   const ys = pigeon.polygon.map((p) => p[1] * H);
   const bw = Math.max(...xs) - Math.min(...xs);
   const bh = Math.max(...ys) - Math.min(...ys);
-  const pad = Math.max(bw, bh) * 0.12;
+  const pad = Math.max(bw, bh) * (0.06 + STYLE().blur * 2.5);   // 留出模糊晕开的地方
   const x0 = Math.min(...xs) - pad;
   const y0 = Math.min(...ys) - pad;
-  const sc = Math.min(1, 520 / Math.max(bw + 2 * pad, bh + 2 * pad));     // 太大的缩一下，省时间
+  const sc = Math.min(2, 560 / Math.max(bw + 2 * pad, bh + 2 * pad));
   const cw = Math.max(2, Math.round((bw + 2 * pad) * sc));
   const ch = Math.max(2, Math.round((bh + 2 * pad) * sc));
-  const P = (px, py) => [(px * W - x0) * sc, (py * H - y0) * sc];
+  const pts = smooth(pigeon.polygon.map(([px, py]) => [(px * W - x0) * sc, (py * H - y0) * sc]), 1);
   const shape = new Path2D();
-  pigeon.polygon.forEach(([px, py], i) => { const [a, b] = P(px, py); i ? shape.lineTo(a, b) : shape.moveTo(a, b); });
+  pts.forEach(([a, b], i) => (i ? shape.lineTo(a, b) : shape.moveTo(a, b)));
   shape.closePath();
   const size = Math.max(cw, ch);
-  const [nx, ny] = P(pigeon.neck[0], pigeon.neck[1]);
-  const cx = pigeon.polygon.reduce((s, p) => s + p[0], 0) / pigeon.polygon.length;
-  const cy = pigeon.polygon.reduce((s, p) => s + p[1], 0) / pigeon.polygon.length;
-  const [bx, by] = P(cx, cy);
-  // 头的方向：从身体中心指向脖子
-  let ux = nx - bx;
-  let uy = ny - by;
+  const nx = (pigeon.neck[0] * W - x0) * sc;
+  const ny = (pigeon.neck[1] * H - y0) * sc;
+  const bx = pts.reduce((s2, p) => s2 + p[0], 0) / pts.length;
+  const by = pts.reduce((s2, p) => s2 + p[1], 0) / pts.length;
+  // 脖子的方向：从脖子指向头顶（轮廓最高处）。色带横过脖子，垂直于这个方向
+  const head = pts.reduce((a, p) => (p[1] < a[1] ? p : a));
+  let ux = head[0] - nx;
+  let uy = head[1] - ny;
   const ul = Math.hypot(ux, uy) || 1;
   ux /= ul; uy /= ul;
+  const st = STYLE();
+  const rand = mulberry(index * 131 + item.photo.id.length * 17);
 
-  // 1. 哑光的灰色身体：胸口亮一点，翅膀和尾巴暗一点
-  const avg = averageInPolygon(src, pigeon.polygon, W, H);
-  const lum = 150 + (0.3 * avg[0] + 0.59 * avg[1] + 0.11 * avg[2]) * 0.18;
-  const body = layer(cw, ch, (g) => {
-    g.fillStyle = `rgb(${lum},${lum + 2},${lum + 6})`;
-    g.fill(shape);
-    g.globalCompositeOperation = 'source-atop';
-    const wing = g.createRadialGradient(bx - ux * size * 0.15, by - uy * size * 0.15, 0, bx - ux * size * 0.15, by - uy * size * 0.15, size * 0.45);
-    wing.addColorStop(0, 'rgba(60,64,72,0.35)');
-    wing.addColorStop(1, 'rgba(60,64,72,0)');
-    g.fillStyle = wing;
-    g.fillRect(0, 0, cw, ch);
-    const chest = g.createRadialGradient(nx - ux * size * 0.08, ny - uy * size * 0.08, 0, nx, ny, size * 0.3);
-    chest.addColorStop(0, 'rgba(235,236,238,0.35)');
-    chest.addColorStop(1, 'rgba(235,236,238,0)');
-    g.fillStyle = chest;
-    g.fillRect(0, 0, cw, ch);
-  });
-
-  // 2. 脖子一圈横过去的色带：靠头那边绿，靠身体那边紫，糊开
-  // 绿紫两色固定在鸽子脖子真实的范围里，取到的颜色只让它们稍微偏一点
-  const [h0, s0, l0] = hsl;
-  const nudge = Math.max(-1, Math.min(1, (((h0 - 160 + 540) % 360) - 180) / 180));
-  const green = 158 + nudge * 14;
-  const s = Math.max(0.55, s0);
-  const l = Math.min(0.56, Math.max(0.46, l0));
-  const band = layer(cw, ch, (g) => {
-    g.filter = `blur(${size * 0.05}px)`;
-    const w = size * 0.16;
-    const grad = g.createLinearGradient(nx + ux * w, ny + uy * w, nx - ux * w, ny - uy * w);
-    grad.addColorStop(0, `hsla(${green}, ${s * 100}%, ${l * 100}%, 0)`);
-    grad.addColorStop(0.3, `hsla(${green}, ${s * 100}%, ${l * 100}%, 0.9)`);
-    grad.addColorStop(0.62, `hsla(${300 + nudge * 12}, ${s * 80}%, ${l * 100}%, 0.85)`);
-    grad.addColorStop(1, `hsla(${300 + nudge * 12}, ${s * 80}%, ${l * 100}%, 0)`);
-    g.fillStyle = grad;
-    // 只在脖子附近：一个椭圆区域
-    g.beginPath();
-    g.ellipse(nx, ny, size * 0.32, size * 0.32, 0, 0, Math.PI * 2);
-    g.fill();
-  });
-
-  // 3. 合起来，边缘糊一点、再做颗粒溶解
   const out = document.createElement('canvas');
   out.width = cw;
   out.height = ch;
   const g = out.getContext('2d', { willReadFrequently: true });
+  g.save();
+  g.clip(shape);
+  // 底色：浅灰
+  g.fillStyle = st.body;
+  g.fillRect(0, 0, cw, ch);
+  // 背上一团深灰（远离头、偏上），喷枪一样软
+  g.filter = `blur(${size * 0.09}px)`;
+  let tx = bx - head[0];
+  let ty = by - head[1];
+  const tl = Math.hypot(tx, ty) || 1;
+  tx /= tl; ty /= tl;                                   // 往尾巴的方向
+  const sx = bx + tx * size * 0.12;
+  const sy = by + ty * size * 0.06 - size * 0.04;
+  g.fillStyle = st.shade;
+  g.beginPath(); g.ellipse(sx, sy, size * 0.3, size * 0.18, Math.atan2(ty, tx), 0, Math.PI * 2); g.fill();
+  // 头：有的亮有的暗（参考图上下两只不一样）
+  if (rand() < 0.5) {
+    g.fillStyle = st.shade;
+    g.globalAlpha = 0.6;
+    g.beginPath(); g.arc(head[0] - ux * size * 0.05, head[1] - uy * size * 0.05 + size * 0.04, size * 0.09, 0, Math.PI * 2); g.fill();
+    g.globalAlpha = 1;
+  }
+  // 脖子两条色带：垂直于头的方向，上薄荷绿、下粉；颜色跟着取到的颜色稍微偏一点
+  const nudge = Math.max(-1, Math.min(1, (((hsl[0] - 160 + 540) % 360) - 180) / 180));
+  g.filter = `blur(${size * 0.018}px)`;
+  const band = (offset, color, width) => {
+    const cx = nx + ux * offset * size;
+    const cy = ny + uy * offset * size;
+    g.save();
+    g.translate(cx, cy);
+    g.rotate(Math.atan2(uy, ux));
+    g.fillStyle = color;
+    g.fillRect(-width * size / 2, -size * 0.18, width * size, size * 0.36);
+    g.restore();
+  };
+  band(0.03, `hsla(${165 + nudge * 10}, 50%, 74%, 0.95)`, 0.05);    // 上：薄荷绿
+  band(-0.025, `hsla(${325 + nudge * 8}, 60%, 76%, 0.9)`, 0.045);   // 下：粉
+  // 嘴：头的方向最远的那一点，浅色
+  const tip = pts.filter((p) => p[1] < head[1] + size * 0.18)
+    .reduce((best, p) => ((p[0] - bx) * -tx + (p[1] - by) * -ty > (best[0] - bx) * -tx + (best[1] - by) * -ty ? p : best), head);
   g.filter = `blur(${size * 0.012}px)`;
-  g.drawImage(body, 0, 0);
+  g.fillStyle = 'rgba(236,232,226,0.9)';
+  g.beginPath(); g.arc(tip[0] + tx * size * 0.012, tip[1] + ty * size * 0.012, size * 0.022, 0, Math.PI * 2); g.fill();
+  // 脚：轮廓最下面那一截，粉
+  g.filter = `blur(${size * 0.01}px)`;
+  // 只在身体正下方那一段（脚），不是整条下边缘
+  const low = pts.filter((p) => Math.abs(p[0] - bx) < size * 0.22);
+  const ymax = Math.max(...(low.length ? low : pts).map((p) => p[1]));
+  const feet = g.createRadialGradient(bx, ymax, 0, bx, ymax, size * 0.16);
+  feet.addColorStop(0, st.feet);
+  feet.addColorStop(0.55, st.feet);
+  feet.addColorStop(1, 'rgba(240,150,200,0)');
+  g.fillStyle = feet;
+  g.fillRect(bx - size * 0.2, ymax - size * 0.06, size * 0.4, size * 0.1);
+  g.restore();
   g.filter = 'none';
-  g.globalCompositeOperation = 'source-atop';
-  g.drawImage(band, 0, 0);
-  g.globalCompositeOperation = 'source-over';
-  grainify(g, cw, ch, 0.22, 0.6);
 
-  const res = { canvas: out, fx: x0 / W, fy: y0 / H, fw: (cw / sc) / W, fh: (ch / sc) / H, neck: [nx / cw, ny / ch] };
+  // 整体糊开：边缘和明暗都软下来（像缩小看时那样），再加一点很轻的颗粒
+  const soft = document.createElement('canvas');
+  soft.width = cw;
+  soft.height = ch;
+  const sg = soft.getContext('2d', { willReadFrequently: true });
+  sg.filter = `blur(${size * st.blur}px)`;
+  sg.drawImage(out, 0, 0);
+  sg.filter = 'none';
+  grainify(sg, cw, ch, st.grain, 0);
+
+  const res = { canvas: soft, fx: x0 / W, fy: y0 / H, fw: (cw / sc) / W, fh: (ch / sc) / H, neck: [nx / cw, ny / ch] };
   silhouettes.set(key, res);
   return res;
 }
 
-function layer(w, h, draw) {
-  const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
-  draw(c.getContext('2d'));
-  return c;
+// 轮廓圆滑一点（Chaikin）
+function smooth(pts, n) {
+  let p = pts;
+  for (let k = 0; k < n; k++) {
+    const q = [];
+    for (let i = 0; i < p.length; i++) {
+      const a = p[i];
+      const b = p[(i + 1) % p.length];
+      q.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25], [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]);
+    }
+    p = q;
+  }
+  return p;
 }
 
 // 颗粒：亮度抖一点，边缘半透明的地方随机溶解成点（参考图 09 那种）
@@ -241,7 +272,7 @@ function grainify(g, w, h, lumAmt, edgeAmt) {
     d[i] = Math.max(0, Math.min(255, d[i] + n));
     d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n));
     d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n));
-    if (a < 0.98) {
+    if (edgeAmt > 0 && a < 0.98) {
       const keep = Math.random() < Math.pow(a, 0.7);
       d[i + 3] = keep ? Math.min(255, (a + (1 - a) * edgeAmt) * 255) : a * 255 * (1 - edgeAmt);
     }
@@ -269,47 +300,96 @@ function averageInPolygon(src, poly, W, H) {
   return n ? [R / n, G / n, B / n] : [150, 150, 150];
 }
 
-// 在照片上画被找到的鸽子：从脖子开始慢慢扩散开；正在框住的那只，颜色先从脖子渗出来一点
+// 在照片上画被找到的鸽子：
+//   1. 从脖子开始慢慢显出模糊的剪影（silhouetteSpreadMs）
+//   2. 保持鸽子的样子一段时间（holdMs）
+//   3. 剪影慢慢淡去（dissolveMs），同时在它脖子的位置晕开一块颜色，贴在屏幕上（drawSpots）
+// 正在框住的那只：颜色先从脖子渗出来一点
 const tmp = document.createElement('canvas');
 export function drawFoundOnPhoto(ctx, rect, now) {
   const id = rect.item.photo.id;
   const list = pigeonsOf(id);
-  const spreadMs = L().observe.silhouetteSpreadMs;
+  const O = L().observe;
   for (let i = 0; i < list.length; i++) {
     const key = `${id}#${i}`;
-    let p;
-    if (foundKeys.has(key)) {
-      const f = found.find((x) => x.key === key);
-      p = Math.min(1, (now - f.at) / spreadMs) * 0.65 + 0.35;
+    let reveal;
+    let dissolve = 0;
+    const f = foundKeys.has(key) ? found.find((x) => x.key === key) : null;
+    if (f) {
+      const e = now - f.at;
+      reveal = Math.min(1, e / O.silhouetteSpreadMs) * 0.65 + 0.35;
+      dissolve = Math.max(0, Math.min(1, (e - O.silhouetteSpreadMs - O.holdMs) / O.dissolveMs));
     } else if (pending.key === key) {
-      p = pending.progress * 0.35;
+      reveal = pending.progress * 0.35;
     } else continue;
     const s = silhouetteFor(rect.item, i, list[i], sampled.get(key) || [160, 0.6, 0.5]);
     const dx = rect.x + s.fx * rect.w;
     const dy = rect.y + s.fy * rect.h;
     const dw = s.fw * rect.w;
     const dh = s.fh * rect.h;
-    if (p >= 0.999) { ctx.drawImage(s.canvas, dx, dy, dw, dh); continue; }
-    // 扩散：以脖子为中心，一个软边的圆慢慢变大
-    tmp.width = s.canvas.width;
-    tmp.height = s.canvas.height;
-    const t = tmp.getContext('2d');
-    t.clearRect(0, 0, tmp.width, tmp.height);
-    t.drawImage(s.canvas, 0, 0);
-    t.globalCompositeOperation = 'destination-in';
-    const nx = s.neck[0] * tmp.width;
-    const ny = s.neck[1] * tmp.height;
-    const R = Math.max(tmp.width, tmp.height) * (0.05 + 1.2 * ease(p));
-    const m = t.createRadialGradient(nx, ny, 0, nx, ny, R);
-    m.addColorStop(0, 'rgba(0,0,0,1)');
-    m.addColorStop(0.6, 'rgba(0,0,0,0.8)');
-    m.addColorStop(1, 'rgba(0,0,0,0)');
-    t.fillStyle = m;
-    t.fillRect(0, 0, tmp.width, tmp.height);
-    t.globalCompositeOperation = 'source-over';
-    ctx.drawImage(tmp, dx, dy, dw, dh);
+    const nx = dx + s.neck[0] * dw;
+    const ny = dy + s.neck[1] * dh;
+    const prevA = ctx.globalAlpha;
+    const prevF = ctx.filter;
+
+    // 剪影：散开的时候越来越糊、越来越大、越来越淡
+    const silA = 1 - ease(dissolve);
+    if (silA > 0.01) {
+      ctx.globalAlpha = prevA * STYLE().alpha * silA;
+      if (dissolve > 0) {
+        const grow = 1 + 0.35 * dissolve;
+        ctx.filter = `blur(${(dissolve * Math.max(dw, dh) * 0.08).toFixed(1)}px)`;
+        ctx.drawImage(s.canvas, nx - (nx - dx) * grow, ny - (ny - dy) * grow, dw * grow, dh * grow);
+        ctx.filter = prevF;
+      } else if (reveal >= 0.999) {
+        ctx.drawImage(s.canvas, dx, dy, dw, dh);
+      } else {
+        // 显出来：以脖子为中心，一个软边的圆慢慢变大
+        tmp.width = s.canvas.width;
+        tmp.height = s.canvas.height;
+        const t = tmp.getContext('2d');
+        t.clearRect(0, 0, tmp.width, tmp.height);
+        t.drawImage(s.canvas, 0, 0);
+        t.globalCompositeOperation = 'destination-in';
+        const mx = s.neck[0] * tmp.width;
+        const my = s.neck[1] * tmp.height;
+        const R = Math.max(tmp.width, tmp.height) * (0.05 + 1.2 * ease(reveal));
+        const m = t.createRadialGradient(mx, my, 0, mx, my, R);
+        m.addColorStop(0, 'rgba(0,0,0,1)');
+        m.addColorStop(0.6, 'rgba(0,0,0,0.8)');
+        m.addColorStop(1, 'rgba(0,0,0,0)');
+        t.fillStyle = m;
+        t.fillRect(0, 0, tmp.width, tmp.height);
+        t.globalCompositeOperation = 'source-over';
+        ctx.drawImage(tmp, dx, dy, dw, dh);
+      }
+    }
+
+    // 记下它脖子现在在屏幕上的位置：剪影淡去时，颜色就从这里晕开（见 updateSpots）
+    if (f && ctx.getTransform().a === devicePixelRatio) { f.lx = nx; f.ly = ny; }
+    ctx.globalAlpha = prevA;
   }
 }
+
+// 每帧调用：保持够久的鸽子，开始在屏幕上晕开颜色（就算照片已经滚出屏幕也一样）
+export function updateSpots(now, W, H) {
+  const O = L().observe;
+  for (const f of found) {
+    if (f.spotAt != null || now - f.at < O.silhouetteSpreadMs + O.holdMs) continue;
+    f.spotAt = now;
+    const m = 60;
+    f.x = Math.max(m, Math.min(W - m, f.lx ?? f.x));
+    f.y = Math.max(m, Math.min(H - m, f.ly ?? f.y));
+  }
+}
+
+// 一个点的样子（颗粒、边缘溶解；羽毛图纸也用它）
+export function dotCanvas(f) {
+  return spotFor(f)[0];
+}
+
+// 给飞走的鸽子用：这只鸽子的颜色
+export function foundList() { return found; }
 
 // ================================================================ 屏幕上的颜色（参考图 05 / 01）
 
@@ -364,7 +444,8 @@ export function drawSpots(ctx, yaw, now, ink, fmtHeight, labelFont) {
   const S = L().spots;
   const t = Math.max(-1, Math.min(1, (yaw || 0) / S.yawMaxDeg)) * 0.5 + 0.5;
   for (const f of found) {
-    const p = Math.min(1, (now - f.at) / S.spreadMs);
+    if (f.spotAt == null) continue;                    // 还在保持鸽子的样子
+    const p = Math.min(1, (now - f.spotAt) / S.spreadMs);
     const e = ease(p);
     const breathe = 1 + 0.025 * Math.sin(now / 2600 + f.seed);
     const [a, b] = spotFor(f);
@@ -435,4 +516,12 @@ export function rgbToHsl(r, g, b) {
   else if (max === g) h = (b - r) / d + 2;
   else h = (r - g) / d + 4;
   return [h * 60, s, l];
+}
+
+// 调试：在控制台看某张照片里鸽子的剪影（不算找到）
+export function previewSilhouette(item, index) {
+  const pg = pigeonsOf(item.photo.id)[index];
+  const key = `${item.photo.id}#${index}`;
+  if (!sampled.has(key)) sampled.set(key, sampleNeck(item, pg));
+  return silhouetteFor(item, index, pg, sampled.get(key));
 }

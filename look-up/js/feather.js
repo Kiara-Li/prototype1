@@ -1,7 +1,7 @@
 // Look Up · 羽毛：用这一路收集到的颜色画一根羽毛；存在这台电脑上（IndexedDB），下一个人在地面上能看到。
 // 羽毛图纸（阶段 E）现在只是示意：正面颜色渐变，背面高度 / 答案 / 日期，折线是单独的一层 SVG（assets/fold-lines.svg）。
 
-import { noise } from './observe.js';
+import { noise, dotCanvas } from './observe.js';
 
 const L = () => window.LOOKUP;
 
@@ -141,6 +141,15 @@ export async function renderSheets({ found, answers, questions, date, fmtHeight 
   g.fillStyle = g.createPattern(noise(), 'repeat');
   g.fillRect(0, 0, SHEET, SHEET);
   g.globalAlpha = 1;
+  // 每只找到的鸽子一个点，按高度放进格子里（参考图 02）
+  const cells = 4;
+  const cell = (SHEET - 200) / cells;
+  [...found].sort((a, b) => a.height - b.height).slice(0, cells * cells).forEach((f, i) => {
+    const cx = 100 + cell * (i % cells) + cell / 2;
+    const cy = 100 + cell * Math.floor(i / cells) + cell / 2;
+    const d = cell * 0.42;
+    g.drawImage(dotCanvas(f), cx - d / 2, cy - d / 2, d, d);
+  });
   if (fold) g.drawImage(fold, 0, 0, SHEET, SHEET);
 
   // 背面：高度、答案、日期（折好后藏在里面）

@@ -56,7 +56,7 @@ def main():
         sugg = []
         for i in keep:
             h, w = masks[i].shape
-            polys = polygons_from_mask(masks[i], w, h)
+            polys = polygons_from_mask(masks[i], w, h, eps_ratio=0.0012)   # 精细一点：剪影要看得出头和尾巴
             if polys:
                 biggest = max(polys, key=len)
                 sugg.append({"polygon": biggest, "conf": round(float(confs[i]), 3)})

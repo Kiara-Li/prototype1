@@ -49,8 +49,8 @@ def load_records():
         return {r["filename"]: r for r in csv.DictReader(f)}
 
 
-def polygons_from_mask(mask, w, h):
-    """二值剪影 → 简化后的多边形（归一化坐标），只留面积够大的几块。"""
+def polygons_from_mask(mask, w, h, eps_ratio=0.004):
+    """二值剪影 → 简化后的多边形（归一化坐标），只留面积够大的几块。eps_ratio 越小轮廓越精细。"""
     m = (mask > 0.5).astype(np.uint8)
     contours, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     if not contours:
@@ -60,7 +60,7 @@ def polygons_from_mask(mask, w, h):
     for c in contours:
         if cv2.contourArea(c) < 0.1 * biggest:
             continue
-        eps = 0.004 * cv2.arcLength(c, True)
+        eps = eps_ratio * cv2.arcLength(c, True)
         c = cv2.approxPolyDP(c, eps, True)
         if len(c) < 3:
             continue

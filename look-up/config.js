@@ -40,6 +40,7 @@ window.LOOKUP = {
     //   'cycle' = 只放一张，隔 cycleSec 秒淡入淡出换成同一高度的另一张（取景框在用时不换）
     //   'stack' = 上下排开，一张一行（高度尺读数不变）
     sameHeight: 'cycle',
+    preferMorePigeons: true,    // 同一高度：鸽子多的照片先放（按 YOLO 数的个数从多到少轮流）
     cycleSec: 9,
     cycleFadeMs: 1800,
     marginPx: 120,              // 左右留白（左边是高度尺）
@@ -90,8 +91,20 @@ window.LOOKUP = {
     lightness: [0.42, 0.62],    // 颜色亮度夹在这个范围
     useSuggestionsUntilMarked: true,   // 还没手动标注的照片，先用 YOLO 的建议轮廓（脖子位置是估的）
     silhouetteSpreadMs: 3500,   // 被找到的鸽子：从脖子开始变成剪影要多久
+    holdMs: 5000,               // 找到之后，保持鸽子的样子多久
+    dissolveMs: 3000,           // 然后剪影慢慢淡去，同时颜色在屏幕上晕开
+    // 被找到的鸽子的样子（参考图 07，riso 印的鸽子）
+    silhouette: {
+      alpha: 0.88,              // 整体透明度（1 = 完全实心）
+      body: '#d4d4d2',          // 浅灰身体
+      shade: 'rgba(84,86,92,0.78)',    // 背上那团柔和的深灰
+      feet: 'rgba(240,150,200,0.95)',  // 粉脚
+      blur: 0.035,              // 整体模糊（相对鸽子大小）：0 = 清楚的图形，越大越糊
+      grain: 0.08,              // 颗粒
+    },
   },
   spots: {
+    show: true,                 // 屏幕上的色斑：鸽子保持一会儿之后才晕开，贴在屏幕上
     radiusPx: 120,              // 屏幕上色斑的大小
     spreadMs: 7000,             // 色斑慢慢晕开要多久
     ringRatio: 0.42,            // 细线圆圈的半径（相对色斑）
@@ -145,6 +158,15 @@ window.LOOKUP = {
     },
     twilightMin: 40,            // 日出日落前后多少分钟算黄昏
   },
+  // 最高处：找到的鸽子变成飞鸽，飞进天空
+  flight: {
+    enabled: false,             // 先关着：Kiara 会录一段动画放进来
+    flyMs: 6500,                // 每只飞完要多久
+    staggerMs: 380,             // 一只接一只起飞的间隔
+    sizePx: 120,                // 飞鸽大小（离得越远越小）
+    flapHz: 3,                  // 扇翅膀的频率
+  },
+
   ending: {
     featherFallMs: 5000,        // 羽毛从最高处落到地面（镜头跟着下来），要快
     lastLineMs: 6000,           // 「Now look up from your screen.」停留

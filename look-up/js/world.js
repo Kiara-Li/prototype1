@@ -5,8 +5,10 @@
 
 const L = () => window.LOOKUP;
 
-export function createWorld(photos) {
-  const sorted = [...photos].sort((a, b) => a.height_in - b.height_in || a.id.localeCompare(b.id));
+// countOf(photoId)：这张照片里有几只鸽子（同一高度时，鸽子多的先放）
+export function createWorld(photos, countOf = () => 0) {
+  const sorted = [...photos].sort((a, b) => a.height_in - b.height_in
+    || (L().rows.preferMorePigeons ? countOf(b.id) - countOf(a.id) : 0) || a.id.localeCompare(b.id));
   const mk = (p) => { const img = new Image(); img.decoding = 'async'; img.src = p.src; return { photo: p, img }; };
   let rows;
   if (L().rows.sameHeight === 'stack') {
@@ -21,7 +23,7 @@ export function createWorld(photos) {
     }
     rows = [...by.entries()].map(([h, items]) => ({ h, items }));
   }
-  rows.forEach((r, i) => { r.index = i; r.phase = (i * 0.37) % 1; });
+  rows.forEach((r, i) => { r.index = i; r.start = null; });
   return { rows, knots: [], k: 1, photoH: 100, W: 0, H: 0, topY: 0, clock: 0 };
 }
 
@@ -109,8 +111,9 @@ export function photoRects(world, camY) {
     const n = row.items.length;
     const put = (it, alpha, main) => out.push({ row, item: it, x: (world.W - it.w) / 2, y: base - it.h, w: it.w, h: it.h, base, alpha, main });
     if (n === 1) { put(row.items[0], 1, true); continue; }
-    // 同一高度的几张轮流出现，交叉淡入淡出
-    const t = world.clock + row.phase * cycle;
+    // 同一高度的几张轮流出现，交叉淡入淡出；从第一次看到这一行时开始算，所以先出现的总是鸽子最多的那张
+    if (row.start === null) row.start = world.clock;
+    const t = world.clock - row.start;
     const k = Math.floor(t / cycle);
     const into = t - k * cycle;
     const cur = row.items[k % n];

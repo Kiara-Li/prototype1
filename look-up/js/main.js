@@ -9,7 +9,8 @@
 
 import { createWorld, layoutWorld, tickWorld, heightToY, yToHeight, screenY, photoRects, drawRuler, fmtHeight } from './world.js';
 import { vision, startVision, pollVision } from './vision.js';
-import { setPigeons, updateFinding, drawFoundOnPhoto, drawSpots, found, pending } from './observe.js';
+import { setPigeons, updateFinding, drawFoundOnPhoto, drawSpots, updateSpots, found, pending, pigeonsOf } from './observe.js';
+import { createFlock, drawFlock, flockDone } from './flight.js';
 import { startAudio, setAudioHeight, playFeather } from './audio.js';
 import { sky, loadSky, skyColors, windVector, hex, rgb } from './sky.js';
 import { drawFeather, featherColors, feathers, renderSheets, downloadCanvas, printSheets } from './feather.js';
@@ -58,7 +59,7 @@ async function boot() {
   try { marks = await (await fetch('data/pigeons.json', { cache: 'no-store' })).json(); } catch { /* 还没标 */ }
   try { sugg = await (await fetch('data/suggestions.json')).json(); } catch { /* */ }
   setPigeons(photos, marks, sugg);
-  world = createWorld(photos);
+  world = createWorld(photos, (id) => pigeonsOf(id).length);
   window.lookUp.world = world;
   try { app.answers = JSON.parse(localStorage.getItem(C.storage.answers)) || []; } catch { app.answers = []; }
   app.groundFeathers = await feathers.all();
@@ -132,7 +133,9 @@ function update(now, dt) {
   } else if (app.state === 'ascent') {
     ascend(now, dt);
   } else if (app.state === 'top') {
-    if (since > 4500) { setState('falling'); playFeather(); app.fallFrom = app.camY; }
+    if (!app.flock) app.flock = C.flight.enabled ? createFlock(found, app.W, app.H, windVector()) : [];
+    const done = app.flock.length ? since > 1500 && flockDone(app.flock, since - 1500) : since > 4500;
+    if (done) { setState('falling'); playFeather(); app.fallFrom = app.camY; }
   } else if (app.state === 'falling') {
     const k = Math.min(1, since / C.ending.featherFallMs);
     app.camY = app.fallFrom * (1 - ease(k));
@@ -143,6 +146,8 @@ function update(now, dt) {
     const k = Math.min(1, since / 1400);
     layoutDashboard(ease(k));
   }
+
+  updateSpots(now, app.W, app.H);
 
   // 声音跟着高度走
   const h = yToHeight(world, app.camY);
@@ -241,8 +246,11 @@ function draw(now) {
     ctx.restore();
   }
 
-  // 屏幕上的颜色（贴在屏幕表面，不跟着高度走）
-  drawSpots(ctx, app.yaw, now, inkCss(), fmtHeight, `10px ${monoFont()}`);
+  // 屏幕上的颜色（贴在屏幕表面，不跟着高度走）：找到的鸽子保持一会儿之后，在它的位置晕开
+  if (C.spots.show) drawSpots(ctx, app.yaw, now, inkCss(), fmtHeight, `10px ${monoFont()}`);
+
+  // 最高处：找到的鸽子飞进天空
+  if (app.state === 'top' && app.flock) drawFlock(ctx, app.flock, now - app.stateAt - 1500);
 
   // 羽毛落下
   if (app.state === 'falling' || app.state === 'top') drawFalling(now);
