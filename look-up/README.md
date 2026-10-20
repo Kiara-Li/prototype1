@@ -1,7 +1,7 @@
 # Look Up（抬头）
 
-Prototype I 的新版本，建立在鸽子视线网站上。旧页面（Sightline / Viewfinder / Sound）不动。
-说明见 [`抬头_brief.md`](抬头_brief.md)。旧版本存档在 git 标签 `prototype1-v1`。
+Prototype I 的新版本，建立在鸽子视线网站上。旧页面（Sightline / Viewfinder / Sound）不动，旧版本存档在 git 标签 `prototype1-v1`。
+说明见 [`抬头_brief.md`](抬头_brief.md)。
 
 ## 打开
 
@@ -11,43 +11,97 @@ Prototype I 的新版本，建立在鸽子视线网站上。旧页面（Sightlin
 python3 -m http.server 8000
 ```
 
-- <http://localhost:8000/look-up/>：入口
+- <http://localhost:8000/look-up/>：作品（用 Chrome，允许摄像头）
+- <http://localhost:8000/look-up/?input=keys>：不开摄像头，用键盘和鼠标（救场用）
 - <http://localhost:8000/look-up/tools/mark.html>：标注工具
 
-## 阶段 A：标注工具 `tools/mark.html`
+第一次打开要联网：MediaPipe 模型约 21MB，天空数据来自 Open-Meteo。
 
-一张一张给照片里的鸽子描轮廓、点脖子。
+## 怎么走一遍
 
-| 操作 | 作用 |
+1. **dashboard**：灰蓝色外框，中间窗口里是地面的鸽子。点 `Begin`（这一下同时打开摄像头和声音）。
+2. **开场**：两只手比成取景框，然后往两边移开，窗口打开。
+3. **校准**：`Look at the screen.`，看着屏幕约 1.6 秒，记下平视的角度。
+4. **抬头**：微微抬头慢慢往上，抬多一点快一点，平视停下，低头往回。最快在约 20°。人脸丢了就停下。
+   每个高度一张大照片（约占屏幕六成），屏幕上大概只有一张；同一高度有好几张时，隔 9 秒淡入淡出换一张。已经走过的（眼睛下面的）照片慢慢模糊、变淡。
+5. **观察**：两只手比取景框（或者大致框住 + 眯一只眼），框里放大、清楚，上升暂停，同一高度也不换照片。框的中心停在一只鸽子身上，颜色先从它的脖子慢慢渗出来；约 0.9 秒后找到它：鸽子从脖子开始扩散成参考图 07 那样的哑光颗粒剪影（脖子一圈绿在上、紫在下），屏幕上慢慢晕开一块它脖子的颜色（不规则、边缘颗粒溶解，细线圆圈 + 高度）。转头时颜色在绿和紫之间偏一点。
+6. **停顿**：到 150″、360″、1320″ 自动停下问一个问题。`Enter` 留下答案，`Esc` 跳过。答案只存在这台电脑上。
+7. **天空**：飞行的鸽子之后只有天空，颜色是纽约此刻的时间（白天 / 黄昏 / 夜里），颗粒跟着真实风向漂。最高处 1000 m 有候鸟那一行，高度尺消失。
+8. **结尾**：一根羽毛（颜色是这一路找到的）从最高处慢慢落下，镜头跟着回到地面；`Now look up from your screen.`；然后回到 dashboard，窗口里是你的羽毛，可以下载 / 打印羽毛图纸。羽毛留在地面上，下一个人能看到。
+
+## 按键
+
+| 键 | 作用 |
 |---|---|
-| 点虚线轮廓 | 采用这条建议轮廓（YOLO 先找的），然后点脖子 |
-| 在照片上点 | 一个点一个点描轮廓；`Enter` 或点回第一个点闭合；然后点脖子 |
-| `⌫` | 撤销上一个点 |
-| `Esc` | 取消正在描的轮廓 / 跳过点脖子 |
-| 点已有的鸽子 | 选中；`Delete` 删除，`K` 重新点脖子 |
-| `D` | 这张照片标完了（没有鸽子也按 `D`，表示「这张没有」） |
-| `←` `→` / `N` | 上一张、下一张 / 下一张还没标完的 |
-| `S` | 显示 / 隐藏建议轮廓 |
-| 滚轮 / 按住 `Alt` 拖动 / `0` | 放大 / 平移 / 回到全图 |
+| `↑` `↓` / 滚轮 | 备用控制：上升、下降 |
+| 鼠标拖一个框 | 备用取景框；在框外单击或 `Esc` 去掉 |
+| `C` | 重新校准（平视） |
+| `D` | 显示调试信息（角度、速度、高度、天空数据） |
+| `F` | 全屏 |
+| `X` 然后 `Y` | 在 dashboard 上清空地面上的羽毛 |
 
-**保存**：每次改动都自动存在这个浏览器里，关掉再开还在。
-要变成项目里的文件：点右上角 **Save file**，第一次选 `look-up/data/pigeons.json`，之后每次点都直接覆盖那个文件（Chrome）。
-**Download** 下载一份，**Import** 读回来，**Load data/** 用 `look-up/data/pigeons.json` 覆盖浏览器里的。
+## 调参数
+
+参数在 [`config.js`](config.js)，文字在 [`content.js`](content.js)（作品名字也在这里）。常用的：
+
+- `dashboard.palette`：dashboard 的颜色，**1 灰蓝 / 2 纸色 / 3 强烈的黄**，改数字就行
+- `rows.sameHeight`：同一高度有好几张时，`'cycle'` 轮流换（默认）或 `'stack'` 上下排开；`cycleSec` 多久换一张
+- `rows.photoVh` / `rows.slotVh`：照片多大、两张之间隔多远
+- `depth`：走过的照片模糊、变淡多少（`enabled: false` 关掉）
+- `world.journeyScreens` / `world.curveH0`：天空那一段多长、低处拉开多少
+- `control`：死区 `deadzoneDeg`、最快的角度 `maxDeg`、最快速度 `maxScreensPerSec`、惯性 `responseMs`；**抬头反而往下走就把 `invertPitch` 改成 `true`**
+- `zones`：每个关键高度的模糊、雾、灰度、背景色
+- `audio.enabled`：**声音现在关着**，录好声音放进 `sound/` 后改成 `true`；`audio.layers` 是每种声音在每个高度的音量
+- `pauses` / `facts`：问题和事实出现的高度（文字在 `content.js` 按顺序对应）
+- `observe` / `spots`：取色的饱和、色斑大小、结构色偏移
+- `ending.featherFallMs`：羽毛落下要多久
+- `grain`：全局颗粒的强度、跳动频率
 
 ## 文件
 
 ```
 look-up/
-  index.html              入口（阶段 B 开始换成真正的网站）
-  content.js              所有文字和作品名字（改名只改这里）
-  assets/                 开场动画的两只手（已修掉指尖毛边）
-  data/photos.json        只留 Kiara 自己拍的照片（73 张），按高度排；图片直接引用 ../data/img/
-  data/photos_report.md   过滤结果清单
-  data/suggestions.json   每张照片的建议轮廓（YOLO）
-  data/pigeons.json       标注结果（标注工具 Save file 写到这里）
-  tools/build_photos.py   从 data/groups.json 过滤照片
-  tools/suggest_pigeons.py  生成建议轮廓（pip install ultralytics）
-  tools/mark.html, mark.js  标注工具
+  index.html              作品页面
+  config.js / content.js  参数 / 文字
+  js/main.js              状态（dashboard → 开场 → 校准 → 上升 → 天空 → 羽毛 → dashboard）、绘制、输入
+  js/world.js             竖向空间：高度曲线、照片按高度排、高度尺（英寸 → 英尺 → 米）
+  js/vision.js            摄像头：头的 pitch / yaw、眯眼、两只手
+  js/observe.js           找到鸽子、取色、剪影、屏幕上的色斑
+  js/audio.js             按高度交叉淡入淡出的声音
+  js/sky.js               纽约时间的天空颜色、Open-Meteo 风向
+  js/feather.js           羽毛、地面上的羽毛（IndexedDB）、羽毛图纸（示意）
+  assets/                 两只手（已修毛边）、fold-lines.svg（折线占位，直接替换）
+  sound/                  占位声音（合成的），换成纸翅膀声时文件名不变
+  data/photos.json        86 张照片（书里 74 张自己拍的 + 记录表的 12 张飞行）
+  data/suggestions.json   YOLO 建议轮廓
+  data/pigeons.json       你的标注（标注工具 Save file 写到这里；没有时用建议轮廓）
+  tools/                  build_photos.py · suggest_pigeons.py · make_sounds.py · mark.html
+  CREDITS.md              声音和数据的来源、授权
+../shared/head.js         头部角度（旧页面也在用）
+../frame.js               L 形手势、取景框（旧页面也在用）
 ```
 
-参考图 `refs/` 不放进仓库（是别人的作品），在 `Desktop/Thesis_网站整理/抬头_look-up/refs/`。
+复用方式：头部角度抽成了 `shared/head.js`，旧的视线页面也改成用它（只改了一行，已确认照常工作）。手势判定直接 import 旧的 `frame.js`，没有复制。摄像头和模型的启动代码旧页面各有一份，我没有去动它们（风险大于好处）。
+
+## 还没定 / 需要你确认
+
+- **鸽子标注**：你还没标的照片，先用 YOLO 的建议轮廓，脖子位置是估的（轮廓最高处往下一点），所以取色可能不准。标完后点标注工具的 Save file 存到 `data/pigeons.json`，刷新就会用你的。
+- **81_01 的高度**：暂用 960″。
+- **声音**：现在关着（`audio.enabled: false`）。`sound/` 里是合成的占位声音，换成你录的、文件名不变即可。
+- **问题和事实的高度**是我放的：问题在 150″（路灯）、360″（窗）、1320″（窗台）；事实在 60″（视线）、180″（窗台 / 屋檐附近）、1000 m（最高处）。
+- **yaw 方向**没实测：转头时颜色往哪边偏，不对就改 `control.invertYaw`。
+- **GitHub Pages** 还没开：要在 `kiara-li.github.io/prototype1/look-up/` 访问，得在仓库 Settings → Pages 里打开。
+
+## 我觉得还很「AI 感」、或者和参考图不一样的地方（阶段 F）
+
+1. **色斑**（已改）：现在是几块颜色叠起来、边缘颗粒溶解的不规则形状，慢慢晕开。和参考 05 比还偏小、偏实，里面颜色的流动可以再多一点。
+2. **被找到的鸽子**（已改）：现在是哑光颗粒剪影 + 脖子一圈绿紫色带。色带的方向是从身体中心指向脖子估的；标注时脖子点得准，色带就准。参考 07 的粉色脚没有做（不知道脚在哪）。
+3. **羽毛**是程序画的，形状偏像叶子，羽枝太少。最好换成你画 / 扫描的羽毛轮廓，颜色再往里填。
+4. **两只手**是干净抠图的照片，和其余印刷感的画面有点像拼贴。可以考虑加同样的颗粒和一点灰度，或者换成你自己拍的手。
+5. **dashboard 的 33 个圆圈编号**排在一起很像网页的分页按钮。参考 03 是少量、较大的圆圈；可能只显示有照片的几个关键高度更好。
+6. **天空**是平滑的数字渐变，即使有颗粒也偏干净；参考 09 的颗粒更粗、更哑光。可以把 `grain.opacity` 调高，或者天空单独加一层更粗的颗粒。
+7. **雾**是整块均匀的半透明颜色，没有层次。真实的雾气应该有一点不均匀。
+8. **声音**是合成的噪声，很「数字」，换成录音后会好很多。
+9. **照片**还留着一点颜色（灰度 0.55–0.9）。如果要更彻底的「只有找到的鸽子是鲜艳的」，把 `zones` 里的 `gray` 都改成 1。
+10. **图注**太长时我会把它缩短（先去掉地点，再只留构件），和书里完整的图注不一样。
+11. **鼠标指针**在上升时一直在屏幕上，可以考虑在 dashboard 之外隐藏。

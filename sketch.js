@@ -8,6 +8,7 @@
 //      Shift + 鼠标拖动：手动画一个取景框
 
 import { drawElevation } from './elevation.js';
+import { headAngles } from './shared/head.js';
 import { classifyHand, createFrameState, updateFrame, zoomFor, drawFrameMarks, HAND_EDGES } from './frame.js';
 import { FaceLandmarker, HandLandmarker, FilesetResolver } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
 
@@ -244,8 +245,7 @@ function detectHands(now) {
 
 // 从 4×4 变换矩阵（列主序）求绕 X 轴的旋转 = 俯仰角
 function pitchFromMatrix(m) {
-  // R[2][1] = m[6], R[2][2] = m[10]
-  let p = -Math.atan2(m[6], m[10]) * DEG;
+  let p = headAngles(m).pitch;          // shared/head.js
   if (C.tracking.invertPitch) p = -p;
   if (calib.invert) p = -p;
   return p;
