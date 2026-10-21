@@ -5,16 +5,20 @@
 //
 // 按键：↑ ↓ 上升 / 下降（备用）· 滚轮 · 鼠标拖出一个框（代替手势）· Esc 去掉框
 //      C 重新校准 · D 摄像头小窗 · F 全屏 · X 清空地面上的羽毛（dashboard，按 Y 确认）
-// URL 加 ?input=keys：不开摄像头，直接用备用控制。
+// URL 加 ?input=keys：不开摄像头，直接用备用控制。?debug：显示调试数值。?device=mobile / desktop：强制手机 / 电脑模式。
+//
+// 输入和画面分开：电脑端（input/desktop.js：摄像头、手势、键盘、鼠标）和手机端（input/mobile.js：陀螺仪、捏合、拖动）
+// 都只写 input/state.js 里的 lookValue、zoomValue、frame…；下面的画面只读这些值。
 
 import { createWorld, layoutWorld, tickWorld, heightToY, yToHeight, screenY, photoRects, drawRuler, fmtHeight } from './world.js';
-import { vision, startVision, pollVision } from './vision.js';
 import { setPigeons, updateFinding, drawFoundOnPhoto, drawSpots, updateSpots, found, pending, pigeonsOf } from './observe.js';
 import { createFlock, drawFlock, flockDone } from './flight.js';
 import { startAudio, setAudioHeight, playFeather } from './audio.js';
 import { sky, loadSky, skyColors, windVector, hex, rgb } from './sky.js';
 import { drawFeather, featherColors, feathers, renderSheets, downloadCanvas, printSheets } from './feather.js';
-import { createFrameState, updateFrame, zoomFor, drawFrameMarks } from '../../frame.js';
+import { drawFrameMarks } from '../../frame.js';
+import { input } from './input/state.js';
+import { isMobileDevice } from './input/device.js';
 
 const C = window.LOOKUP;
 const T = window.CONTENT;
@@ -22,7 +26,10 @@ const FRAME_CFG = { ...window.CONFIG.frame, ...C.frame };
 const $ = (id) => document.getElementById(id);
 const cv = $('scene');
 const ctx = cv.getContext('2d');
-const keysOnly = new URLSearchParams(location.search).get('input') === 'keys';
+const MOBILE = isMobileDevice();
+if (new URLSearchParams(location.search).has('debug')) C.debug.show = true;
+document.documentElement.classList.toggle('mobile', MOBILE);
+let driver;              // 输入：电脑或手机（boot 里按设备加载，手机不加载摄像头和手势模型）
 
 const app = {
   state: 'loading',
@@ -30,28 +37,26 @@ const app = {
   W: 0, H: 0,
   camY: 0,
   vel: 0,
-  zero: 0,                 // 校准：平视时的 pitch
-  pitch: null,             // 平滑后的 pitch（减过零点）
-  yaw: 0,
-  calibSamples: [],
   asked: new Set(),        // 已经问过的问题
   pausedQ: null,
   answers: [],
   groundFeathers: [],
   newFeather: null,
-  keyUp: false, keyDown: false,
   view: { s: 1, dy: 0 },   // dashboard / 开场时整个画面的放大和偏移
   clearConfirm: false,
-  dragFrom: null,
 };
-window.lookUp = { app, vision, found, sky };   // 控制台调试用
+window.lookUp = { app, input, found, sky };   // 控制台调试用
 
 let world;
-const frame = createFrameState();
 
 // ================================================================ 启动
 
 async function boot() {
+  const args = { app, C, FRAME_CFG, cv, getWorld: () => world };
+  driver = MOBILE
+    ? (await import('./input/mobile.js')).createMobileInput(args)
+    : (await import('./input/desktop.js')).createDesktopInput(args);
+  window.lookUp.driver = driver;
   const photos = (await (await fetch('data/photos.json')).json()).photos;
   photos.forEach((p) => { p.src = p.src.startsWith('data/') ? p.src : p.src.replace(/^\.\.\//, '../'); });
   let marks = null;
@@ -89,22 +94,19 @@ function loop(now) {
 
 function update(now, dt) {
   const since = now - app.stateAt;
-  const hands = keysOnly ? null : pollVision(now, FRAME_CFG.lShape, FRAME_CFG.eye, C.frame.everyNFrames);
-
-  // 头的角度（平滑）
-  if (vision.faceOk && vision.pitch !== null) {
-    const p = (vision.pitch - app.zero) * (C.control.invertPitch ? -1 : 1);
-    const a = 1 - Math.exp(-dt / C.control.pitchSmoothingMs);
-    app.pitch = app.pitch === null ? p : app.pitch + (p - app.pitch) * a;
-    const y = (vision.yaw || 0) * (C.control.invertYaw ? -1 : 1);
-    app.yaw += (y - app.yaw) * a;
-  }
+  const frame = input.frame;
 
   tickWorld(world, dt, frame.active || pending.key !== null || app.pausedQ !== null);
 
-  // 取景框（手势或鼠标）；只在上升的时候
-  if (app.state === 'ascent' || app.state === 'top') {
-    updateFrame(frame, hands, now, dt, { cfg: FRAME_CFG, video: vision.video, W: app.W, H: app.H, wink: vision.wink });
+  // 输入：电脑端摄像头 / 手势，手机端陀螺仪 / 捏合，都写进 input
+  driver.update(now, dt, app.state);
+
+  // 滚轮之类的一次性位移
+  if (input.scrollDelta) {
+    if (app.state === 'ascent' && app.pausedQ === null && !frame.active) {
+      app.camY = Math.max(0, Math.min(world.topY, app.camY + input.scrollDelta));
+    }
+    input.scrollDelta = 0;
   }
 
   if (app.state === 'intro') {
@@ -119,14 +121,13 @@ function update(now, dt) {
       hideHands();
       $('dash').style.display = 'none';
       setState('calibrate');
-      showLine(keysOnly || vision.status !== 'ready' ? '' : T.calibrate);
-      app.calibSamples = [];
+      driver.calibrate.start();
+      showLine(driver.calibrate.prompt());
     }
   } else if (app.state === 'calibrate') {
-    if (vision.faceOk && vision.pitch !== null) app.calibSamples.push(vision.pitch);
-    if (since > C.control.calibrationMs || keysOnly || vision.status === 'no-camera' || vision.status === 'error') {
-      if (app.calibSamples.length > 5) app.zero = median(app.calibSamples);
-      app.pitch = null;
+    driver.calibrate.sample();
+    if (driver.calibrate.ready(since)) {
+      driver.calibrate.end();
       showLine('');
       setState('ascent');
     }
@@ -160,18 +161,10 @@ function update(now, dt) {
 // 抬头 = 往上走：角度对应速度，不对应高度
 function ascend(now, dt) {
   const c = C.control;
-  let target = 0;
-  if (app.keyUp) target = c.keyScreensPerSec * app.H;
-  else if (app.keyDown) target = -c.keyScreensPerSec * app.H;
-  else if (!keysOnly && vision.faceOk && app.pitch !== null) {
-    const a = Math.abs(app.pitch);
-    if (a > c.deadzoneDeg) {
-      const t = Math.min(1, (a - c.deadzoneDeg) / (c.maxDeg - c.deadzoneDeg));
-      target = Math.sign(app.pitch) * Math.pow(t, 1.4) * c.maxScreensPerSec * app.H;
-      if (target < 0) target *= c.downFactor;
-    }
-  }
-  // 取景框在用 / 停顿 / 人脸丢失：停下
+  const frame = input.frame;
+  // lookValue（-1…1）→ 目标速度。人脸丢失 / 陀螺仪没数据时 lookValue 是 0
+  let target = input.lookValue * c.maxScreensPerSec * app.H;
+  // 取景框在用 / 停顿：停下
   if (frame.active || app.pausedQ !== null) target = 0;
   const k = 1 - Math.exp(-dt / c.responseMs);
   app.vel += (target - app.vel) * k;
@@ -187,11 +180,12 @@ function ascend(now, dt) {
     });
   }
   // 最高处
-  if (app.camY >= world.topY - 0.5) { app.camY = world.topY; app.vel = 0; frame.active = false; setState('top'); }
+  if (app.camY >= world.topY - 0.5) { app.camY = world.topY; app.vel = 0; driver.releaseFrame(); setState('top'); }
 
-  // 找鸽子：框的中心停在一只鸽子上 0.5 秒
+  // 找鸽子：框的中心（手机：屏幕中心）停在一只鸽子上
   const rects = photoRects(world, app.camY).filter((r) => r.main);
-  app.finding = updateFinding(rects, frame.active ? frame.rect : null, now);
+  const p = input.probe;
+  app.finding = updateFinding(rects, p ? { x: p.x, y: p.y, w: 0, h: 0 } : null, now);
 }
 
 // ================================================================ 绘制
@@ -213,7 +207,8 @@ function draw(now) {
   drawScene(now, z, false);
   ctx.restore();
 
-  // 取景框：框外变淡，框里放大、清楚
+  // 取景框：框外变淡，框里放大、清楚（手机：整个屏幕就是框）
+  const frame = input.frame;
   if (frame.alpha > 0 && frame.rect && (app.state === 'ascent' || app.state === 'top')) {
     const r = frame.rect;
     ctx.save();
@@ -221,19 +216,21 @@ function draw(now) {
     ctx.fillStyle = z.bgCss;
     ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.rect(r.x, r.y, r.w, r.h); ctx.fill('evenodd');
     ctx.restore();
-    const m = zoomFor(r, W, H, FRAME_CFG);
-    const cx = r.x + r.w / 2;
-    const cy = r.y + r.h / 2;
+    const m = input.zoomValue;
+    const cx = input.zoomCenter.x;
+    const cy = input.zoomCenter.y;
     ctx.save();
     ctx.globalAlpha = frame.alpha;
     ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
     ctx.translate(cx, cy); ctx.scale(m, m); ctx.translate(-cx, -cy);
     drawScene(now, z, true);
     ctx.restore();
-    ctx.save();
-    ctx.globalAlpha = frame.alpha;
-    drawFrameMarks(ctx, r, FRAME_CFG, inkCss());
-    ctx.restore();
+    if (input.frameMarks) {
+      ctx.save();
+      ctx.globalAlpha = frame.alpha;
+      drawFrameMarks(ctx, r, FRAME_CFG, inkCss());
+      ctx.restore();
+    }
   }
 
   // 停顿问问题时：画面淡下去，问题浮在上面
@@ -247,7 +244,7 @@ function draw(now) {
   }
 
   // 屏幕上的颜色（贴在屏幕表面，不跟着高度走）：找到的鸽子保持一会儿之后，在它的位置晕开
-  if (C.spots.show) drawSpots(ctx, app.yaw, now, inkCss(), fmtHeight, `10px ${monoFont()}`);
+  if (C.spots.show) drawSpots(ctx, input.yaw, now, inkCss(), fmtHeight, `10px ${monoFont()}`);
 
   // 最高处：找到的鸽子飞进天空
   if (app.state === 'top' && app.flock) drawFlock(ctx, app.flock, now - app.stateAt - 1500);
@@ -507,7 +504,9 @@ function setupDashboard() {
   $('dLines').innerHTML = T.dashboard.lines.map((l) => `<p>${l}</p>`).join('');
   $('dHow').textContent = T.dashboard.howTo;
   $('dBegin').textContent = T.dashboard.begin;
-  $('dKeys').textContent = keysOnly ? T.dashboard.keysNote : '';
+  $('rotate').textContent = T.rotate;
+  $('dKeys').textContent = driver.keysOnly ? T.dashboard.keysNote : '';
+  if (MOBILE) $('dHow').textContent = T.dashboard.howToMobile;
   $('eTitle').textContent = T.dashboard.title;
   $('eLines').innerHTML = T.dashboard.endLines.map((l) => `<p>${l}</p>`).join('');
   $('eDownload').textContent = T.dashboard.download;
@@ -574,8 +573,8 @@ async function begin() {
   $('dStart').style.pointerEvents = 'none';
   $('dCircles').style.opacity = 0;
   $('dClear').style.opacity = 0;
+  driver.begin();          // 手机：这一下点击里请求陀螺仪权限（iOS 必须）；电脑：打开摄像头
   startAudio();
-  if (!keysOnly) startVision();
   setState('intro');
 }
 
@@ -616,27 +615,33 @@ function toEnd() {
 function ask(i) {
   app.pausedQ = i;
   $('pQ').textContent = T.questions[i];
-  $('pNote').innerHTML = `${T.answerNote}<br>${T.answerHint}`;
+  $('pNote').innerHTML = `${T.answerNote}<br>${MOBILE ? T.answerHintMobile : T.answerHint}`;
   $('pInput').value = app.answers[i] || '';
   $('prompt').style.display = 'block';
   setTimeout(() => $('pInput').focus(), 50);
 }
 
+function closeQuestion(keep) {
+  const i = app.pausedQ;
+  if (i === null) return;
+  if (keep && $('pInput').value.trim()) {
+    app.answers[i] = $('pInput').value.trim();
+    try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
+  }
+  app.asked.add(i);
+  app.pausedQ = null;
+  $('prompt').style.display = 'none';
+  $('pInput').blur();
+}
+
 $('pInput').addEventListener('keydown', (e) => {
   e.stopPropagation();
   if (e.isComposing || e.keyCode === 229) return;          // 输入法正在选字
-  if (e.key === 'Enter' || e.key === 'Escape') {
-    const i = app.pausedQ;
-    if (e.key === 'Enter' && $('pInput').value.trim()) {
-      app.answers[i] = $('pInput').value.trim();
-      try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
-    }
-    app.asked.add(i);
-    app.pausedQ = null;
-    $('prompt').style.display = 'none';
-    $('pInput').blur();
-  }
+  if (e.key === 'Enter') closeQuestion(true);
+  else if (e.key === 'Escape') closeQuestion(false);
 });
+// 手机没有 Esc：收起键盘 / 点别处 = 留下已经写的（没写就是跳过）
+if (MOBILE) $('pInput').addEventListener('blur', () => setTimeout(() => closeQuestion(true), 0));
 
 // ================================================================ 文字、颗粒、调试
 
@@ -680,29 +685,25 @@ function renderDebug() {
   if (!C.debug.show) { el.style.display = 'none'; return; }
   el.style.display = 'block';
   el.textContent = [
-    `state     ${app.state}`,
-    `camera    ${keysOnly ? 'keys' : vision.status}${vision.faceOk ? ' · face' : ''}${vision.wink ? ' · wink' : ''}`,
-    `pitch     ${app.pitch === null ? '—' : app.pitch.toFixed(1) + '°'}   zero ${app.zero.toFixed(1)}°`,
-    `yaw       ${app.yaw.toFixed(1)}°`,
+    `state     ${app.state}${MOBILE ? ' · mobile' : ''}`,
+    ...driver.debugLines(),
+    `look      ${input.lookValue.toFixed(2)}   zoom ${input.zoomValue.toFixed(2)}`,
     `speed     ${(app.vel / app.H).toFixed(2)} screens/s`,
     `height    ${fmtHeight(app.h || 0)}`,
-    `frame     ${frame.active ? 'on' : 'off'}`,
+    `frame     ${input.frame.active ? 'on' : 'off'}`,
     `found     ${found.length}`,
     `sky       ${sky.source} · wind ${sky.windDirection}° ${sky.windSpeed} km/h · ${skyColors().phase}`,
   ].join('\n');
 }
 
-// ================================================================ 输入：键盘、滚轮、鼠标框
+// ================================================================ 按键（调试、全屏、校准、清空羽毛）
 
 window.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
   const k = e.key.toLowerCase();
-  if (e.key === 'ArrowUp') { app.keyUp = true; e.preventDefault(); }
-  else if (e.key === 'ArrowDown') { app.keyDown = true; e.preventDefault(); }
-  else if (k === 'd') C.debug.show = !C.debug.show;
+  if (k === 'd') C.debug.show = !C.debug.show;
   else if (k === 'f') { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
-  else if (k === 'c' && app.state === 'ascent') { setState('calibrate'); app.calibSamples = []; showLine(T.calibrate); }
-  else if (e.key === 'Escape' && frame.lastBoth === Infinity) frame.lastBoth = -1e9;
+  else if (k === 'c' && app.state === 'ascent') { setState('calibrate'); driver.calibrate.start(); showLine(T.calibrate); }
   else if (k === 'x' && (app.state === 'dashboard' || app.state === 'end') && app.groundFeathers.length) {
     app.clearConfirm = true; $('dClear').textContent = T.dashboard.clearConfirm;
   } else if (k === 'y' && app.clearConfirm) {
@@ -710,35 +711,7 @@ window.addEventListener('keydown', (e) => {
     app.clearConfirm = false;
   } else if (app.clearConfirm) { app.clearConfirm = false; $('dClear').textContent = ''; }
 });
-window.addEventListener('keyup', (e) => {
-  if (e.key === 'ArrowUp') app.keyUp = false;
-  if (e.key === 'ArrowDown') app.keyDown = false;
-});
-window.addEventListener('wheel', (e) => {
-  if (app.state !== 'ascent' || app.pausedQ !== null || frame.active) return;
-  app.camY = Math.max(0, Math.min(world.topY, app.camY - e.deltaY * C.control.wheelFactor));
-}, { passive: true });
-
-// 鼠标拖出一个框 = 取景框（备用）；松开后留着，Esc 或在框外单击去掉
-cv.addEventListener('mousedown', (e) => {
-  if (app.state !== 'ascent' && app.state !== 'top') return;
-  app.dragFrom = [e.clientX, e.clientY];
-});
-window.addEventListener('mousemove', (e) => {
-  if (!app.dragFrom) return;
-  const r = { x: Math.min(app.dragFrom[0], e.clientX), y: Math.min(app.dragFrom[1], e.clientY), w: Math.abs(e.clientX - app.dragFrom[0]), h: Math.abs(e.clientY - app.dragFrom[1]) };
-  if (r.w < FRAME_CFG.minSizePx || r.h < FRAME_CFG.minSizePx) return;
-  frame.target = r;
-  if (!frame.rect) frame.rect = { ...r };
-  frame.active = true;
-  frame.lastBoth = Infinity;
-});
-window.addEventListener('mouseup', (e) => {
-  if (!app.dragFrom) return;
-  const moved = Math.hypot(e.clientX - app.dragFrom[0], e.clientY - app.dragFrom[1]);
-  if (moved < 4 && frame.lastBoth === Infinity) frame.lastBoth = -1e9;   // 单击：去掉手动框
-  app.dragFrom = null;
-});
+// ↑ ↓、滚轮、鼠标拖框（电脑）和陀螺仪、捏合、拖动（手机）在 input/ 里
 
 // ================================================================ 工具
 

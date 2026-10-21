@@ -13,6 +13,7 @@ window.CONTENT = {
       'Follow them up, one height at a time.',
     ],
     howTo: 'Turn on your camera. Sit down. Look at the screen.',   // TODO 占位
+    howToMobile: 'Hold your phone in front of you. Raise it toward the sky.',   // TODO 占位（手机）
     begin: 'Begin',
     keysNote: 'No camera: use ↑ ↓ and drag a frame with the mouse.',
     // 结尾回到 dashboard 时
@@ -29,6 +30,8 @@ window.CONTENT = {
   },
 
   calibrate: 'Look at the screen.',
+  calibrateMobile: 'Hold still.',                     // 手机：记下开始时的姿态
+  rotate: 'Please turn your phone upright.',          // 手机横过来时
   lost: '',                                           // 人脸丢失时不显示文字，只是停下
 
   // ---- 和高度有关的事实（对应 config.facts 的高度）
@@ -46,6 +49,7 @@ window.CONTENT = {
   ],
   answerNote: 'Your answers stay on this computer. They will be printed on your feather.',
   answerHint: 'Enter to keep · Esc to skip',
+  answerHintMobile: 'Return to keep · tap outside to skip',
 
   last: 'Now look up from your screen.',
 

@@ -72,6 +72,21 @@ window.LOOKUP = {
     wheelFactor: 1.0,           // 备用控制：滚轮
   },
 
+  // ---------------------------------------------------------------- 手机模式（input/mobile.js）
+  // 把手机往上举、往天上指 = 抬头；双指捏合 = 放大（范围用上面 frame 的 zoomMax）
+  mobile: {
+    deadzoneDeg: 3,             // 相对开始姿态 ±3° 内不动
+    maxDeg: 25,                 // 往上举这么多度是最快（手机能转的角度比头大）
+    smoothingMs: 140,           // 陀螺仪的低通滤波（越大越稳、越慢）
+    invert: false,              // 举起来反而往下走就改成 true
+    calibrationMs: 900,         // 开始时记录姿态的时长
+    gyroTimeoutMs: 1500,        // 这么久没收到陀螺仪数据 → 改用单指拖动
+    dragDeadzonePx: 8,          // 单指拖动（兜底）：离起点这么近不动
+    dragMaxVh: 0.25,            // 拖出屏幕高度的这么多是最快
+    zoomActiveAbove: 1.05,      // 捏合放大超过这个倍数，算「在取景」（上升暂停、开始找鸽子）
+    doubleTapMs: 300,           // 双击回到不放大
+  },
+
   // 摄像头小窗（按 D）
   debug: { show: false, cameraWidth: 200 },
 
