@@ -19,6 +19,7 @@ import { drawFeather, featherColors, feathers, renderSheets, downloadCanvas, pri
 import { drawFrameMarks } from '../../frame.js';
 import { input } from './input/state.js';
 import { isMobileDevice } from './input/device.js';
+import { createDashboard } from './dashboard.js';
 
 const C = window.LOOKUP;
 const T = window.CONTENT;
@@ -29,7 +30,12 @@ const ctx = cv.getContext('2d');
 const MOBILE = isMobileDevice();
 if (new URLSearchParams(location.search).has('debug')) C.debug.show = true;
 document.documentElement.classList.toggle('mobile', MOBILE);
+// 电脑：新的 dashboard（dashboard.js，按 Figma）。手机先用原来的，等手机版设计。?olddash：电脑上也用原来的
+const PARAMS = new URLSearchParams(location.search);
+const NEW_DASH = !MOBILE && !PARAMS.has('olddash');
+document.documentElement.classList.toggle('newdash', NEW_DASH);
 let driver;              // 输入：电脑或手机（boot 里按设备加载，手机不加载摄像头和手势模型）
+let dash = null;
 
 const app = {
   state: 'loading',
@@ -72,8 +78,57 @@ async function boot() {
   makeGrain();
   resize();
   setupDashboard();
+  if (NEW_DASH) setupNewDashboard();
   setState('dashboard');
   requestAnimationFrame(loop);
+}
+
+// 电脑版 dashboard：let's play 时开摄像头；教完两个动作 → 直接进入（不再走原来的开场）
+function setupNewDashboard() {
+  app.view.s = 1;
+  app.view.dy = 0;
+  let unlocked = false;
+  try { unlocked = localStorage.getItem(C.storage.unlocked) === '1'; } catch { /* */ }
+  if (PARAMS.has('unlock')) unlocked = true;
+  if (PARAMS.has('lock')) unlocked = false;
+  // chapter 刻度（占位）：每个高度用离它最近的那一行的照片当窗口里的画面
+  const chapters = C.dash.chapters.map((h) => {
+    let best = null;
+    for (const r of world.rows) if (!best || Math.abs(Math.log1p(r.h) - Math.log1p(h)) < Math.abs(Math.log1p(best.h) - Math.log1p(h))) best = r;
+    return { h, label: fmtHeight(h), src: best ? best.items[0].photo.src : null };
+  });
+  dash = createDashboard({
+    C, T, driver, unlocked, chapters,
+    onPlay: () => driver.begin(),
+    onEnter: () => {
+      startAudio();
+      setState('calibrate');
+      driver.calibrate.start();
+      showLine(driver.calibrate.prompt());
+    },
+    feather: {
+      draw: (canvas) => {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        canvas.width = w * devicePixelRatio;
+        canvas.height = h * devicePixelRatio;
+        const g = canvas.getContext('2d');
+        g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        const last = app.newFeather || app.groundFeathers[app.groundFeathers.length - 1];
+        const colors = found.length ? featherColors(found) : last ? last.colors : featherColors([]);
+        drawFeather(g, w * 0.46, h * 0.94, 0.35, h * 0.86, h * 0.21, colors, 7);
+      },
+      download: async () => {
+        const s = await renderSheets(sheetData());
+        downloadCanvas(s.front, 'feather-front.png');
+        setTimeout(() => downloadCanvas(s.back, 'feather-back.png'), 400);
+      },
+      print: async () => printSheets(await renderSheets(sheetData())),
+      again: () => location.reload(),
+    },
+  });
+  window.lookUp.dash = dash;
+  dash.show();
 }
 
 function setState(s) {
@@ -100,6 +155,7 @@ function update(now, dt) {
 
   // 输入：电脑端摄像头 / 手势，手机端陀螺仪 / 捏合，都写进 input
   driver.update(now, dt, app.state);
+  if (dash) dash.update(now);
 
   // 滚轮之类的一次性位移
   if (input.scrollDelta) {
@@ -251,7 +307,7 @@ function draw(now) {
 
   // 羽毛落下
   if (app.state === 'falling' || app.state === 'top') drawFalling(now);
-  if (app.state === 'end') drawEndFeather();
+  if (app.state === 'end' && !NEW_DASH) drawEndFeather();
 }
 
 // 整个世界：背景 → 每一行（照片、基线、图注、被找到的鸽子）→ 地面上的羽毛 → 雾 → 事实 → 高度尺
@@ -600,6 +656,8 @@ function hideHands() { $('handL').style.opacity = 0; $('handR').style.opacity = 
 
 function toEnd() {
   setState('end');
+  try { localStorage.setItem(C.storage.unlocked, '1'); } catch { /* */ }
+  if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(); return; }
   $('dash').style.display = 'block';
   $('dStart').style.display = 'none';
   $('dEnd').style.opacity = 1;
@@ -685,7 +743,7 @@ function renderDebug() {
   if (!C.debug.show) { el.style.display = 'none'; return; }
   el.style.display = 'block';
   el.textContent = [
-    `state     ${app.state}${MOBILE ? ' · mobile' : ''}`,
+    `state     ${app.state}${MOBILE ? ' · mobile' : ''}${dash ? ` · dash ${dash.step} (${dash.face})` : ''}`,
     ...driver.debugLines(),
     `look      ${input.lookValue.toFixed(2)}   zoom ${input.zoomValue.toFixed(2)}`,
     `speed     ${(app.vel / app.H).toFixed(2)} screens/s`,
@@ -725,7 +783,7 @@ function resize() {
   const ratio = world.topY ? app.camY / world.topY : 0;
   layoutWorld(world, app.W, app.H);
   app.camY = ratio * world.topY;
-  if (app.state === 'dashboard') { app.view.dy = dashDy(); layoutDashboard(1); }
+  if (app.state === 'dashboard' && !NEW_DASH) { app.view.dy = dashDy(); layoutDashboard(1); }
   if (app.state === 'end') layoutDashboard(1);
 }
 window.addEventListener('resize', () => { if (world) resize(); });

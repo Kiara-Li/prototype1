@@ -14,7 +14,8 @@ export const input = {
 
   // 取景框：{ active, rect, alpha, … }。电脑端就是 frame.js 的状态；手机端是整个屏幕
   frame: null,
-  frameMarks: true,       // 是否画取景框的四角线（手机端不画）
+  frameMarks: true,
+  wantFrame: false,       // dashboard 最后一步要检测两只手比取景框（不在上升中也要算）       // 是否画取景框的四角线（手机端不画）
 
   // 找鸽子看的那一点（没放大时的屏幕坐标），没在框 / 放大就是 null
   probe: null,

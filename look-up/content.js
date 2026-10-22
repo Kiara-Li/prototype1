@@ -29,6 +29,45 @@ window.CONTENT = {
     clearConfirm: 'Clear all feathers on the ground? Press Y to confirm.',
   },
 
+  // ---- 电脑版 dashboard（按 Figma frame 2–14）。卡片上的字按设计稿断行：一行一个字符串
+  dash: {
+    thesis: 'Kiara Li thesis website',
+    thesisUrl: 'https://kiarali.com',               // TODO 之后换成 living archive 的地址
+    about: 'about this project',
+    aboutUrl: 'https://kiarali.com',                // TODO 之后换成只介绍这个项目的页面
+    feather: 'see your feather and how to fold it',
+    featherLocked: 'look all the way up to unlock this',
+    headline: ['LOOK UP!', 'AN ART', 'EXPERIMENT', 'THAT HAS YOU', 'LOOK UP', 'TO FIND THE', 'PIGEONS HIDING', 'IN THE CITY.'],
+    // 卡片四周：左上一组（横 + 竖）连成一句，右下一组连成一句；不再重复左边标题那句
+    edgeTL: ['pigeons live at every height of this city,', 'most of them above your eyes.'],
+    edgeBR: ['so look up, slowly, one height at a time,', 'and find the ones looking down.'],
+    tipsTitle: 'a few tips',
+    tips: [                                            // 每条一行（右栏大约 30 个字母）
+      'Camera on. Nothing is saved.',
+      'Phone or computer, both work.',
+      'Do the hand gestures shown.',
+      'Heads up: lots of birds.',
+      'Sit somewhere with good light.',
+      'Press F for full screen.',
+    ],
+    chaptersLocked: 'chapters! unlock them by looking all the way up',
+    chaptersOpen: 'chapters! hover over one to take a peek',
+    // 卡片
+    congrats: ['congrats! you found', 'this feather! you are', 'invited to play with', 'this website!'],
+    play: 'let’s play!',
+    two: ['there are only two', 'actions you need', 'to play around'],
+    first: 'the first one',
+    head: ['now move your', 'head up to'],
+    lookUp: 'LOOK UP',
+    nice: ['Nice work!', 'remember to look', 'up to keep', 'scrolling'],
+    second: 'the second one',
+    hands: ['follow the hands on', 'the bottom left and', 'top right to take a', 'peek! now it starts!'],
+    go: 'continue',
+    noCamUp: 'no camera? press ↑',
+    noCamHands: 'no camera? click the card',
+    featherFace: ['this is your feather.', 'print it, fold it, keep it.'],
+  },
+
   calibrate: 'Look at the screen.',
   calibrateMobile: 'Hold still.',                     // 手机：记下开始时的姿态
   rotate: 'Please turn your phone upright.',          // 手机横过来时

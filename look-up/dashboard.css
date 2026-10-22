@@ -1,0 +1,135 @@
+/* Look Up · 电脑版 dashboard（Figma frame 2–14）
+   所有长度都是网格单位 --u（dashboard.js 按屏幕算：u = min(宽 / 96, 高 / 62)，1728 宽时 18px）。
+   位置在 dashboard.js 的 layout() 里算，这里只管样子。?grid 显示背后的网格。 */
+
+#dx {
+  --u: 18px;
+  --dx-bg: #f5f5f5;
+  --dx-ink: #000;
+  --dx-line: #7b7b7b;
+  --dx-grey-ink: #6b6b6b;      /* 标签（等宽字）：灰 */
+  --dx-faint: #a3a3a3;         /* 锁着的 */
+  --dx-grey: #d9d9d9;
+  position: fixed; inset: 0; z-index: 30; display: none; overflow: hidden;
+  background: var(--dx-bg); color: var(--dx-ink);
+  font-family: var(--sans); -webkit-font-smoothing: antialiased;
+}
+html.newdash #dash, html.newdash .hand { display: none !important; }
+html.dx-on #grain { display: none; }
+#dx > * { position: absolute; }
+#dx a { color: inherit; text-decoration: none; cursor: pointer; }
+
+/* ---- 网格线 */
+#dx .dx-line { background: var(--dx-line); transition: opacity 500ms; }
+#dx .dx-line.h { left: 0; width: 100%; height: 1px; }
+#dx .dx-line.v { top: 0; height: 100%; width: 1px; }
+
+/* ---- 字 */
+#dx .dx-small { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); letter-spacing: -0.005em; white-space: nowrap; }
+/* 等宽小标签：顶上的「你的羽毛」、底下的 chapters、tips 的标题、窗口下面的字 */
+#dx .dx-label { font-family: var(--mono); font-size: calc(var(--u) * 1.1); line-height: calc(var(--u) * 1.5); letter-spacing: 0.04em;
+                color: var(--dx-grey-ink); white-space: nowrap; }
+
+/* 上下两栏：一行三格，基线对齐 */
+#dx .dx-band { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; transform: translateY(-50%); }
+#dx .dx-band > :first-child { justify-self: start; }
+#dx .dx-band > :nth-child(2) { justify-self: center; }
+#dx .dx-band > :last-child { justify-self: end; }
+#dx .dx-band > * { transition: opacity 500ms; }
+#dx .dx-thesis:hover, #dx .dx-about:hover { opacity: 0.55; }
+#dx .dx-featherlink.locked { color: var(--dx-faint); cursor: default; }
+#dx .dx-featherlink.open { color: var(--dx-ink); }
+#dx .dx-featherlink.open:hover { opacity: 0.55; }
+
+#dx .dx-head { font-size: calc(var(--u) * 2.46); line-height: calc(var(--u) * 2.28); letter-spacing: -0.025em; transition: opacity 500ms; }
+
+#dx .dx-edge { line-height: calc(var(--u) * 1.5); }
+#dx .dx-edge.v { writing-mode: vertical-rl; transform: rotate(180deg); }
+
+/* ---- tips（右栏下方） */
+#dx .dx-tips { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); transition: opacity 500ms; }
+#dx .dx-tips h2 { font-weight: normal; margin: 0; padding-bottom: calc(var(--u) * 0.5); }
+#dx .dx-tips ol { list-style: none; margin: 0; padding: 0; counter-reset: tip; border-bottom: 1px solid var(--dx-line); }
+#dx .dx-tips li { counter-increment: tip; display: grid; grid-template-columns: calc(var(--u) * 2.5) 1fr;
+                  align-items: baseline;
+                  border-top: 1px solid var(--dx-line); padding: calc(var(--u) * 0.5) 0; }
+#dx .dx-tips li::before { content: counter(tip, decimal-leading-zero); font-family: var(--mono); font-size: calc(var(--u) * 1.1); color: var(--dx-grey-ink); }
+
+/* ---- chapter 刻度（下边线下面） */
+#dx .dx-ticks { transition: opacity 500ms; }
+#dx .dx-tick { position: absolute; top: 0; width: calc(var(--u) * 1.5); margin-left: calc(var(--u) * -0.75); height: calc(var(--u) * 2.5); }
+#dx .dx-tick::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: calc(var(--u) * 1.5);
+                       background: var(--dx-line); transition: height 300ms cubic-bezier(.3,0,.2,1), background 300ms; }
+#dx .dx-ticks.open .dx-tick { cursor: pointer; }
+#dx .dx-ticks.open .dx-tick:hover::before, #dx .dx-tick.on::before { height: calc(var(--u) * 2.25); background: var(--dx-ink); }
+
+/* ---- 黑色方块把字拉出来 */
+#dx .rv { position: relative; display: block; width: max-content; }
+#dx .rv-bar { position: absolute; left: -0.04em; right: -0.04em; top: 0.14em; bottom: 0.1em; background: var(--dx-ink);
+              transform: scaleX(0); pointer-events: none; }
+
+/* ---- 卡片 */
+#dx .dx-card { transform-origin: 50% 50%; }
+#dx .dx-rot { position: absolute; inset: 0; transform-style: preserve-3d; }
+#dx .dx-face { position: absolute; inset: 0; overflow: hidden; background: #fff; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+#dx .dx-face.b { transform: rotateY(180deg); }
+#dx .dx-face.grey { background: var(--dx-grey); }
+#dx .dx-face.hidden { pointer-events: none; }
+#dx .dx-shade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+#dx .dx-body { position: absolute; inset: 0; transition: opacity 350ms; }
+
+#dx .dx-art { position: absolute; inset: var(--u); background: url("assets/dash/card_front.png") center / 100% 100% no-repeat; }
+#dx .dx-pigeon { position: absolute; inset: 0; background: url("assets/dash/pigeon_icon.png") center / cover no-repeat; }
+
+#dx .dx-ctext { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 10.6); width: calc(var(--u) * 21);
+                font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; white-space: nowrap; }
+#dx .dx-btn { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 26.5); width: calc(var(--u) * 20); height: calc(var(--u) * 4.5);
+              padding: 0 0 0 calc(var(--u) * 3.5); box-sizing: border-box; border: 0; background: none; color: inherit; cursor: pointer;
+              font: inherit; font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 4.5); text-align: left; letter-spacing: -0.01em; }
+#dx .dx-btn .rv { display: inline-block; }
+#dx .dx-btn::before, #dx .dx-btn::after, #dx .dx-mark { content: ""; position: absolute; width: calc(var(--u) * 2.75); height: calc(var(--u) * 3);
+              border: 0 solid var(--dx-ink); transition: transform 350ms cubic-bezier(.3,0,.2,1); }
+#dx .dx-btn::before, #dx .dx-mark.bl { left: 0; bottom: 0; border-left-width: 2px; border-bottom-width: 2px; }
+#dx .dx-btn::after, #dx .dx-mark.tr { right: 0; top: 0; border-top-width: 2px; border-right-width: 2px; }
+#dx .dx-btn:hover::before { transform: translate(calc(var(--u) * -0.5), calc(var(--u) * 0.5)); }
+#dx .dx-btn:hover::after { transform: translate(calc(var(--u) * 0.5), calc(var(--u) * -0.5)); }
+#dx .dx-big { position: absolute; left: 0; top: 0; line-height: 1; white-space: nowrap; will-change: transform; }
+#dx .dx-btn:focus { outline: none; }
+#dx .dx-btn:focus-visible { outline: 1px dashed var(--dx-ink); outline-offset: 4px; }
+#dx .dx-hint { position: absolute; left: calc(var(--u) * 10); bottom: calc(var(--u) * 3); font-family: var(--mono);
+               font-size: calc(var(--u) * 1); line-height: calc(var(--u) * 1.5); color: #6d6d6d; letter-spacing: 0.06em; }
+
+/* 窗口（chapter 预览）：卡片上开一个正方形的洞 */
+#dx .dx-hole { position: absolute; left: calc(var(--u) * 6); top: calc(var(--u) * 5); width: calc(var(--u) * 28); height: calc(var(--u) * 28);
+               background: var(--dx-grey) url("assets/dash/window_placeholder.jpg") center / cover; overflow: hidden; }
+#dx .dx-hole img, #dx .dx-hole video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); display: block; }
+#dx .dx-holelabel { position: absolute; left: calc(var(--u) * 6); top: calc(var(--u) * 34.25); font-family: var(--mono);
+                    font-size: calc(var(--u) * 1.2); line-height: calc(var(--u) * 1.5); letter-spacing: 0.12em; color: var(--dx-grey-ink); }
+
+/* 你的羽毛 */
+#dx .dx-fcanvas { position: absolute; left: 0; top: 0; width: 100%; height: calc(var(--u) * 24); }
+#dx .dx-ftext { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 24); font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; white-space: nowrap; }
+#dx .dx-flinks { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 31); display: flex; flex-direction: column; align-items: flex-start;
+                 font-family: var(--mono); font-size: calc(var(--u) * 1.1); line-height: calc(var(--u) * 1.75); letter-spacing: 0.08em; color: var(--dx-grey-ink); }
+#dx .dx-flinks a { border-bottom: 1px solid currentColor; }
+#dx .dx-flinks a:hover { opacity: 0.55; }
+#dx .dx-flinks span { opacity: 0.55; }
+
+/* 手势成功：缩小卡片的四角标记 */
+#dx .dx-marks { pointer-events: none; opacity: 0; }
+
+/* 两只手 */
+#dx .dx-hand { left: 0; top: 0; pointer-events: none; transform-origin: 0 0; will-change: transform; user-select: none; --hf: 0%; }
+/* 图片在掌心 / 手腕处是裁掉的直边：手移到中间时让这两条边淡掉（--hf 0% = 不淡） */
+@property --hf { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+#dx .dx-hand.soft { --hf: 26%; }
+#dx .dx-hand[data-k="bl"] {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--hf)), linear-gradient(to top, transparent 0, #000 var(--hf));
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+#dx .dx-hand[data-k="tr"] {
+  -webkit-mask-image: linear-gradient(to left, transparent 0, #000 var(--hf)), linear-gradient(to bottom, transparent 0, #000 var(--hf));
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+
+/* ?grid：背后的网格 */
+#dx .dx-gridview { inset: 0; pointer-events: none; z-index: 5; }
+#dx.fading { transition: background-color var(--leave, 1500ms) ease, opacity var(--leave, 1500ms) ease; }

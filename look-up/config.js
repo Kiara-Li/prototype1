@@ -197,7 +197,24 @@ window.LOOKUP = {
     windDrift: 6,               // 颗粒跟着真实风向漂移的速度
   },
 
+  // 电脑版 dashboard（dashboard.js）。长度都是网格单位 u：u = min(屏幕宽 / 96, 屏幕高 / 62)，1728 宽时 u = 18px
+  dash: {
+    flipMs: 1100,               // 卡片翻一次
+    idleFrontMs: 4200,          // 没人碰的时候：正面停多久翻到背面
+    idleBackMs: 3200,           //               背面停多久翻回来
+    riseMs: 2600,               // LOOK UP 从卡片底边升到顶上
+    lookUpAbove: 0.35,          // 抬头：lookValue 超过这个（约 11°）……
+    lookUpHoldMs: 350,          //       ……并保持这么久，算抬头了
+    noCameraHintMs: 5000,       // 摄像头这么久还没好：提示用 ↑ / 点击
+    closeMs: 2600,              // 两只手往中间合拢、卡片缩小
+    smallCard: 11,              // 缩小后的卡片边长（u）
+    handsHoldMs: 700,           // 检测到手势之后，四角标记出现、停一会儿再进入
+    leaveMs: 1500,              // 进入网站：手往两边移开，dashboard 淡出
+    chapters: [0, 12, 60, 180, 600, 2400, 12000, 60000],   // TODO 占位：chapter 的刻度（英寸），之后按真正的 chapter 改
+  },
+
   storage: {
+    unlocked: 'lookup-unlocked-v1',
     answers: 'lookup-answers-v1',
     feathersDb: 'lookup',
   },

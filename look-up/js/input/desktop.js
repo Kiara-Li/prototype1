@@ -27,8 +27,8 @@ export function createDesktopInput({ app, C, FRAME_CFG, cv, getWorld }) {
       input.yaw += (y - input.yaw) * a;
     }
 
-    // 取景框（手势或鼠标）；只在上升的时候
-    if (state === 'ascent' || state === 'top') {
+    // 取景框（手势或鼠标）；只在上升的时候（和 dashboard 最后教手势的那一步）
+    if (state === 'ascent' || state === 'top' || input.wantFrame) {
       updateFrame(frame, hands, now, dt, { cfg: FRAME_CFG, video: vision.video, W: app.W, H: app.H, wink: vision.wink });
     }
 
