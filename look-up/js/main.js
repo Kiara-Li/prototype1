@@ -67,7 +67,7 @@ async function boot() {
     ? (await import('./input/mobile.js')).createMobileInput(args)
     : (await import('./input/desktop.js')).createDesktopInput(args);
   window.lookUp.driver = driver;
-  const photos = (await (await fetch('data/photos.json')).json()).photos;
+  const photos = (await (await fetch('data/photos.json', { cache: 'no-cache' })).json()).photos;
   photos.forEach((p) => { p.src = p.src.startsWith('data/') ? p.src : p.src.replace(/^\.\.\//, '../'); });
   let marks = null;
   let sugg = null;
@@ -264,6 +264,7 @@ const bk = {
   phase: 'guide', next: 0, sec: -1, idx: 0, cur: null, prev: null, prevEnter: false,
   switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0, turnAt: 0,
   targetH: 0,
+  marks: new Map(),            // 去过的高度 → 那一页基线在书页上的位置（高度尺上用浅灰标出来）
 };
 window.lookUp.bk = bk;
 
@@ -271,9 +272,15 @@ async function setupBook() {
   const items = new Map();
   for (const row of world.rows) for (const it of row.items) items.set(it.photo.id, it);
   book = await loadBook(items);
-  book.sections = C.book.sections.map((s) => ({ ...s, groups: s.groups.map((id) => book.groups.get(id)).filter(Boolean) }));
+  // 每个 section 里按高度从低到高；一样高按书里的页码
+  book.sections = C.book.sections.map((s) => ({
+    ...s,
+    groups: s.groups.map((id) => book.groups.get(id)).filter(Boolean)
+      .sort((a, b) => a.height_in - b.height_in || Number(a.id) - Number(b.id)),
+  }));
   // 天空：飞行照片（原图），从低到高，一张一页
-  skyItems = [...items.values()].filter((it) => /^In flight/.test(it.photo.caption) && /^data\//.test(it.photo.src))
+  skyItems = [...items.values()].filter((it) => /^In flight/.test(it.photo.caption) && /^data\//.test(it.photo.src)
+      && it.photo.height_in >= C.book.minHeight)
     .sort((a, b) => a.photo.height_in - b.photo.height_in);
   if (skyItems.length) book.sections.push({ key: 'sky', sky: true, groups: skyItems.map((it) => skySpread(it, book.spread)) });
   window.lookUp.book = book;
@@ -336,18 +343,22 @@ function enterSection(i, now) {
 function showSpread(j, now, entering) {
   const B = C.book;
   const g = book.sections[bk.sec].groups[j];
+  // 同一个 section 里：高度变了 → 直接上升（像进入 section 一样，新的一页从上面落下来）；高度一样 → 方块翻页
+  const rise = entering || !bk.cur || g.height_in !== bk.cur.height_in;
+  if (rise) bk.enterAt = now;
   bk.prev = bk.cur;
-  bk.prevEnter = entering;
+  bk.prevEnter = rise;
   bk.idx = j;
   bk.cur = g;
   bk.switchedAt = now;
-  if (entering) bk.baseY = null;
+  if (rise) bk.baseY = null;
+  if (!bk.marks.has(g.height_in)) bk.marks.set(g.height_in, g.baseline_y);
   const own = g.images.filter((im) => im.own).length;
   // 翻页：上一页的照片先被黑块一张张收走，然后这一页一张张拉出来
   const rv = { stagger: B.revealStaggerMs, dur: B.revealMs };
   bk.outAt = now;
-  bk.inAt = entering ? now : now + (bk.prev ? revealTotal(bk.prev, rv) * 0.75 : 0);
-  const shown = entering ? now + B.enterMs : bk.inAt + revealTotal(g, rv);
+  bk.inAt = rise ? now : now + (bk.prev ? revealTotal(bk.prev, rv) * 0.75 : 0);
+  const shown = rise ? now + B.enterMs : bk.inAt + revealTotal(g, rv);
   const stay = book.sections[bk.sec].sky ? B.skyPhotoMs : B.spreadMs + B.perPhotoMs * own;
   bk.turnAt = shown + stay;
   bk.targetH = g.height_in;
@@ -382,7 +393,8 @@ function drawBookScene(now) {
   const B = C.book;
   ctx.fillStyle = B.background;
   ctx.fillRect(-W, -H, W * 3, H * 3);
-  const o = { ink: B.ink, historical: B.historical, sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawFoundOnPhoto(ctx, r, now) };
+  const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, captions: B.captions, numbers: B.numbers,
+    sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawFoundOnPhoto(ctx, r, now) };
   const L = bookLayout(book, W, H, B);
 
   if (bk.phase === 'done') {
@@ -422,7 +434,37 @@ function drawBookScene(now) {
   }
 
   drawGroundFeathers();
-  if (app.state !== 'dashboard' && app.state !== 'end') drawRuler(ctx, world, app.camY, app.h || 0, B.ink, 1, `10px ${monoFont()}`);
+  if (app.state !== 'dashboard' && app.state !== 'end') drawHeights(now, L);
+}
+
+// 高度尺：现在这一页的高度（黑，在基线上）+ 去过的高度（浅灰，留在当时基线的位置），越走越多
+function drawHeights(now, L) {
+  const B = C.book;
+  ctx.save();
+  ctx.font = `${B.heightPx}px ${monoFont()}`;
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 1;
+  const used = [];
+  const free = (y) => used.every((u) => Math.abs(u - y) > B.heightPx * 1.4);
+  const mark = (y, label, color) => {
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(0, Math.round(y) + 0.5); ctx.lineTo(B.heightTickPx, Math.round(y) + 0.5); ctx.stroke();
+    if (free(y)) { ctx.fillText(label, B.heightTickPx + 6, y); used.push(y); }
+  };
+  const cur = bk.phase !== 'done' && bk.cur && bk.baseY !== null;
+  let curY = null;
+  if (cur) {
+    const e = bk.prevEnter ? enterOffset(now) : 1;
+    curY = bk.baseY - (1 - e) * app.H;
+    used.push(curY);
+  }
+  for (const [h, by] of bk.marks) {
+    if (cur && h === bk.cur.height_in) continue;
+    mark(L.oy + by * L.s, fmtHeight(h), B.visitedInk);
+  }
+  if (cur) { used.pop(); mark(curY, fmtHeight(bk.cur.height_in), B.ink); }
+  ctx.restore();
 }
 
 // 指引：屏幕上方中间一句话（Kiara 之后设计）

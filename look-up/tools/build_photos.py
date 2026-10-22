@@ -80,7 +80,8 @@ def main():
     IMG_OUT.mkdir(parents=True, exist_ok=True)
     used = {e["original"] for e in kept if e["original"]}
     for r in flights:
-        if r["filename"] in used or not (ORIG_DIR / r["filename"]).exists():
+        # 书里已经出现过的飞行照片也再导出一张整的（天空那一段一张一页用；书里的是裁过的）
+        if not (ORIG_DIR / r["filename"]).exists():
             continue
         im = ImageOps.exif_transpose(Image.open(ORIG_DIR / r["filename"])).convert("RGB")
         sc = LONG_EDGE / max(im.size)

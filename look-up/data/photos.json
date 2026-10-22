@@ -813,6 +813,25 @@
    "height_source": "record"
   },
   {
+   "id": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01",
+   "src": "data/img/0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "src_hd": null,
+   "px": [
+    1200,
+    1600
+   ],
+   "group": null,
+   "caption": "In flight / Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan / Sept. 2026",
+   "original": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "record": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
+   "rule": "records: in flight",
+   "height_in": 162.0,
+   "height_source": "record",
+   "same_original_as": [
+    "47_02"
+   ]
+  },
+  {
    "id": "47_02",
    "src": "../data/img/47_02.jpg",
    "src_hd": null,
@@ -826,7 +845,10 @@
    "record": "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01.jpg",
    "rule": "caption",
    "height_in": 162.0,
-   "height_source": "record"
+   "height_source": "record",
+   "same_original_as": [
+    "0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01"
+   ]
   },
   {
    "id": "51_01",

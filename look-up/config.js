@@ -29,25 +29,34 @@ window.LOOKUP = {
   // groups 是书里的组号（跨页右页的页码，和 Sightline 页面右边那列数字一样）。
   book: {
     enabled: true,              // false = 回到原来的竖向照片
-    background: '#ffffff',
+    background: '#f5f5f5',      // 和 dashboard 一样
     ink: '#000000',
     historical: '#d9d9d9',      // 历史照片的位置：浅灰色块（之后换成别的）
+    captions: false,            // 竖排小图注（太小看不清，先不显示）
+    numbers: false,             // 组号
+    heightPx: 11,               // 左边高度尺的字号
+    heightTickPx: 28,           // 刻度线长度
+    visitedInk: '#a3a3a3',      // 去过的高度：浅灰
+    minHeight: 60,              // 低于人的视线（60″）的照片不放
+    // 白名单：每个 section 只用这些构件；照书里的跨页整页放（混着别的构件的 47、53、55 也整页放）
+    // 每个 section 里按高度从低到高（一样高按页码）。In flight 书里没有成形的跨页 → 用记录表里的飞行照片，一张一页
     sections: [
-      { key: 'bench',   groups: ['21'] },                               // 公园长椅 18″
-      { key: 'fence',   groups: ['23', '25', '27', '29', '31', '33'] }, // 公园栏杆 42–72″（含警察路障）
-      { key: 'awning',  groups: ['35', '37', '43'] },                   // 雨棚 120–144″
-      { key: 'ledge',   groups: ['39', '53', '57', '59', '65'] },       // 建筑凸边 + 窗台
-      { key: 'fire',    groups: ['49', '67', '69'] },                   // 消防梯
-      { key: 'signal',  groups: ['61', '63'] },                         // 信号灯 216″
-      { key: 'light',   groups: ['47', '71', '73', '75', '77'] },       // 路灯
+      { key: 'awning',  groups: ['35', '43'] },                          // Awning / canopy, metal + Storefront canopy, glass
+      { key: 'sign',    groups: ['45', '51', '55'] },                    // Projecting storefront sign
+      { key: 'ledge',   groups: ['39', '53', '59'] },                    // Building ledge + Window sill
+      { key: 'signal',  groups: ['63'] },                                // Traffic signal on mast arm
+      { key: 'fire',    groups: ['49', '67', '69'] },                    // Fire escape
+      { key: 'light',   groups: ['47', '71', '73', '75', '77'] },        // Streetlight
+      // 第 7 个 In flight 自动加在最后（photos.json 里所有 In flight、≥ minHeight 的原图）
     ],
-    // 还没放进 section 的组：01–19（地面）、41、45、51、55（壁灯、店招、横幅架）、79、81
+    // 没放进来的组：01–33（低于视线，或者不在白名单）、37、41、57、61、65、79、81
     lookAbove: 0.2,             // 抬头判定：lookValue 超过这个（约 8°）……
     lookHoldMs: 250,            //          ……保持这么久就算
-    enterMs: 1400,              // 进入一个 section：跨页从上面落下来
+    enterMs: 1400,              // 进入一个 section / 同一个 section 里高度变了：跨页从上面落下来（上升）
     spreadMs: 6000,             // 一个跨页停多久（再加上每张自己的照片 perPhotoMs）
     perPhotoMs: 1500,
-    revealMs: 320,              // 翻页：黑色方块拉出来 / 收回去各要多久（和 dashboard 上的字一样）
+    revealColor: '#d9d9d9',     // 同一个高度换页：灰色方块拉出来 / 收回去
+    revealMs: 320,              //                各要多久
     revealStaggerMs: 120,       //       一张接一张，隔这么久（从左到右）
     skyPhotoMs: 4500,           // 天空：每张飞行照片停多久（一张一页，底边在基线上）
     sidePx: 120,                // 跨页左右至少留这么多（左边是高度尺）

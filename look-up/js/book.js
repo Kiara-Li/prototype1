@@ -8,7 +8,7 @@ const idOf = (file) => file.replace(/^.*\//, '').replace(/\.\w+$/, '');
 
 // photoItems：Look Up 自己的照片（id → { photo, img }），书里同一张照片直接用它，图片只加载一次
 export async function loadBook(photoItems) {
-  const data = await (await fetch('../data/groups.json')).json();
+  const data = await (await fetch('../data/groups.json', { cache: 'no-cache' })).json();
   const groups = new Map();
   for (const g of data.groups) {
     const images = g.images.map((im) => {
@@ -98,10 +98,10 @@ export function drawSpread(ctx, g, L, baselineY, alpha, o) {
       ctx.fillStyle = o.bar || o.ink;
       ctx.fillRect(x + rv.bar[0] * w, y, (rv.bar[1] - rv.bar[0]) * w, h);
     }
-    if (im.caption) verticalText(ctx, im.caption, L.ox + im.caption_x * s, Y(im.caption_bottom), 5 * s, o.sans, o.ink);
+    if (im.caption && o.captions) verticalText(ctx, im.caption, L.ox + im.caption_x * s, Y(im.caption_bottom), 5 * s, o.sans, o.ink);
   }
   const np = g.number_pos;
-  if (np && revealAt(o.reveal, 0).show) verticalText(ctx, g.id, L.ox + np.x * s, Y(np.y + np.h), 7 * s, o.mono, o.ink);
+  if (np && o.numbers && revealAt(o.reveal, 0).show) verticalText(ctx, g.id, L.ox + np.x * s, Y(np.y + np.h), 7 * s, o.mono, o.ink);
   ctx.restore();
 }
 

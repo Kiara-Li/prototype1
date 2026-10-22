@@ -70,12 +70,11 @@ window.CONTENT = {
 
   // ---- 书：每个 section 之前的指引（TODO 占位，Kiara 之后设计）。顺序和 config.book.sections 一样
   guides: [
-    'Look up until you can see 18″.',
-    'Look up a little more, to the park fence.',
-    'Look up to the awnings.',
+    'Look up until you can see the awnings.',
+    'Look up to the shop signs.',
     'Look up to the ledges and window sills.',
-    'Look up to the fire escapes.',
     'Look up to the traffic lights.',
+    'Look up to the fire escapes.',
     'Look up to the streetlights.',
   ],
   guideSky: 'Now look up at the sky.',

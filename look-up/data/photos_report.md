@@ -1,6 +1,6 @@
 # Look Up · 照片过滤结果
 
-书里一共 130 张图：留下 86 张（自己拍的），去掉 44 张（历史照片）。
+书里一共 131 张图：留下 87 张（自己拍的），去掉 44 张（历史照片）。
 
 规则：图注是「构件 / 地点 / 年月」= 自己拍的；「摄影师 / 标题 / 年份 / 来源」= 历史照片。
 
@@ -62,7 +62,8 @@
 | 150″ | `45_04` | 45 | Projecting storefront sign / European Wax Center, 428 E 14th St / Sept. 2026 |  |
 | 150″ | `47_01` | 47 | Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026 |  |
 | 150″ | `47_03` | 47 | Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026 |  |
-| 162″ | `47_02` | 47 | Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026 |  |
+| 162″ | `0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01` | None | In flight / Tompkins Square Park, east side near Avenue B between E 9th and E 10th St, East Village, Manhattan / Sept. 2026 | 和 47_02 是同一张原图 |
+| 162″ | `47_02` | 47 | Streetlight / Tompkins Square Park, Avenue B at E 9th–10th St / Sept. 2026 | 和 0162_in-flight_tompkins-sq-ave-b-e9th_2026-09_01 是同一张原图 |
 | 168″ | `51_01` | 51 | Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026 |  |
 | 168″ | `51_02` | 51 | Projecting storefront sign / Chipotle, 117 E 14th St at Irving Pl / Sept. 2026 |  |
 | 180″ | `49_01` | 49 | Fire escape / 339–341 E 10th St near Avenue B / Sept. 2026 |  |
