@@ -11,26 +11,28 @@ export async function loadBook(photoItems) {
   const data = await (await fetch('../data/groups.json', { cache: 'no-cache' })).json();
   const groups = new Map();
   for (const g of data.groups) {
+    // 图片先不下载：用到这一组（loadGroup）的时候才开始加载，打开网站时不用等整本书
+    const lazy = [];
+    const pending = (file) => { const img = new Image(); img.decoding = 'async'; lazy.push([img, `../data/${file}`]); return img; };
     const images = g.images.map((im) => {
-      if (im.kind !== 'own') {
-        const img = new Image();
-        img.src = `../data/${im.file}`;
-        return { ...im, own: false, img };
-      }
+      if (im.kind !== 'own') return { ...im, own: false, img: pending(im.file) };
       const id = idOf(im.file);
       let item = photoItems.get(id);
-      if (!item) {
-        const img = new Image();
-        img.src = `../data/${im.file}`;
-        item = { photo: { id, height_in: g.height_in, caption: im.caption }, img };
-      }
+      if (!item) item = { photo: { id, height_in: g.height_in, caption: im.caption }, img: pending(im.file) };
       return { ...im, own: true, item };
     });
     // 翻页动画的先后：从左到右
     [...images].sort((a, b) => a.x - b.x || a.y - b.y).forEach((im, i) => { im.order = i; });
-    groups.set(g.id, { ...g, images });
+    groups.set(g.id, { ...g, images, lazy });
   }
   return { spread: data.spread, groups };
+}
+
+// 开始下载这一组的图片（只下一次）
+export function loadGroup(g) {
+  if (!g || !g.lazy) return;
+  for (const [img, src] of g.lazy) img.src = src;
+  g.lazy = null;
 }
 
 // 跨页放在屏幕中间：左边留出高度尺的位置

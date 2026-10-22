@@ -112,6 +112,11 @@ export function markFound(rect, index, now) {
 
 function pixelsOf(item) {
   const id = item.photo.id;
+  if (!item.img.naturalWidth) {                  // 图片还没下载完：先给一张空的，不记下来
+    const c = document.createElement('canvas');
+    c.width = c.height = 1;
+    return c;
+  }
   if (!photoPixels.has(id)) {
     const c = document.createElement('canvas');
     c.width = item.img.naturalWidth;

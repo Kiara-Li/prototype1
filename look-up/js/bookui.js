@@ -476,7 +476,8 @@ export function createBookUI(o) {
   return {
     guide, caption,
     place, setFront, flipTo, video, hideCaption,
-    liveVideo: () => root.querySelector('.bk-face:not(.hidden) .bk-video.blend.on'),     // 天空背景跟着它取颜色 addPiece, openQuestion, showTutorial, hideTutorial, setHint,
+    addPiece, openQuestion, showTutorial, hideTutorial, setHint,
+    liveVideo: () => root.querySelector('.bk-face:not(.hidden) .bk-video.blend.on'),     // 天空背景跟着它取颜色
     set on(handlers) { onFace = handlers; },
     get face() { return current; },
     get tutorial() { return tutorial; },

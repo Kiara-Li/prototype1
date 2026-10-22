@@ -20,7 +20,7 @@ import { drawFrameMarks } from '../../frame.js';
 import { input } from './input/state.js';
 import { isMobileDevice } from './input/device.js';
 import { createDashboard } from './dashboard.js';
-import { loadBook, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal, skySpread } from './book.js';
+import { loadBook, loadGroup, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal, skySpread } from './book.js';
 import { createBookUI } from './bookui.js';
 import { createSkySound } from './skysound.js';
 import { openSheet } from './sheet.js';
@@ -151,9 +151,14 @@ let last = performance.now();
 function loop(now) {
   const dt = Math.min(100, now - last);
   last = now;
-  update(now, dt);
-  draw(now);
   requestAnimationFrame(loop);
+  // 某一帧出错也不要让整个画面停住（只在控制台报错）
+  try {
+    update(now, dt);
+    draw(now);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 function update(now, dt) {
@@ -296,6 +301,7 @@ async function setupBook() {
       && it.photo.height_in >= C.book.minHeight)
     .sort((a, b) => a.photo.height_in - b.photo.height_in);
   if (skyItems.length) book.sections.push({ key: 'sky', sky: true, groups: skyItems.map((it) => skySpread(it, book.spread)) });
+  preloadSection(0);                                  // 第一个 section 的图片现在就开始下载（看 dashboard 的时候）
   window.lookUp.book = book;
   bookUI = createBookUI({ C, T });
   bookUI.on = {
@@ -593,8 +599,14 @@ function askSection() {
   }, `${sectionText().name || ''} · from ${inches()} up`);
 }
 
+// 这个 section 和下一个 section 的图片开始下载（书里别的页不下载）
+function preloadSection(i) {
+  for (const k of [i, i + 1]) if (book.sections[k]) book.sections[k].groups.forEach(loadGroup);
+}
+
 function enterSection(i, now) {
   bk.sec = i;
+  preloadSection(i);
   // 去天空之前的那段声音：路灯开始时从头放；进入天空时接到翅膀拍动
   const sec = book.sections[i];
   if (skySound && sec.key === C.book.skySound.startSection) skySound.start();
