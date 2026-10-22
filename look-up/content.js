@@ -74,7 +74,7 @@ window.CONTENT = {
     tutorialMobile: 'Pinch until a pigeon fills the screen. Hold still until it comes loose.',
     noCam: 'No camera? Draw a square around a pigeon, and wait.',
     up: 'LOOK UP',                                  // 卡片上竖着排，从下往上走；指引也是这两个字往上走
-    lookHint: 'Tilt your head up, and hold it there.',   // 该抬头、过一会儿还没抬：出现在旁边
+    lookHint: 'Look up to go higher.',   // 该抬头、过一会儿还没抬：出现在旁边
     lookHintKeys: 'Press ↑ to look up.',
     ready: 'Before you look up again, I want to ask you something.',
     yes: 'Ask me',
