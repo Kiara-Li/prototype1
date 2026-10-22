@@ -84,6 +84,7 @@ export function drawSpread(ctx, g, L, baselineY, alpha, o) {
     const y = Y(im.y);
     const w = im.w * s;
     const h = im.h * s;
+    if (im === o.skip || im.virtual) continue;     // 被卡片盖住的（bookui.js 画）/ 天空页留给卡片的一栏
     const rv = revealAt(o.reveal, im.order);
     if (rv.bar) {
       ctx.fillStyle = o.bar || o.ink;
@@ -142,12 +143,16 @@ export function skySpread(item, spread) {
   const m = 22.5;                                    // 书里的页边
   const base = spread.h - m;
   const [pw, ph] = item.photo.px || [item.img.naturalWidth || 4, item.img.naturalHeight || 3];
-  const k = Math.min((spread.w - 2 * m - 10) / pw, (base - m) / ph);
+  const cardW = 148.5;                               // 右边留一栏给卡片（和书里一栏的宽度一样）
+  const k = Math.min((spread.w - 2 * m - cardW - 10) / pw, (base - m) / ph);
   const w = pw * k;
   const h = ph * k;
   const x = m;
   return {
     id: '', sky: true, height_in: item.photo.height_in, baseline_y: base, baseline_width: 0.5, number_pos: null,
-    images: [{ own: true, item, x, y: base - h, w, h, order: 0, caption: item.photo.caption, caption_x: x + w + 1.5, caption_bottom: base - 1 }],
+    images: [
+      { own: true, item, x, y: base - h, w, h, order: 0, caption: item.photo.caption, caption_x: x + w + 1.5, caption_bottom: base - 1 },
+      { own: false, virtual: true, x: spread.w - m - cardW, y: m, w: cardW, h: base - m, order: 1 },
+    ],
   };
 }

@@ -68,16 +68,62 @@ window.CONTENT = {
     featherFace: ['This is your feather.', 'Print it, fold it, keep it.'],
   },
 
-  // ---- 书：每个 section 之前的指引（TODO 占位，Kiara 之后设计）。顺序和 config.book.sections 一样
-  guides: [
-    'Look up until you can see the awnings.',
-    'Look up to the shop signs.',
-    'Look up to the ledges and window sills.',
-    'Look up to the traffic lights.',
-    'Look up to the fire escapes.',
-    'Look up to the streetlights.',
+  // ---- 书页上的界面（bookui.js）
+  book: {
+    tutorial: 'Make a window with your hands, like these. Hold it over a pigeon until it comes loose.',
+    tutorialMobile: 'Pinch until a pigeon fills the screen. Hold still until it comes loose.',
+    noCam: 'No camera? Draw a square around a pigeon, and wait.',
+    up: 'There is more of it above you.',
+    ready: 'Before you climb any higher, one question.',
+    yes: 'Ask me',
+    done: 'Keep this',
+    next: 'Go higher',
+    inch: 'inch',
+  },
+
+  // ---- 每个 section：name（卡片上的小标签）、intro（切到第一只鸽子后卡片背面）、question（最后一页的填空，___ 是空）
+  // 七句填空连起来读，是一首从雨棚一直写到天空的诗。介绍是草稿，Kiara 之后改。
+  sections: [
+    { name: 'Awning',
+      intro: 'Before air conditioning, a shop kept cool with canvas. Every morning someone cranked the awning out to shade the window, the goods, and whoever stopped to look. The pigeons took the roof.',
+      question: { prompt: 'When did you last wait out the rain under someone else’s awning?',
+        sentence: 'I waited under an awning on ___, while the rain ___.' } },
+    { name: 'Projecting sign',
+      intro: 'A sign that sticks out from the wall turns sideways to talk to people on foot, not in cars. The city decides how far it may reach over your head. Nobody decided who would sit on top.',
+      question: { prompt: 'Which sign do you read every day without meaning to?',
+        sentence: 'Every day I read a sign that says ___, and think of ___.' } },
+    { name: 'Ledge & sill',
+      intro: 'Ledges and sills were drawn to throw rain off a façade. Pigeons come from rock doves that nested on sea cliffs; to them a building is simply another cliff, and this is the shelf.',
+      question: { prompt: 'What would you leave on a ledge for someone to find?',
+        sentence: 'On the ledge outside my window I would leave ___ for ___.' } },
+    { name: 'Traffic signal',
+      intro: 'The mast arm swings the light out over the lane, right where a driver is already looking. It was built for people in a hurry. The birds on top have nowhere to be.',
+      question: { prompt: 'What do you think about while you wait for the light?',
+        sentence: 'Waiting for the light, I think about ___ until it turns ___.' } },
+    { name: 'Fire escape',
+      intro: 'In 1867 New York began requiring fire escapes on tenements. People found every other use for them: a bed on hot nights, a line for laundry, a garden of tomatoes, a balcony for talking across the gap.',
+      question: { prompt: 'Who would you sit with on a fire escape on a hot night?',
+        sentence: 'On a hot night I would climb out with ___ and watch ___.' } },
+    { name: 'Streetlight',
+      intro: 'Broadway was lit by electric arc lamps in 1880. A streetlight is made for walking home in the dark. To a pigeon it is a high perch that stays warm after sunset.',
+      question: { prompt: 'Where were you going the last time a streetlight came on above you?',
+        sentence: 'The streetlight came on as I walked toward ___, feeling ___.' } },
+    { name: 'In flight',
+      intro: 'Up here nothing was built for anyone. A pigeon can find its way home from very far away. You have come a long way up, too.',
+      question: { prompt: 'When did you last look up, only to look?',
+        sentence: 'The last time I looked up, the sky was ___ and I was ___.' } },
   ],
-  guideSky: 'Now look up at the sky.',
+
+  // ---- 书：每个 section 之前的指引（一句比一句往上）。顺序和 config.book.sections 一样
+  guides: [
+    'Look up, not far. Just to where the shops keep their shade.',
+    'A little higher, to the signs that lean out over the sidewalk.',
+    'Higher. This is where the city starts to look like a cliff.',
+    'Up to the traffic lights. They have been changing all day without you.',
+    'Climb the fire escapes with your eyes, floor by floor.',
+    'Up to the streetlights, before they come on.',
+  ],
+  guideSky: 'Now past all of it. Look at the sky.',
 
   calibrate: 'Look at the screen.',
   calibrateMobile: 'Hold still.',                     // 手机：记下开始时的姿态

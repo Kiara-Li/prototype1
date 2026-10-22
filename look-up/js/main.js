@@ -21,6 +21,7 @@ import { input } from './input/state.js';
 import { isMobileDevice } from './input/device.js';
 import { createDashboard } from './dashboard.js';
 import { loadBook, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal, skySpread } from './book.js';
+import { createBookUI } from './bookui.js';
 
 const C = window.LOOKUP;
 const T = window.CONTENT;
@@ -78,6 +79,7 @@ async function boot() {
   window.lookUp.world = world;
   if (BOOK) await setupBook();
   try { app.answers = JSON.parse(localStorage.getItem(C.storage.answers)) || []; } catch { app.answers = []; }
+  if (BOOK) app.answers = [];      // 书：每个 section 一个填空，每次从空白开始（旧版的问题答案不混进来）
   app.groundFeathers = await feathers.all();
   loadSky();
   makeGrain();
@@ -254,7 +256,11 @@ function ascend(now, dt) {
 // ================================================================ 书：指引 → section（跨页自己翻）→ 下一个指引 …… → 天空
 //
 // guide     屏幕上一句指引；抬一下头（lookValue 超过 lookAbove，保持 lookHoldMs）→ 进入下一个 section
-// section   这个 section 的跨页一页页自己翻（框鸽子 / 回答问题的时候停住）；低头不影响
+// section   用两只手比一个框，框住鸽子停一会儿 = 切下来（原处留下一个和背景一样颜色的洞，切下的方块飞到右上角）。
+//           切到第一只之后，这一页历史照片的位置像 dashboard 的卡片一样翻过来：介绍 → 再翻：
+//             上面还有（同一个 section 更高的一页）→「再抬头 ↑」，抬头就上升到那一页
+//             这是最后一页 →「Ready? Yes」→ 卡片放大成填空 → 填完，切下来的方块飞进句子里 → 下一个 section 的指引
+//           低头不影响
 // skyguide  7 个 section 之后：看天空的指引 → 天空也是一个 section：飞行照片一张一页，尽量大，
 //           底边还在基线上（不全屏，水平线还在）；最后一张之后 → top（羽毛落下）
 
@@ -262,8 +268,12 @@ let book = null;
 let skyItems = [];
 const bk = {
   phase: 'guide', next: 0, sec: -1, idx: 0, cur: null, prev: null, prevEnter: false,
-  switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0, turnAt: 0,
+  switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0,
   targetH: 0,
+  card: 'front',               // 这一页卡片：front → intro → up / ready → question
+  introUntil: 0,
+  tutorialDone: false,
+  holes: new Map(),            // 切掉的地方：照片 id → [{ x, y, w, h }]（照片里的比例）
   marks: new Map(),            // 去过的高度 → 那一页基线在书页上的位置（高度尺上用浅灰标出来）
 };
 window.lookUp.bk = bk;
@@ -284,11 +294,36 @@ async function setupBook() {
     .sort((a, b) => a.photo.height_in - b.photo.height_in);
   if (skyItems.length) book.sections.push({ key: 'sky', sky: true, groups: skyItems.map((it) => skySpread(it, book.spread)) });
   window.lookUp.book = book;
+  bookUI = createBookUI({ C, T });
+  bookUI.on = {
+    card: () => { if (bk.card === 'intro') toNext(); },
+    yes: () => askSection(),
+  };
+  window.lookUp.bookUI = bookUI;
+  window.lookUp.rects = () => bookRects(performance.now());     // 调试：这一页照片在屏幕上的位置
+  window.lookUp.pigeonsOf = pigeonsOf;
+}
+let bookUI = null;
+
+// 这一页的卡片：历史照片里最大的那张（天空：右边留出来的一栏）
+function cardOf(g) {
+  let best = null;
+  for (const im of g.images) if (!im.own && (!best || im.w * im.h > best.w * best.h)) best = im;
+  return best;
+}
+function cardRect(now) {
+  if (!bk.cur || bk.baseY === null) return null;
+  const im = cardOf(bk.cur);
+  if (!im) return null;
+  const L = bookLayout(book, app.W, app.H, C.book);
+  const e = bk.prevEnter ? enterOffset(now) : 1;
+  const base = bk.baseY - (1 - e) * app.H;
+  const s = L.s;
+  return { x: L.ox + im.x * s, y: base - (bk.cur.baseline_y - im.y) * s, w: im.w * s, h: im.h * s };
 }
 
 function bookUpdate(now, dt) {
   const B = C.book;
-  const hold = input.frame.active || app.pausedQ !== null || pending.key !== null;
   if (bk.phase === 'guide' || bk.phase === 'skyguide') {
     // 判定很宽松：抬一下头就算
     if (app.pausedQ === null && input.lookValue > B.lookAbove) {
@@ -299,21 +334,15 @@ function bookUpdate(now, dt) {
       }
     } else bk.upSince = 0;
   } else if (bk.phase === 'section') {
-    if (hold) bk.turnAt += dt;                 // 在框鸽子 / 回答问题：先不翻
-    if (now >= bk.turnAt) {
-      const sec = book.sections[bk.sec];
-      if (bk.idx + 1 < sec.groups.length) showSpread(bk.idx + 1, now, false);
-      else if (bk.sec + 1 < book.sections.length) {
-        bk.next = bk.sec + 1;
-        bk.phase = book.sections[bk.next].sky ? 'skyguide' : 'guide';
-        bk.guideAt = now;
-      } else {
-        bk.phase = 'done';
-        bk.doneAt = now;
-        driver.releaseFrame();
-        setState('top');
-      }
-    }
+    const settled = !bk.prevEnter || enterOffset(now) >= 1;
+    // 教学：第一次用手比出框 → 手离开
+    if (bookUI.tutorial && input.frame.active) { bk.tutorialDone = true; bookUI.hideTutorial(); }
+    if (bk.card === 'intro' && now > bk.introUntil) toNext();
+    // 上面还有：抬头 → 上升到这个 section 更高的一页
+    if (bk.card === 'up' && settled && !input.frame.active && input.lookValue > B.lookAbove) {
+      if (!bk.upSince) bk.upSince = now;
+      if (now - bk.upSince > B.lookHoldMs) { bk.upSince = 0; showSpread(bk.idx + 1, now, false); }
+    } else if (bk.card === 'up') bk.upSince = 0;
   }
 
   // 高度尺跟着现在这一页的高度慢慢走
@@ -330,7 +359,106 @@ function bookUpdate(now, dt) {
 
   // 找鸽子：框的中心（手机：屏幕中心）停在一只鸽子上
   const p = input.probe;
-  app.finding = updateFinding(bookRects(now), p ? { x: p.x, y: p.y, w: 0, h: 0 } : null, now);
+  const before = found.length;
+  const rects = bk.phase === 'section' ? bookRects(now) : [];
+  app.finding = updateFinding(rects, p ? { x: p.x, y: p.y, w: 0, h: 0 } : null, now);
+  if (found.length > before) cutOut(found[found.length - 1], rects, now);
+
+  // 卡片跟着书页走
+  bookUI.place(bk.phase === 'section' || bk.phase === 'question' || bk.phase === 'guide' || bk.phase === 'skyguide' ? cardRect(now) : null);
+}
+
+// 切下来：框（正方形）里的这一块 → 一张小图（加一层色调）飞到右上角；照片上留下一个和背景一样颜色的洞
+function cutOut(f, rects, now) {
+  const B = C.book;
+  const r = rects.find((x) => x.item.photo.id === f.photoId);
+  if (!r) return;
+  let sq;
+  const fr = input.frame.rect;
+  if (input.mode === 'mobile' || !fr) {
+    const side = (Math.min(app.W, app.H) / Math.max(1, input.zoomValue)) * 0.5;
+    const c = input.probe || { x: f.x, y: f.y };
+    sq = { x: c.x - side / 2, y: c.y - side / 2, w: side, h: side };
+  } else {
+    const side = Math.min(fr.w, fr.h);
+    sq = { x: fr.x + (fr.w - side) / 2, y: fr.y + (fr.h - side) / 2, w: side, h: side };
+  }
+  const img = r.item.img;
+  const n = 360;
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const g = c.getContext('2d');
+  g.fillStyle = B.background;
+  g.fillRect(0, 0, n, n);
+  const kx = img.naturalWidth / r.w;
+  const ky = img.naturalHeight / r.h;
+  // 只取照片里面的部分（框伸到照片外面的地方留背景色）
+  const ix0 = Math.max(sq.x, r.x);
+  const iy0 = Math.max(sq.y, r.y);
+  const ix1 = Math.min(sq.x + sq.w, r.x + r.w);
+  const iy1 = Math.min(sq.y + sq.h, r.y + r.h);
+  if (ix1 > ix0 && iy1 > iy0) {
+    g.drawImage(img, (ix0 - r.x) * kx, (iy0 - r.y) * ky, (ix1 - ix0) * kx, (iy1 - iy0) * ky,
+      ((ix0 - sq.x) / sq.w) * n, ((iy0 - sq.y) / sq.h) * n, ((ix1 - ix0) / sq.w) * n, ((iy1 - iy0) / sq.h) * n);
+    const list = bk.holes.get(f.photoId) || [];
+    list.push({ x: (ix0 - r.x) / r.w, y: (iy0 - r.y) / r.h, w: (ix1 - ix0) / r.w, h: (iy1 - iy0) / r.h, at: now });
+    bk.holes.set(f.photoId, list);
+  }
+  if (B.cutTint) {
+    g.globalCompositeOperation = 'color';
+    g.fillStyle = B.cutTint;
+    g.fillRect(0, 0, n, n);
+    g.globalCompositeOperation = 'source-over';
+  }
+  bookUI.addPiece(c, sq, r.item.photo.height_in);
+  if (bookUI.tutorial) { bk.tutorialDone = true; bookUI.hideTutorial(); }
+  // 这一页第一次切到：卡片翻过来，介绍这个构件（只有每个 section 的第一页有介绍）
+  if (bk.card === 'front') {
+    const text = bk.idx === 0 ? sectionText().intro : '';
+    bk.card = 'intro';
+    bk.introUntil = now + (text ? B.introMs : B.noIntroMs);
+    if (text) bookUI.flipTo('intro', { label: sectionLabel(), text });
+  }
+}
+
+const inches = () => `${Math.round(bk.cur ? bk.cur.height_in : 0)}″`;      // 和右上角「120 inch」一样用英寸
+const sectionLabel = () => `${sectionText().name || ''} · ${inches()}`;
+const sectionText = () => (T.sections && T.sections[bk.sec]) || { intro: '', question: { prompt: '', sentence: '___' } };
+
+// 介绍看完：上面还有 →「再抬头 ↑」；最后一页 →「Ready? Yes」
+function toNext() {
+  const last = bk.idx + 1 >= book.sections[bk.sec].groups.length;
+  bk.card = last ? 'ready' : 'up';
+  bookUI.flipTo(bk.card);
+}
+
+// Yes：卡片放大成填空；填完 → 下一个 section 的指引（7 个都完了 → 羽毛落下）
+function askSection() {
+  if (bk.card !== 'ready') return;
+  bk.card = 'question';
+  bk.phase = 'question';
+  input.frame.active = false;
+  const sec = bk.sec;
+  const q = sectionText().question;
+  bookUI.openQuestion(q, (answers) => {
+    const parts = q.sentence.split('___');
+    app.answers[sec] = parts.map((p, i) => p + (i < answers.length ? answers[i] || '…' : '')).join('').trim();
+    try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
+    const now = performance.now();
+    const im = cardOf(bk.cur);
+    bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
+    bk.card = 'front';
+    if (bk.sec + 1 < book.sections.length) {
+      bk.next = bk.sec + 1;
+      bk.phase = book.sections[bk.next].sky ? 'skyguide' : 'guide';
+      bk.guideAt = now;
+    } else {
+      bk.phase = 'done';
+      bk.doneAt = now;
+      driver.releaseFrame();
+      setState('top');
+    }
+  }, `${sectionText().name || ''} · from ${inches()} up`);
 }
 
 function enterSection(i, now) {
@@ -338,6 +466,19 @@ function enterSection(i, now) {
   bk.phase = 'section';
   bk.enterAt = now;
   showSpread(0, now, true);
+  // 第一次：两只手示范怎么比框（框在第一张自己拍的照片上）
+  if (!bk.tutorialDone) {
+    setTimeout(() => {
+      if (bk.tutorialDone || bk.phase !== 'section') return;
+      const r = bookRects(performance.now())[0];
+      if (!r) return;
+      const side = Math.min(r.w, r.h) * 0.6;
+      const v = driver.vision;
+      const noCam = driver.keysOnly || !v || v.status === 'no-camera' || v.status === 'error';
+      bookUI.showTutorial({ x: r.x + r.w / 2 - side / 2, y: r.y + r.h / 2 - side / 2, w: side, h: side },
+        MOBILE ? T.book.tutorialMobile : noCam ? T.book.noCam : T.book.tutorial);
+    }, C.book.enterMs);
+  }
 }
 
 function showSpread(j, now, entering) {
@@ -353,25 +494,15 @@ function showSpread(j, now, entering) {
   bk.switchedAt = now;
   if (rise) bk.baseY = null;
   if (!bk.marks.has(g.height_in)) bk.marks.set(g.height_in, g.baseline_y);
-  const own = g.images.filter((im) => im.own).length;
   // 翻页：上一页的照片先被黑块一张张收走，然后这一页一张张拉出来
   const rv = { stagger: B.revealStaggerMs, dur: B.revealMs };
   bk.outAt = now;
   bk.inAt = rise ? now : now + (bk.prev ? revealTotal(bk.prev, rv) * 0.75 : 0);
-  const shown = rise ? now + B.enterMs : bk.inAt + revealTotal(g, rv);
-  const stay = book.sections[bk.sec].sky ? B.skyPhotoMs : B.spreadMs + B.perPhotoMs * own;
-  bk.turnAt = shown + stay;
   bk.targetH = g.height_in;
-  maybeAsk();
-}
-
-// 问题：这一页的高度过了某个问题的高度，就停下来问（一次一个）
-function maybeAsk() {
-  if (app.pausedQ !== null) return;
-  for (let i = 0; i < C.pauses.length; i++) {
-    if (app.asked.has(i) || !T.questions[i]) continue;
-    if (bk.targetH >= C.pauses[i]) { ask(i); return; }
-  }
+  // 这一页的卡片：先是历史照片（天空：空的）
+  bk.card = 'front';
+  const im = cardOf(g);
+  bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
 }
 
 // 进入 section：新的跨页从上面落下来，上一页往下走（像抬头）
@@ -394,7 +525,7 @@ function drawBookScene(now) {
   ctx.fillStyle = B.background;
   ctx.fillRect(-W, -H, W * 3, H * 3);
   const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, historicalPhotos: B.historicalPhotos, captions: B.captions, numbers: B.numbers,
-    sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawFoundOnPhoto(ctx, r, now) };
+    sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawHoles(r) };
   const L = bookLayout(book, W, H, B);
 
   if (bk.phase === 'done') {
@@ -420,7 +551,7 @@ function drawBookScene(now) {
         drawBaseline(ctx, bk.prev, L, pb, W, B.ink, 1 - e);
       }
       const y = bk.baseY - (1 - e) * H;
-      drawSpread(ctx, bk.cur, L, y, 1, o);
+      drawSpread(ctx, bk.cur, L, y, 1, { ...o, skip: cardOf(bk.cur) });
       drawBaseline(ctx, bk.cur, L, y, W, B.ink, 1);
     } else {
       // 翻页：黑块把上一页的照片一张张收走，再把这一页一张张拉出来；基线慢慢移过去
@@ -428,7 +559,7 @@ function drawBookScene(now) {
       if (bk.prev && now < bk.inAt + revealTotal(bk.cur, rv)) {
         drawSpread(ctx, bk.prev, L, baselineOf(bk.prev, L), 1, { ...o, reveal: { ...rv, start: bk.outAt, mode: 'out' } });
       }
-      drawSpread(ctx, bk.cur, L, bk.baseY, 1, { ...o, reveal: { ...rv, start: bk.inAt, mode: 'in' } });
+      drawSpread(ctx, bk.cur, L, bk.baseY, 1, { ...o, skip: cardOf(bk.cur), reveal: { ...rv, start: bk.inAt, mode: 'in' } });
       drawBaseline(ctx, bk.cur, L, bk.baseY, W, B.ink, 1);
     }
   }
@@ -467,19 +598,37 @@ function drawHeights(now, L) {
   ctx.restore();
 }
 
-// 指引：屏幕上方中间一句话（Kiara 之后设计）
-function drawGuide(now) {
-  if (app.state !== 'ascent' || (bk.phase !== 'guide' && bk.phase !== 'skyguide') || app.pausedQ !== null) return;
-  const text = bk.phase === 'skyguide' ? T.guideSky : T.guides[bk.next];   // TODO 指引之后 Kiara 设计
-  if (!text) return;
-  ctx.save();
-  ctx.globalAlpha = Math.min(1, (now - bk.guideAt) / 600);
-  ctx.fillStyle = C.book.ink;
-  ctx.font = `${C.book.guidePx}px ${sansFont()}`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`↑  ${text}`, app.W / 2, Math.max(24, bookLayout(book, app.W, app.H, C.book).oy / 2 + 6));
-  ctx.restore();
+// 切掉的地方：和背景一样的颜色，看起来像被剪下来了
+function drawHoles(r) {
+  const list = bk.holes.get(r.item.photo.id);
+  if (!list) return;
+  const now = performance.now();
+  for (const h of list) {
+    const x = r.x + h.x * r.w;
+    const y = r.y + h.y * r.h;
+    const w = h.w * r.w;
+    const hh = h.h * r.h;
+    // 洞从中间张开（像被剪开），切口上有一条细线，慢慢淡掉
+    const k = Math.min(1, (now - h.at) / 380);
+    const e = 1 - Math.pow(1 - k, 3);
+    ctx.fillStyle = C.book.background;
+    ctx.fillRect(x + (w * (1 - e)) / 2, y + (hh * (1 - e)) / 2, w * e, hh * e);
+    const line = Math.max(0, 1 - (now - h.at - 300) / 1400);
+    if (line > 0) {
+      ctx.save();
+      ctx.globalAlpha = line;
+      ctx.strokeStyle = C.book.ink;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(Math.round(x) + 0.5, Math.round(y) + 0.5, Math.round(w) - 1, Math.round(hh) - 1);
+      ctx.restore();
+    }
+  }
+}
+
+// 指引的字（bookui.js 画在屏幕上方）
+function guideText() {
+  if (app.state !== 'ascent' || (bk.phase !== 'guide' && bk.phase !== 'skyguide')) return '';
+  return (bk.phase === 'skyguide' ? T.guideSky : T.guides[bk.next]) || '';
 }
 
 // ================================================================ 绘制
@@ -527,7 +676,7 @@ function draw(now) {
     }
   }
 
-  if (BOOK) drawGuide(now);
+  if (BOOK && bookUI) bookUI.guide(guideText());
 
   // 停顿问问题时：画面淡下去，问题浮在上面
   app.pauseFade = Math.max(0, Math.min(1, (app.pauseFade || 0) + (app.pausedQ !== null ? 0.06 : -0.06)));
@@ -540,7 +689,7 @@ function draw(now) {
   }
 
   // 屏幕上的颜色（贴在屏幕表面，不跟着高度走）：找到的鸽子保持一会儿之后，在它的位置晕开
-  if (C.spots.show) drawSpots(ctx, input.yaw, now, inkCss(), fmtHeight, `10px ${monoFont()}`);
+  if (C.spots.show && !BOOK) drawSpots(ctx, input.yaw, now, inkCss(), fmtHeight, `10px ${monoFont()}`);
 
   // 最高处：找到的鸽子飞进天空
   if (app.state === 'top' && app.flock) drawFlock(ctx, app.flock, now - app.stateAt - 1500);
@@ -828,7 +977,7 @@ function setupDashboard() {
 }
 
 function sheetData() {
-  return { found, answers: app.answers, questions: T.questions, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), fmtHeight };
+  return { found, answers: app.answers, questions: BOOK && T.sections ? T.sections.map((x) => x.question.prompt) : T.questions, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), fmtHeight };
 }
 
 // 每一层高度一个圆圈编号（参考图 03）；找到过鸽子的那层填上颜色
@@ -992,7 +1141,7 @@ function renderDebug() {
     `height    ${fmtHeight(app.h || 0)}`,
     `frame     ${input.frame.active ? 'on' : 'off'}`,
     `found     ${found.length}`,
-    ...(BOOK ? [`book      ${bk.phase} · section ${bk.sec + 1} · spread ${bk.cur ? bk.cur.id : '—'} · next ${bk.next + 1}`] : []),
+    ...(BOOK ? [`book      ${bk.phase} · section ${bk.sec + 1} · spread ${bk.cur ? bk.cur.id || 'sky' : '—'} · card ${bk.card} · cut ${found.length}`] : []),
     `sky       ${sky.source} · wind ${sky.windDirection}° ${sky.windSpeed} km/h · ${skyColors().phase}`,
   ].join('\n');
 }

@@ -126,6 +126,9 @@ html.dx-on #grain { display: none; }
 #dx .dx-cam .dx-mark.bl { left: calc(var(--u) * -0.75); bottom: calc(var(--u) * -0.75); }
 #dx .dx-cam .dx-mark.tr { right: calc(var(--u) * -0.75); top: calc(var(--u) * -0.75); }
 
+/* 进入网站时中间那个灰色小方块（Figma frame 18） */
+#dx .dx-sq { background: var(--dx-grey); opacity: 0; pointer-events: none; transform-origin: 50% 50%; }
+
 /* 手势成功：缩小卡片的四角标记 */
 #dx .dx-marks { pointer-events: none; opacity: 0; }
 

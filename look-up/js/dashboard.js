@@ -16,21 +16,16 @@
 // 网格：u = min(屏幕宽 / 96, 屏幕高 / 62)。中间一栏 48u，卡片 40u，上下两条线之间 50u。?grid 显示网格。
 
 import { input } from './input/state.js';
+import { EASE, EASE_OUT, EASE_IN, esc, rv, quiet, reveal, setText } from './motion.js';
 
 // 两只手：图片尺寸、在 1728 宽（u = 18）时的缩放、L 形内角在图片里的位置（拇指和食指相交处）
 const HAND = {
   bl: { src: 'assets/dash/hand_bl.png', w: 1300, h: 1076, scale: 0.49, corner: [300, 560] },
   tr: { src: 'assets/dash/hand_tr.png', w: 1300, h: 1062, scale: 0.48, corner: [995, 430] },
 };
-const EASE = 'cubic-bezier(.65,0,.35,1)';
-const EASE_OUT = 'cubic-bezier(.16,.7,.25,1)';
-const EASE_IN = 'cubic-bezier(.55,0,.75,.2)';
 const GREY = new Set(['congrats']);
 const CLEAR = new Set(['pigeon']);      // 透明底：只有鸽子
 
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const rv = (text) => `<span class="rv"><span class="rv-t">${esc(text)}</span><span class="rv-bar"></span></span>`;
-const quiet = (p) => p.catch(() => {});     // 动画被取消时不报错
 
 export function createDashboard(o) {
   const { C, driver } = o;
@@ -68,6 +63,7 @@ export function createDashboard(o) {
     <img class="dx-hand" data-k="bl" src="${HAND.bl.src}" alt="" draggable="false">
     <img class="dx-hand" data-k="tr" src="${HAND.tr.src}" alt="" draggable="false">
     <div class="dx-marks"><span class="dx-mark bl"></span><span class="dx-mark tr"></span></div>
+    <div class="dx-sq"></div>
     <div class="dx-cam"><div class="dx-camvideo"><video muted playsinline></video></div><span class="dx-mark bl"></span><span class="dx-mark tr"></span></div>`;
 
   const q = (s) => root.querySelector(s);
@@ -80,7 +76,7 @@ export function createDashboard(o) {
     marks: q('.dx-marks'), ticks: q('.dx-ticks'), chap: q('.dx-chap'), about: q('.dx-about'),
     hands: { bl: q('.dx-hand[data-k="bl"]'), tr: q('.dx-hand[data-k="tr"]') },
     grid: q('.dx-gridview'),
-    cam: q('.dx-cam'), camVideo: q('.dx-cam video'),
+    cam: q('.dx-cam'), camVideo: q('.dx-cam video'), sq: q('.dx-sq'),
   };
   const ui = [...root.querySelectorAll('.ui')];
   for (const k of ['bl', 'tr']) el.hands[k].style.width = `${HAND[k].w}px`;
@@ -147,30 +143,7 @@ export function createDashboard(o) {
     fitBig();
   }
 
-  // ================================================================ 黑色方块把字拉出来
-
-  function reveal(scope, { delay = 0, stagger = 110, dur = 300 } = {}) {
-    const lines = scope.classList && scope.classList.contains('rv') ? [scope] : [...scope.querySelectorAll('.rv')];
-    lines.forEach((line, i) => {
-      const t = line.querySelector('.rv-t');
-      const bar = line.querySelector('.rv-bar');
-      if (!t.textContent) return;
-      bar.getAnimations().forEach((a) => a.cancel());
-      t.style.visibility = 'hidden';
-      bar.style.transformOrigin = '0 50%';
-      const a1 = bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
-        { duration: dur, delay: delay + i * stagger, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'both' });
-      quiet(a1.finished.then(() => {
-        t.style.visibility = '';
-        bar.style.transformOrigin = '100% 50%';
-        const a2 = bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }],
-          { duration: dur, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'both' });
-        a1.cancel();
-        return a2.finished.then(() => a2.cancel());
-      }));
-    });
-  }
-  const setText = (e, text) => { e.querySelector('.rv-t').textContent = text; };
+  // 黑色方块把字拉出来：reveal()、setText() 在 motion.js（书页上也用）
 
   // ================================================================ 卡片
 
@@ -520,20 +493,59 @@ export function createDashboard(o) {
     el.cam.animate([{ transform: 'scale(0.6)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 520, delay: 200, easing: EASE_OUT, fill: 'both' });
   }
 
+  // 进入网站（Figma frame 16 → 19）：
+  //   16 四条线收拢，贴住缩小的卡片四边；手离开
+  //   17 卡片消失，两条竖线合成一条、两条横线合成一条：一个十字（dashboard 结束）
+  //   18 十字再分开，中间是一个灰色的小方块
+  //   19 线和方块往外散开，后面的书页露出来
   function leave() {
     step = 'leaving';
-    o.onEnter();
-    root.style.setProperty('--leave', `${D.leaveMs}ms`);
-    root.classList.add('fading');
-    root.style.backgroundColor = 'transparent';
-    for (const e of [el.card, el.marks, ...el.edges, ...el.lines]) {
-      e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: D.leaveMs * 0.6, easing: 'ease', fill: 'forwards' });
-    }
-    moveHands('away', D.leaveMs, EASE_IN, 0).then(() => {
-      root.style.display = 'none';
-      html.classList.remove('dx-on');
-      step = 'gone';
-    });
+    const { cx, cy, u, W, H } = L;
+    const half = (D.smallCard * u) / 2;
+    const [t1, t2, t3, t4] = D.leaveSteps;
+    const lineTo = (pos, dur, easing = EASE) => Promise.all(el.lines.map((e) => {
+      const k = e.dataset.k;
+      const prop = k === 'lt' || k === 'lb' ? 'top' : 'left';
+      const from = parseFloat(getComputedStyle(e)[prop]);
+      e.getAnimations().forEach((a) => a.cancel());
+      e.style[prop] = `${from}px`;
+      const a = e.animate([{ [prop]: `${from}px` }, { [prop]: `${pos[k]}px` }], { duration: dur, easing, fill: 'forwards' });
+      return quiet(a.finished);
+    }));
+    const box = { lt: cy - half, lb: cy + half, cl: cx - half, cr: cx + half };
+    const cross = { lt: cy, lb: cy, cl: cx, cr: cx };
+    const out = { lt: -2, lb: H + 2, cl: -2, cr: W + 2 };
+    for (const e of [...el.edges]) e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: t1, easing: 'ease', fill: 'forwards' });
+    moveHands('away', t1, EASE_IN, 0);
+    Object.assign(el.sq.style, { left: `${cx - half}px`, top: `${cy - half}px`, width: `${2 * half}px`, height: `${2 * half}px` });
+    lineTo(box, t1)
+      .then(() => {
+        // 17：卡片收掉，线合成十字
+        el.marks.animate([{ opacity: 1 }, { opacity: 0 }], { duration: t2 * 0.6, fill: 'forwards' });
+        el.card.animate([{ opacity: 1, transform: getComputedStyle(el.card).transform }, { opacity: 0, transform: 'scale(0.02)' }], { duration: t2, easing: EASE, fill: 'forwards' });
+        return lineTo(cross, t2);
+      })
+      .then(() => new Promise((r) => setTimeout(r, 120)))
+      .then(() => {
+        // 18：十字分开，中间一个灰色方块
+        el.sq.animate([{ transform: 'scale(0)', opacity: 1 }, { transform: 'scale(1)', opacity: 1 }], { duration: t3, easing: EASE, fill: 'forwards' });
+        return lineTo(box, t3);
+      })
+      .then(() => {
+        // 19：散开，露出书页
+        o.onEnter();
+        root.style.setProperty('--leave', `${t4}ms`);
+        root.classList.add('fading');
+        root.style.backgroundColor = 'transparent';
+        el.sq.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: `scale(${Math.max(W, H) / half})`, opacity: 0 }], { duration: t4, easing: EASE_IN, fill: 'forwards' });
+        for (const e of el.lines) e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: t4, easing: 'ease-in', fill: 'forwards' });
+        return lineTo(out, t4, EASE_IN);
+      })
+      .then(() => {
+        root.style.display = 'none';
+        html.classList.remove('dx-on');
+        step = 'gone';
+      });
   }
 
   // ---- 每帧（main.js 调用）
@@ -665,7 +677,7 @@ export function createDashboard(o) {
     root.style.backgroundColor = '';
     root.style.display = 'block';
     html.classList.add('dx-on');
-    for (const e of [el.card, el.marks, ...el.edges, ...el.lines]) e.getAnimations().forEach((a) => a.cancel());
+    for (const e of [el.card, el.marks, el.sq, ...el.edges, ...el.lines]) e.getAnimations().forEach((a) => a.cancel());
     for (const e of ui) e.style.opacity = '';
     el.marks.style.opacity = 0;
     el.card.style.transform = '';

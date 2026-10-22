@@ -54,15 +54,19 @@ window.LOOKUP = {
     lookAbove: 0.2,             // 抬头判定：lookValue 超过这个（约 8°）……
     lookHoldMs: 250,            //          ……保持这么久就算
     enterMs: 1400,              // 进入一个 section / 同一个 section 里高度变了：跨页从上面落下来（上升）
-    spreadMs: 6000,             // 一个跨页停多久（再加上每张自己的照片 perPhotoMs）
-    perPhotoMs: 1500,
+    introMs: 9000,              // 介绍卡停多久再翻成「再抬头 ↑」/「Ready?」（点一下卡片也会翻）
+    noIntroMs: 1600,            // 没有介绍的页（每个 section 第一页以外）：切到之后多久翻
+    flipMs: 1100,               // 卡片翻一次（和 dashboard 一样）
+    cutTint: 'rgba(122, 86, 214, 0.72)',   // 切下来的方块加一层色调（先随便放：紫）；null = 不加
+    tutorialHandScale: 0.55,    // 教学的手：dashboard 上手的大小 × 这个
+    pieceU: 9,                  // 右上角每一块的大小（网格单位）
+    pieceFlyMs: 900,            // 切下来的方块飞过去要多久
+    panelMs: 900,               // 卡片放大成填空面板
     revealColor: '#d9d9d9',     // 同一个高度换页：灰色方块拉出来 / 收回去
     revealMs: 320,              //                各要多久
     revealStaggerMs: 120,       //       一张接一张，隔这么久（从左到右）
-    skyPhotoMs: 4500,           // 天空：每张飞行照片停多久（一张一页，底边在基线上）
     sidePx: 120,                // 跨页左右至少留这么多（左边是高度尺）
     marginY: 40,
-    guidePx: 15,                // 指引文字字号
   },
 
   // ---------------------------------------------------------------- 竖向空间（阶段 B）
@@ -253,7 +257,7 @@ window.LOOKUP = {
     handsFar: 0.6,              //                                    ……这么远 = 张开
     smallCard: 11,              // 缩小后的卡片边长（u）
     handsHoldMs: 0,             // 检测到手势之后，四角标记出现、再停这么久进入（0 = 马上）
-    leaveMs: 1500,              // 进入网站：手往两边移开，dashboard 淡出
+    leaveSteps: [700, 520, 520, 1100],   // 进入网站：线贴住卡片 → 合成十字 → 分开成灰方块 → 散开（毫秒）
     chapters: [0, 12, 60, 180, 600, 2400, 12000, 60000],   // TODO 占位：chapter 的刻度（英寸），之后按真正的 chapter 改
   },
 
