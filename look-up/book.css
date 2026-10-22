@@ -25,6 +25,10 @@
 #bk .bk-wipe { position: absolute; inset: 0; transform: scaleX(0); pointer-events: none; }
 #bk .bk-text { position: absolute; letter-spacing: -0.01em; }
 #bk .bk-arrow { position: absolute; bottom: 0.4em; line-height: 1; }
+/* 再抬头：竖着排的 LOOK UP（从下往上读），从卡片底下走到顶上 */
+#bk .bk-lookup { position: absolute; line-height: 1; letter-spacing: -0.01em; }
+#bk .bk-lookup span { position: absolute; left: 0; bottom: 0; display: block; writing-mode: vertical-rl; transform-origin: 50% 50%;
+                      rotate: 180deg; white-space: nowrap; }
 
 /* 按钮：等宽字，左下 / 右上两个角标（和 dashboard 一样） */
 #bk .bk-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; margin-top: 0.9em;
@@ -99,7 +103,8 @@
 #bk .bk-grp { display: inline-block; white-space: nowrap; margin-right: 0.25em; }
 
 /* 历史照片的信息：卡片上面一行（摄影师, 标题），右边竖排（年份 · 收藏） */
-#bk .bk-cap { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); opacity: 0; }
+#bk .bk-cap { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); opacity: 0; text-align: right; white-space: nowrap; overflow: hidden; }
+#bk .bk-cap .bk-capmeta, #bk .bk-cap .bk-captitle { overflow: hidden; }
 #bk .bk-capmeta { display: none; font-family: var(--mono); font-size: calc(var(--u) * 1.0); letter-spacing: 0.06em; color: #6b6b6b; }
 #bk .bk-cap.with-meta .bk-capmeta { display: block; }
 #bk .bk-capv { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); writing-mode: vertical-rl; transform: rotate(180deg);

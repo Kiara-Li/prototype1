@@ -74,10 +74,9 @@ export function createBookUI(o) {
   function caption(c, delay = 0) {
     for (const e of [el.cap, el.capV]) e.getAnimations().forEach((a) => a.cancel());
     capShown = !!c;
+    capText = c;
+    capFit = '';
     if (!c) { el.cap.style.opacity = 0; el.capV.style.opacity = 0; return; }
-    el.capTitle.textContent = c.title;
-    el.capMeta.textContent = c.meta;
-    el.capV.textContent = c.meta;
     // 浮现：往上浮一点、淡入
     const frames = [{ opacity: 0, transform: 'translateY(0.7em)' }, { opacity: 1, transform: 'none' }];
     el.cap.animate(frames, { duration: 1100, delay, easing: EASE_OUT, fill: 'both' });
@@ -93,16 +92,43 @@ export function createBookUI(o) {
       e.animate([{ opacity: from }, { opacity: 0 }], { duration: 600, easing: EASE_OUT, fill: 'both' });
     }
   }
+  // 一段信息按「/」或「·」分成几块，从前往后放，放不下就不放了（信息不完整没关系，不要超出卡片）
+  let capText = null;
+  let capFit = '';
+  const measureCv = document.createElement('canvas').getContext('2d');
+  function fitParts(text, sep, max, e) {
+    if (!text) return '';
+    const cs = getComputedStyle(e);
+    measureCv.font = `${cs.fontSize} ${cs.fontFamily}`;
+    const fits = (t) => measureCv.measureText(t).width <= max;
+    let out = '';
+    for (const part of text.split(sep)) {
+      const t = out ? `${out}${sep}${part}` : part;
+      if (fits(t)) { out = t; continue; }
+      if (!out) {                                    // 第一块就放不下：按词截
+        for (const w of part.split(' ')) { const tw = out ? `${out} ${w}` : w; if (!fits(tw)) break; out = tw; }
+      }
+      break;
+    }
+    return out;
+  }
   function placeCaption(r, opts) {
     const on = r && capShown && opts.cap;
     el.cap.style.visibility = on ? 'visible' : 'hidden';
     el.capV.style.visibility = on ? 'visible' : 'hidden';
     if (!on) return;
-    const side = (opts.room || 0) >= 1.9 * u && el.capV.textContent;
+    const side = (opts.room || 0) >= 1.9 * u && !!capText.meta;
+    // 两段信息在卡片右上角交成一个 cross mark：上面一行右对齐到卡片右边，右边竖排从卡片顶上开始
+    const key = `${Math.round(r.w)}|${Math.round(r.h)}|${side}`;
+    if (capFit !== key) {
+      capFit = key;
+      el.capTitle.textContent = fitParts(capText.title, ' / ', r.w, el.capTitle);
+      el.capMeta.textContent = side ? '' : fitParts(capText.meta, ' · ', r.w, el.capMeta);
+      el.capV.textContent = side ? fitParts(capText.meta, ' · ', r.h, el.capV) : '';
+    }
     el.cap.classList.toggle('with-meta', !side && !!el.capMeta.textContent);
     el.capV.style.display = side ? 'block' : 'none';
-    // 上面一行可以往右写宽一点（尽量一行放完，卡片贴着页顶时上面放不下几行）
-    Object.assign(el.cap.style, { left: `${r.x}px`, bottom: `${window.innerHeight - r.y + 0.55 * u}px`, maxWidth: `${Math.max(r.w, window.innerWidth - r.x - u)}px` });
+    Object.assign(el.cap.style, { left: `${r.x}px`, bottom: `${window.innerHeight - r.y + 0.55 * u}px`, width: `${r.w}px`, maxWidth: '' });
     if (side) {
       // 竖排：从下往上读，结束在卡片顶端（和 dashboard 卡片左边那行一样）
       const lh = 1.5 * u;
@@ -155,7 +181,11 @@ export function createBookUI(o) {
       return label(data.label) + text(data.text, pad + lab * 2.6, lab * 2.6 + btnPx * 3.2)
         + `<button class="bk-btn bk-cardbtn" data-act="next" style="left:${pad}px;bottom:${pad * 0.6}px;font-size:${btnPx}px">${rv(TB.read)}</button>`;
     }
-    if (kind === 'up') return `${text(TB.up, pad)}<div class="bk-arrow" style="font-size:${cardFont() * 2.2}px;left:${pad}px">↑</div>`;
+    if (kind === 'up') {
+      // 「LOOK UP」转 90° 竖着排，从卡片底下往上走到顶（视线跟着往上）
+      const fs = Math.min((cw - 2 * pad) * 0.9, (ch - 2 * pad) / 4.4);
+      return `<div class="bk-lookup" style="font-size:${fs}px;left:${pad}px;top:${pad}px;bottom:${pad}px;width:${fs}px"><span>${esc(TB.up)}</span></div>`;
+    }
     if (kind === 'ready') {
       const { fs, lines } = fit(TB.ready, 4 * u);
       return `<div class="bk-text bk-bottom" style="left:${pad}px;bottom:${pad}px;font-size:${fs}px;line-height:${fs * 1.28}px">
@@ -260,8 +290,15 @@ export function createBookUI(o) {
       el.rot.style.transform = `${p} rotateY(${angle}deg)`;
       anim.cancel();
       from.classList.add('hidden');
+      from.querySelectorAll('video').forEach((v) => v.pause());       // 翻走的那一面上的视频不用再放
       current = kind;
       reveal(to.querySelector('.bk-body'));
+      const lk = to.querySelector('.bk-lookup span');
+      if (lk) {
+        const travel = Math.max(0, lk.parentElement.clientHeight - lk.offsetHeight);
+        lk.animate([{ translate: '0 0', opacity: 0 }, { opacity: 1, offset: 0.15 }, { translate: `0 ${-travel}px`, opacity: 1 }],
+          { duration: 1800, easing: EASE, fill: 'both' });
+      }
     });
   }
 
@@ -303,9 +340,6 @@ export function createBookUI(o) {
       { transform: `translate(0px, 0px) scale(1) rotate(${s.rot}deg)`, offset: 1 },
     ], { duration: B.pieceFlyMs, easing: 'linear' });
     pieces.push({ el: img, h });
-    setText(el.h, `${Math.round(h)} ${TB.inch}`);
-    Object.assign(el.h.style, { right: `${u + s.size + 0.5 * u}px`, top: `${1.6 * u}px` });
-    reveal(el.h, { dur: 220 });
   }
 
   // ================================================================ 面板：填空 → 你的词 + 切下来的鸽子
