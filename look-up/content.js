@@ -83,38 +83,39 @@ window.CONTENT = {
     inch: 'inch',
   },
 
-  // ---- 每个 section：name（卡片上的小标签）、intro（切到第一只鸽子后卡片背面）、question（最后一页的填空，___ 是空）
-  //      picture：最后那张纸的背面，句子里这个词换成在这一段切下来的鸽子
-  // 七句填空连起来读，是一首从雨棚一直写到天空的诗。介绍是草稿，Kiara 之后改。
+  // ---- 每个 section：name（卡片上的小标签）、intro（切到第一只鸽子后卡片背面）、question（最后一页的填空）
+  //      sentence 里：___ 是要填的空；[ ] 里是这个构件的名字——填的时候照常显示这个词，
+  //      最后那张纸上，这个词换成在这一段切下来的鸽子。height：那张纸左边尺子上写的高度（″）
+  // 七句（Kiara 写的）连起来读，是一首从雨棚一直写到天空的诗。介绍和 prompt 是草稿。
   sections: [
     { name: 'Awning',
       intro: 'Before air conditioning, a shop kept cool with canvas. Every morning someone cranked the awning out to shade the window, the goods, and whoever stopped to look. The pigeons took the roof.',
       question: { prompt: 'When did you last wait out the rain under someone else’s awning?',
-        sentence: 'I waited under an awning on ___, while the rain ___.' }, picture: 'awning' },
+        sentence: 'I waited out the rain under the [awning] of a ___.' }, height: 120 },
     { name: 'Projecting sign',
       intro: 'A sign that sticks out from the wall turns sideways to talk to people on foot, not in cars. The city decides how far it may reach over your head. Nobody decided who would sit on top.',
-      question: { prompt: 'Which sign do you read every day without meaning to?',
-        sentence: 'Every day I read a sign that says ___, and think of ___.' }, picture: 'sign' },
+      question: { prompt: 'Which shop do you walk past every day?',
+        sentence: 'Every day I walk past the [sign] of ___.' }, height: 159 },
     { name: 'Ledge & sill',
       intro: 'Ledges and sills were drawn to throw rain off a façade. Pigeons come from rock doves that nested on sea cliffs; to them a building is simply another cliff, and this is the shelf.',
-      question: { prompt: 'What would you leave on a ledge for someone to find?',
-        sentence: 'On the ledge outside my window I would leave ___ for ___.' }, picture: 'ledge' },
+      question: { prompt: 'What can you see from your window?',
+        sentence: 'Past the [ledge] outside my window, I can see ___.' }, height: 180 },
     { name: 'Traffic signal',
       intro: 'The mast arm swings the light out over the lane, right where a driver is already looking. It was built for people in a hurry. The birds on top have nowhere to be.',
-      question: { prompt: 'What do you think about while you wait for the light?',
-        sentence: 'Waiting for the light, I think about ___ until it turns ___.' }, picture: 'light' },
+      question: { prompt: 'What did you think about the last time you waited to cross?',
+        sentence: 'Waiting for the [traffic signal] to turn green, I thought about ___.' }, height: 216 },
     { name: 'Fire escape',
       intro: 'In 1867 New York began requiring fire escapes on tenements. People found every other use for them: a bed on hot nights, a line for laundry, a garden of tomatoes, a balcony for talking across the gap.',
-      question: { prompt: 'Who would you sit with on a fire escape on a hot night?',
-        sentence: 'On a hot night I would climb out onto the fire escape with ___ and watch ___.' }, picture: 'fire escape' },
+      question: { prompt: 'What have you seen people do on a fire escape?',
+        sentence: 'I’ve seen people use the [fire escape] to ___.' }, height: 300 },
     { name: 'Streetlight',
       intro: 'Broadway was lit by electric arc lamps in 1880. A streetlight is made for walking home in the dark. To a pigeon it is a high perch that stays warm after sunset.',
-      question: { prompt: 'Where were you going the last time a streetlight came on above you?',
-        sentence: 'The streetlight came on as I walked toward ___, feeling ___.' }, picture: 'streetlight' },
+      question: { prompt: 'Where were you walking, late one night?',
+        sentence: 'Late one night, under the [streetlight], I was walking to ___.' }, height: 348 },
     { name: 'In flight',
       intro: 'Up here nothing was built for anyone. A pigeon can find its way home from very far away. You have come a long way up, too.',
-      question: { prompt: 'When did you last look up, only to look?',
-        sentence: 'The last time I looked up, the sky was ___ and I was ___.' }, picture: 'sky' },
+      question: { prompt: 'What color was the sky the last time you looked up?',
+        sentence: 'When I looked up, the [sky] was ___.' }, height: 960 },
   ],
 
   // ---- 书：每个 section 之前的指引（一句比一句往上）。顺序和 config.book.sections 一样

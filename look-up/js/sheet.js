@@ -1,8 +1,8 @@
 // Look Up · 最后的纸
 //
 //   正面   一路切下来的鸽子，按高度从下往上摆满一个正方形网格（4 块 = 2 × 2，16 块 = 4 × 4；摆不满的格子是浅灰）
-//   背面   七句填空连成的诗，左边一把尺子（参考海报）：你的词是黑的，题目的字是灰的；每句里构件的名字（awning、sign…）
-//          换成在那一段切下来的鸽子（content.js 里每个 section 的 picture）。没回答的空留一条线，可以手写
+//   背面   七句填空连成的诗，左边一把尺子（参考海报）：你的词是黑的，题目的字是灰的；每句里 [构件名]
+//          换成在那一段切下来的鸽子（content.js 的 sentence）。跳过没回答的那句不放，尺子上也没有它的高度
 //   动画   碎片从屏幕四周飞进来，从下往上拼成一张纸 → 纸翻过来，是诗 → 下载 / 打印
 //   下载   两面并排放在一张 A4（横）上，一个 PNG；打印同一张图，A4 横放，不缩放就是 130mm 的正方形
 
@@ -52,12 +52,8 @@ function renderGrid(pieces) {
 // 一句话 → 一串词：{ t, ans } 文字 / { blank } 没填的空 / { img } 鸽子（换掉构件的名字）
 function tokens(sec, answers, piece) {
   const MARK = '\u0001';
-  let sentence = sec.question.sentence;
-  if (piece && sec.picture) {
-    // 只换题目里的字（不换你写的）：第一处
-    const re = new RegExp(`\\b${sec.picture.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-    sentence = sentence.replace(re, MARK);
-  }
+  // [构件名]：有这一段切下来的鸽子就换成鸽子，没有就照常写这个词
+  const sentence = sec.question.sentence.replace(/\[([^\]]*)\]/, (m, w) => (piece ? MARK : w)).replace(/\[([^\]]*)\]/g, '$1');
   const out = [];
   const words = (s, ans) => s.split(/\s+/).filter(Boolean).forEach((w) => {
     if (!w.includes(MARK)) { out.push({ t: w, ans }); return; }
@@ -115,9 +111,10 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
   const top = h1 + labPx * 1.3 + labPx * 0.9;
   hline(top, 0, x0 + width * 0.35);
 
-  // 每个 section 一格，最低的在最下面
+  // 只放回答了的 section（跳过的不出现，尺子上也没有它的高度）；每句一格，最低的在最下面
+  const answered = sections.map((s, i) => i).filter((i) => answers[i] && answers[i].some((a) => a && a.trim()));
   const bottom = SIDE * 0.965;
-  const n = sections.length;
+  const n = Math.max(1, answered.length);
   const band = (bottom - top) / n;
   const lineY = (k) => bottom - k * band;            // 第 k 个 section 的长线
 
@@ -125,7 +122,7 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
   for (let y = bottom; y > top + 2; y -= band / 5) hline(y, 0, tickW);
 
   // 字号：每一句都放得进自己那一格
-  const stanzas = sections.map((s, i) => ({ i, toks: tokens(s, answers[i], pieceOf(i)) }));
+  const stanzas = answered.map((i, k) => ({ i, k, toks: tokens(sections[i], answers[i], pieceOf(i)) }));
   const measure = (tok, f) => {
     g.font = `${f}px ${sans}`;
     if (tok.img) return g.measureText(tok.pre || '').width + f * 1.3 + g.measureText((tok.post || '') + (tok.tail || '')).width;
@@ -154,7 +151,7 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
   const lh = f * 1.34;
 
   for (const st of stanzas) {
-    const y = lineY(st.i);
+    const y = lineY(st.k);
     hline(y);
     // 高度：等宽字，坐在长线上（和海报上的 25' 一样）
     const h = heightOf(st.i);
@@ -259,7 +256,7 @@ function print(c) {
 function renderSides({ pieces, sections, answers, T, date, heights }) {
   const ordered = [...pieces].sort((a, b) => a.h - b.h);
   const pieceOf = (i) => pieces.find((p) => p.sec === i) || null;
-  const heightOf = (i) => (pieceOf(i) ? pieceOf(i).h : heights ? heights[i] : 0);
+  const heightOf = (i) => (heights && heights[i]) || (pieceOf(i) ? pieceOf(i).h : 0);      // 尺子上写 content.js 里每段的高度
   return { grid: renderGrid(ordered), poem: renderPoem({ sections, answers, pieceOf, heightOf, title: T.title, date }) };
 }
 // 调试：整张 A4

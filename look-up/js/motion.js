@@ -9,6 +9,8 @@ export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '
 export const rv = (text) => `<span class="rv"><span class="rv-t">${esc(text)}</span><span class="rv-bar"></span></span>`;
 export const quiet = (p) => p.catch(() => {});     // 动画被取消时不报错
 export const setText = (e, text) => { e.querySelector('.rv-t').textContent = text; };
+// 填空的句子：[构件名] 在网页上照常显示这个词（最后那张纸上才换成鸽子）
+export const plainSentence = (s) => s.replace(/\[([^\]]*)\]/g, '$1');
 
 // 黑色方块把字拉出来：方块从左边伸出来盖住这一行 → 字出现 → 方块收向右边
 export function reveal(scope, { delay = 0, stagger = 110, dur = 300 } = {}) {

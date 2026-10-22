@@ -585,7 +585,7 @@ function askSection() {
   bookUI.openQuestion(q, (answers) => {
     if (answers) {
       app.answerParts[sec] = answers;
-      const parts = q.sentence.split('___');
+      const parts = q.sentence.replace(/\[([^\]]*)\]/g, '$1').split('___');
       app.answers[sec] = parts.map((p, i) => p + (i < answers.length ? answers[i] || '…' : '')).join('').trim();
       try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
     }
@@ -1221,7 +1221,7 @@ function showSheet() {
   const secs = book.sections.map((s, i) => T.sections[i]).filter(Boolean);
   openSheet({
     pieces: app.pieces, sections: secs, answers: app.answerParts, T: T.sheet,
-    heights: book.sections.map((s) => (s.groups[0] ? s.groups[0].height_in : 0)),
+    heights: secs.map((s, i) => s.height || (book.sections[i].groups[0] ? book.sections[i].groups[0].height_in : 0)),
     date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
   });
 }

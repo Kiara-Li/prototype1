@@ -7,7 +7,7 @@
 //   手         第一次：两只手示范怎么比框
 // 位置由 main.js 每帧告诉它（卡片跟着书页走）。
 
-import { EASE, EASE_OUT, EASE_IN, esc, rv, quiet, reveal, setText } from './motion.js';
+import { EASE, EASE_OUT, EASE_IN, esc, rv, quiet, reveal, setText, plainSentence } from './motion.js';
 
 const HAND = {
   bl: { src: 'assets/dash/hand_bl.png', w: 1300, h: 1076, scale: 0.49, corner: [300, 560] },
@@ -329,7 +329,7 @@ export function createBookUI(o) {
       { transform: `translate(${r.x - px}px, ${r.y - py}px) scale(${r.w / pw}, ${r.h / ph})` },
       { transform: 'none' },
     ], { duration: B.panelMs, easing: EASE });
-    const parts = question.sentence.split('___');
+    const parts = plainSentence(question.sentence).split('___');
     el.pbody.innerHTML = `
       <div class="bk-plabel">${rv(poemLabel)}</div>
       <div class="bk-q">${wrap(question.prompt, pw - 5 * u, 2.11 * u, sans()).map(rv).join('')}</div>
@@ -356,7 +356,7 @@ export function createBookUI(o) {
   function compose(question, label) {
     const ins = [...el.pbody.querySelectorAll('.bk-in')];
     const answers = ins.map((i) => i.value.trim());
-    const parts = question.sentence.split('___');
+    const parts = plainSentence(question.sentence).split('___');
     let html = '';
     let n = 0;
     parts.forEach((p, i) => {
