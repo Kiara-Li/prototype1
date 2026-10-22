@@ -161,7 +161,7 @@ export function createDashboard(o) {
               <div class="dx-holelabel">${rv(`Chapter ${i + 1} · ${ch.label}`)}</div>`;
     },
     feather: () => `<canvas class="dx-fcanvas"></canvas><div class="dx-ftext">${T.featherFace.map(rv).join('')}</div>
-      <div class="dx-flinks"><a data-act="download">${esc(o.T.dashboard.download)}</a><a data-act="print">${esc(o.T.dashboard.print)}</a>
+      <div class="dx-flinks"><a data-act="download">${esc(o.T.dashboard.download)}</a>
       <span>${esc(o.T.dashboard.tutorial)}</span><a data-act="again">${esc(o.T.dashboard.again)}</a></div>`,
   };
   function text(lines) { return `<div class="dx-ctext">${lines.map(rv).join('')}</div>`; }

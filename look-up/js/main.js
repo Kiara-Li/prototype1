@@ -22,6 +22,9 @@ import { isMobileDevice } from './input/device.js';
 import { createDashboard } from './dashboard.js';
 import { loadBook, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal, skySpread } from './book.js';
 import { createBookUI } from './bookui.js';
+import { createSkySound } from './skysound.js';
+import { openSheet } from './sheet.js';
+import { createSectionSound } from './sectionsound.js';
 
 const C = window.LOOKUP;
 const T = window.CONTENT;
@@ -51,6 +54,8 @@ const app = {
   asked: new Set(),        // 已经问过的问题
   pausedQ: null,
   answers: [],
+  answerParts: [],         // 书：每个 section 填的词（数组），最后那张纸上用
+  pieces: [],              // 书：一路切下来的鸽子 { canvas, h, sec }，最后拼成一张纸
   groundFeathers: [],
   newFeather: null,
   view: { s: 1, dy: 0 },   // dashboard / 开场时整个画面的放大和偏移
@@ -124,12 +129,8 @@ function setupNewDashboard() {
         const colors = found.length ? featherColors(found) : last ? last.colors : featherColors([]);
         drawFeather(g, w * 0.46, h * 0.94, 0.35, h * 0.86, h * 0.21, colors, 7);
       },
-      download: async () => {
-        const s = await renderSheets(sheetData());
-        downloadCanvas(s.front, 'feather-front.png');
-        setTimeout(() => downloadCanvas(s.back, 'feather-back.png'), 400);
-      },
-      print: async () => printSheets(await renderSheets(sheetData())),
+      download: () => showSheet(),
+      print: () => showSheet(),
       again: () => location.reload(),
     },
   });
@@ -271,6 +272,7 @@ const bk = {
   switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0,
   targetH: 0,
   enterDir: 1,
+  skyAt: -1,                   // 进入天空的时间（背景从灰变蓝）
   card: 'front',               // 这一页卡片：front → intro → up / ready → question
   introUntil: 0,
   tutorialDone: false,
@@ -304,8 +306,11 @@ async function setupBook() {
   window.lookUp.bookUI = bookUI;
   window.lookUp.rects = () => bookRects(performance.now());     // 调试：这一页照片在屏幕上的位置
   window.lookUp.pigeonsOf = pigeonsOf;
+  window.lookUp.show = (i, j = 0) => { enterSection(i, performance.now()); if (j) showSpread(j, performance.now()); };   // 调试：直接跳到第 i 个 section 的第 j 页
 }
 let bookUI = null;
+const skySound = C.book && C.book.skySound ? createSkySound(C.book.skySound) : null;
+const sectionSound = C.book && C.book.sectionSounds ? createSectionSound(C.book.sectionSounds) : null;
 
 // 这一页的卡片：历史照片里最大的那张（天空：右边留出来的一栏）
 function cardOf(g) {
@@ -501,7 +506,7 @@ function cutOut(r, sq, shown, now) {
   const B = C.book;
   const f = { photoId: r.item.photo.id };
   const img = r.item.img;
-  const n = 360;
+  const n = 720;                              // 最后那张纸上一块可能很大（只切到一只：整面 130mm）
   const c = document.createElement('canvas');
   c.width = c.height = n;
   const g = c.getContext('2d');
@@ -528,6 +533,7 @@ function cutOut(r, sq, shown, now) {
     g.globalCompositeOperation = 'source-over';
   }
   bookUI.addPiece(c, shown, r.item.photo.height_in);
+  app.pieces.push({ canvas: c, h: r.item.photo.height_in, sec: bk.sec });
   if (bookUI.tutorial) { bk.tutorialDone = true; bookUI.hideTutorial(); }
   // 这一页第一次切到：卡片翻过来，介绍这个构件（只有每个 section 的第一页有介绍）
   if (bk.card === 'front') {
@@ -562,6 +568,7 @@ function finishSection() {
   } else {
     bk.phase = 'done';
     bk.doneAt = now;
+    if (sectionSound) sectionSound.stop();
     driver.releaseFrame();
     setState('top');
   }
@@ -577,6 +584,7 @@ function askSection() {
   const q = sectionText().question;
   bookUI.openQuestion(q, (answers) => {
     if (answers) {
+      app.answerParts[sec] = answers;
       const parts = q.sentence.split('___');
       app.answers[sec] = parts.map((p, i) => p + (i < answers.length ? answers[i] || '…' : '')).join('').trim();
       try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
@@ -587,6 +595,12 @@ function askSection() {
 
 function enterSection(i, now) {
   bk.sec = i;
+  // 去天空之前的那段声音：路灯开始时从头放；进入天空时接到翅膀拍动
+  const sec = book.sections[i];
+  if (skySound && sec.key === C.book.skySound.startSection) skySound.start();
+  if (skySound && sec.sky) skySound.toFinale();
+  if (sec.sky) bk.skyAt = now;                 // 天空：背景慢慢变成视频里的蓝
+  if (sectionSound) sectionSound.enter(sec.key);      // 这个 section 自己的一点声音（雨、铃声、嘀嗒……）
   bk.phase = 'section';
   bk.enterAt = now;
   showSpread(0, now, true);
@@ -612,6 +626,7 @@ function showSpread(j, now, entering) {
   const rise = entering || !bk.cur || g.height_in !== bk.cur.height_in;
   if (rise) bk.enterAt = now;
   bk.enterDir = !bk.cur ? 1 : -1;               // 第一页：从下面滑上来；之后：从上面落下来
+  if (sectionSound && !entering) sectionSound.spread();
   bk.prev = bk.cur;
   bk.prevEnter = rise;
   bk.idx = j;
@@ -628,7 +643,12 @@ function showSpread(j, now, entering) {
   bk.card = 'front';
   const im = cardOf(g);
   bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
-  bookUI.caption(im && !im.virtual && B.historicalPhotos ? parseCaption(im.caption) : null, rise ? B.enterMs : revealTotal(g, rv));
+  const settle = rise ? B.enterMs : revealTotal(g, rv);
+  bookUI.caption(im && !im.virtual && B.historicalPhotos ? parseCaption(im.caption) : null, settle);
+  // 有的页：历史照片过一会儿换成一段视频（照片的信息跟着淡出）；天空的最后一页（'last'）：右边空着的那一栏出现视频
+  const last = book.sections[bk.sec].sky && j === book.sections[bk.sec].groups.length - 1;
+  const v = B.videos && (last ? B.videos.last : g.id && B.videos[g.id]);
+  if (v && im) bookUI.video(v, settle + v.delayMs, bookUI.hideCaption);
 }
 
 // 进入 section：新的跨页滑进来。第一页从下面滑上来（线框散开之后）；之后从上面落下来，上一页往下走（像抬头）
@@ -654,9 +674,10 @@ function drawBookScene(now) {
   const B = C.book;
   ctx.fillStyle = B.background;
   ctx.fillRect(-W, -H, W * 3, H * 3);
+  const L = bookLayout(book, W, H, B);
+  drawSkyBg(now, L);
   const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, historicalPhotos: B.historicalPhotos, captions: B.captions, numbers: B.numbers,
     sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawHoles(r) };
-  const L = bookLayout(book, W, H, B);
 
   if (bk.phase === 'done') {
     // 最后：最后一页的照片被黑块收走，后面是纽约此刻的天空颜色（羽毛在这里落下）
@@ -694,7 +715,93 @@ function drawBookScene(now) {
     }
   }
 
+  drawSkyVideo(now);
   if (app.state !== 'dashboard' && app.state !== 'end') drawHeights(now, L);
+}
+
+// 天空这个 section 的背景：和最后那段天空视频一样的蓝（从上到下的渐变照视频取的颜色），
+// 对齐右边那一栏（视频出现的地方），这样看不出哪里是视频、哪里是背景，像真的看到了天空。
+// 视频放着的时候，每一帧从视频里取颜色（镜头在动，天空的蓝也在变），背景跟着它慢慢变
+const skyLive = { stops: null, g: null };
+function drawSkyBg(now, L) {
+  const S = C.book.skyBg;
+  if (!S || bk.skyAt < 0) return;
+  const k = ease(Math.min(1, (now - bk.skyAt) / S.fadeMs));
+  const col = book.sections[book.sections.length - 1].groups[0].images.find((im) => im.virtual);
+  const top = L.oy + col.y * L.s;
+  if (!skyLive.stops) skyLive.stops = S.stops.map((c) => hex(c));
+  const v = bookUI && bookUI.liveVideo();
+  if (v && v.readyState >= 2) sampleVideo(v, col.w / col.h);
+  const g = ctx.createLinearGradient(0, top, 0, top + col.h * L.s);
+  const n = skyLive.stops.length;
+  skyLive.stops.forEach((c, i) => g.addColorStop(i / (n - 1), `rgb(${c.map(Math.round).join(',')})`));
+  ctx.save();
+  ctx.globalAlpha = k;
+  ctx.fillStyle = g;
+  ctx.fillRect(-app.W, -app.H, app.W * 3, app.H * 3);
+  ctx.restore();
+}
+// 融进背景的视频画在书页的 canvas 上（不用 <video> 直接显示：浏览器显示视频和画 canvas 的颜色不完全一样，
+// 画在同一个 canvas 上，和背景取的颜色才对得上）：裁成那一栏的形状，四边羽化，慢慢浮现
+let featherCv = null;
+function drawSkyVideo(now) {
+  const v = bookUI && bookUI.liveVideo();
+  const r = v && v.readyState >= 2 ? cardRect(now) : null;
+  if (!r) return;
+  const S = C.book.skyBg;
+  const dpr = devicePixelRatio;
+  const w = Math.round(r.w * dpr);
+  const h = Math.round(r.h * dpr);
+  if (!featherCv) featherCv = document.createElement('canvas');
+  if (featherCv.width !== w || featherCv.height !== h) { featherCv.width = w; featherCv.height = h; }
+  const g = featherCv.getContext('2d');
+  const vw = v.videoWidth;
+  const vh = v.videoHeight;
+  const sw = Math.min(vw, (vh * r.w) / r.h);
+  const sh = Math.min(vh, (vw * r.h) / r.w);
+  g.globalCompositeOperation = 'source-over';
+  g.clearRect(0, 0, w, h);
+  g.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, w, h);
+  g.globalCompositeOperation = 'destination-in';
+  const fx = S.featherX;
+  const fy = S.featherY;
+  const gx = g.createLinearGradient(0, 0, w, 0);
+  gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(fx, '#000'); gx.addColorStop(1 - fx, '#000'); gx.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gx;
+  g.fillRect(0, 0, w, h);
+  const gy = g.createLinearGradient(0, 0, 0, h);
+  gy.addColorStop(0, 'rgba(0,0,0,0)'); gy.addColorStop(fy, '#000'); gy.addColorStop(1 - fy, '#000'); gy.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gy;
+  g.fillRect(0, 0, w, h);
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, (now - Number(v.dataset.on || now)) / S.videoFadeMs);
+  ctx.drawImage(featherCv, r.x, r.y, r.w, r.h);
+  ctx.restore();
+}
+
+// 视频里露出来的那一条（object-fit: cover，竖着居中），缩成 16 × n 的小图，每一行取平均 → 背景的渐变；慢慢靠过去，不闪
+function sampleVideo(v, aspect) {
+  const n = skyLive.stops.length;
+  if (!skyLive.g) {
+    const c = document.createElement('canvas');
+    c.width = 16;
+    c.height = n;
+    skyLive.g = c.getContext('2d', { willReadFrequently: true });
+  }
+  const vw = v.videoWidth;
+  const vh = v.videoHeight;
+  const sw = Math.min(vw, vh * aspect);
+  const sh = Math.min(vh, vw / aspect);
+  try {
+    skyLive.g.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, 16, n);
+    const d = skyLive.g.getImageData(0, 0, 16, n).data;
+    for (let y = 0; y < n; y++) {
+      const m = [0, 0, 0];
+      for (let x = 0; x < 16; x++) for (let i = 0; i < 3; i++) m[i] += d[(y * 16 + x) * 4 + i] / 16;
+      const cur = skyLive.stops[y];
+      for (let i = 0; i < 3; i++) cur[i] += (m[i] - cur[i]) * 0.06;
+    }
+  } catch { /* 视频还没准备好 */ }
 }
 
 // 高度尺：现在这一页的高度（黑，在基线上）+ 去过的高度（浅灰，留在当时基线的位置），越走越多
@@ -1099,13 +1206,26 @@ function setupDashboard() {
 
   $('dBegin').onclick = begin;
   $('eDownload').onclick = async () => {
+    if (BOOK) { showSheet(); return; }
     const s = await renderSheets(sheetData());
     downloadCanvas(s.front, 'feather-front.png');
     setTimeout(() => downloadCanvas(s.back, 'feather-back.png'), 400);
   };
-  $('ePrint').onclick = async () => printSheets(await renderSheets(sheetData()));
+  $('ePrint').onclick = async () => (BOOK ? showSheet() : printSheets(await renderSheets(sheetData())));
   $('eAgain').onclick = () => location.reload();
 }
+
+// 书：最后的纸（碎片拼成的网格，翻过来是诗），在 js/sheet.js
+function showSheet() {
+  if (!BOOK || !book) return;
+  const secs = book.sections.map((s, i) => T.sections[i]).filter(Boolean);
+  openSheet({
+    pieces: app.pieces, sections: secs, answers: app.answerParts, T: T.sheet,
+    heights: book.sections.map((s) => (s.groups[0] ? s.groups[0].height_in : 0)),
+    date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+  });
+}
+window.lookUp.sheet = showSheet;
 
 function sheetData() {
   return { found, answers: app.answers, questions: BOOK && T.sections ? T.sections.map((x) => x.question.prompt) : T.questions, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), fmtHeight };
@@ -1179,6 +1299,7 @@ function hideHands() { $('handL').style.opacity = 0; $('handR').style.opacity = 
 function toEnd() {
   setState('end');
   try { localStorage.setItem(C.storage.unlocked, '1'); } catch { /* */ }
+  if (BOOK) setTimeout(showSheet, C.book.sheetDelayMs);      // 结尾：碎片自己拼成一张纸
   if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(); return; }
   $('dash').style.display = 'block';
   $('dStart').style.display = 'none';

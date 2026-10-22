@@ -50,6 +50,50 @@ window.LOOKUP = {
       { key: 'light',   groups: ['47', '71', '73', '75', '77'] },        // Streetlight
       // 第 7 个 In flight 自动加在最后（photos.json 里所有 In flight、≥ minHeight 的原图）
     ],
+    // 去天空之前的那段声音（js/skysound.js）：在 startSection 开始时从头播放、慢慢变大；
+    // 抬头进入天空的那一刻接到 jumpTo，一秒后是翅膀拍动（录音里 30.5–33.5 秒）
+    skySound: {
+      src: 'sound/sky_wings.m4a',
+      startSection: 'light',    // 从哪个 section 开始放（路灯 = 天空前最后一个）
+      volFrom: 0.2,             // 先淡入到 20%……
+      volTo: 0.3,               // ……再慢慢升到 30%
+      fadeInSec: 6,
+      riseSec: 40,
+      loopStart: 1,             // 还没去天空时，在这一段环境声里循环（秒）
+      loopEnd: 29,
+      jumpTo: 29.5,             // 进入天空时接到这里
+      crossfadeSec: 0.8,
+    },
+    // 历史照片换成视频：组号 → 视频。这一页落定、照片信息浮现之后再过 delayMs，灰色方块把照片换成视频
+    // （71 = 路灯里最大的那张历史照片 PECO Lamp Trimmer；视频都是 Kiara 拍的原片转成的 H.264）
+    // 天空这个 section 的背景：和天空视频一样的蓝（照浏览器里播出来的视频从上到下取的颜色，对齐视频那一栏）；进入天空时 fadeMs 慢慢变过去
+    skyBg: {
+      stops: ['#3a78cb', '#3674c5', '#316fbf', '#2d6bba', '#2b68b7', '#2a68b7', '#2a69b9', '#2c6dbe', '#3072c5', '#3478ce'],
+      fadeMs: 2400,
+      featherX: 0.3,            // 视频左右各羽化多少（那一栏宽度的比例）
+      featherY: 0.1,            //     上下
+      videoFadeMs: 2500,        // 视频慢慢浮现
+    },
+    // 每个 section 自己的一点声音（js/sectionsound.js）：很小声，垫在下面。文件放在 sound/sections/，没有就不响
+    //   loop 一直循环 · spread 每翻到一页响一次 · every 隔一会儿响一次（everyMs 之间随机）
+    sectionSounds: {
+      master: 1,
+      fadeInSec: 2.5,
+      fadeOutSec: 1.5,
+      sections: {
+        awning: { src: 'sound/sections/rain_awning.m4a', mode: 'loop', vol: 0.14 },              // 雨打在雨棚上
+        sign:   { src: 'sound/sections/shop_bell.m4a', mode: 'spread', vol: 0.12, firstMs: 900 }, // 开门的铃声
+        signal: { src: 'sound/sections/aps_tick.m4a', mode: 'loop', vol: 0.10 },                 // 路口给盲人的提示音（暂时用英国的，之后换纽约录的）
+        fire:   { src: 'sound/sections/fire_escape_steps.m4a', mode: 'every', vol: 0.14, everyMs: [7000, 14000], firstMs: 1800 }, // 踩在铁梯上
+        light:  { src: 'sound/sections/night_city.m4a', mode: 'loop', vol: 0.2 },                // 夜晚城市：远处的警笛（录音本身比较轻）
+      },
+    },
+    sheetDelayMs: 2600,         // 回到 dashboard 以后多久，碎片拼成最后那张纸
+    videos: {
+      '43': { src: 'assets/video/awning.mp4', rate: 2, delayMs: 2500, loop: true },         // 屋檐里高的那页（Zero Irving 玻璃雨棚）；IMG_7641 往上看高楼
+      '71': { src: 'assets/video/streetlight.mp4', rate: 2, delayMs: 2500, loop: true },
+      last: { src: 'assets/video/sky.mp4', rate: 1, delayMs: 1500, loop: true, blend: true },   // blend：四边羽化，融进背景             // 最后：天空最后一页右边那一栏；IMG_7637 天空和鸽子，去掉了声音
+    },
     // 没放进来的组：01–33（低于视线，或者不在白名单）、37、41、57、61、65、79、81
     lookAbove: 0.2,             // 抬头判定：lookValue 超过这个（约 8°）……
     lookHoldMs: 250,            //          ……保持这么久就算

@@ -84,6 +84,15 @@ export function createBookUI(o) {
     el.capV.animate([{ opacity: 0, transform: 'rotate(180deg) translateY(-0.7em)' }, { opacity: 1, transform: 'rotate(180deg)' }],
       { duration: 1100, delay: delay + 250, easing: EASE_OUT, fill: 'both' });
   }
+  function hideCaption() {
+    if (!capShown) return;
+    capShown = false;
+    for (const e of [el.cap, el.capV]) {
+      const from = getComputedStyle(e).opacity;
+      e.getAnimations().forEach((a) => a.cancel());
+      e.animate([{ opacity: from }, { opacity: 0 }], { duration: 600, easing: EASE_OUT, fill: 'both' });
+    }
+  }
   function placeCaption(r, opts) {
     const on = r && capShown && opts.cap;
     el.cap.style.visibility = on ? 'visible' : 'hidden';
@@ -176,6 +185,54 @@ export function createBookUI(o) {
     el.faces[0].classList.remove('hidden');
     fill(el.faces[0], 'front', src);
     current = 'front';
+  }
+
+  // 历史照片换成一段视频（config.book.videos）：灰色方块从左边拉过来盖住照片 → 照片没了 → 方块收向右边，露出视频。
+  // 视频一开始就放进卡片里加载（看不见），等 delayMs 以后再换；换页（gen 变了）或卡片已经翻走就不换了
+  function video(v, delayMs, onSwap) {
+    const g = gen;
+    const body = el.faces[0].querySelector('.bk-body');
+    const vid = document.createElement('video');
+    vid.className = `bk-photo bk-video${v.blend ? ' blend' : ''}`;
+    Object.assign(vid, { muted: true, playsInline: true, loop: v.loop !== false, preload: 'auto', src: v.src });
+    vid.setAttribute('muted', '');
+    vid.setAttribute('playsinline', '');
+    const rate = () => { vid.defaultPlaybackRate = v.rate || 1; vid.playbackRate = v.rate || 1; };
+    rate();
+    vid.addEventListener('loadedmetadata', rate);
+    body.appendChild(vid);
+    setTimeout(() => {
+      if (g !== gen || current !== 'front') return;
+      if (v.blend) {
+        // 融进背景的：不用方块；main.js 把它画在书页的 canvas 上，慢慢浮现（看不出从哪里开始是视频）
+        vid.classList.add('on');
+        vid.dataset.on = performance.now();
+        rate();
+        quiet(vid.play());
+        if (onSwap) onSwap();
+        return;
+      }
+      const bar = document.createElement('div');
+      bar.className = 'bk-wipe';
+      bar.style.background = B.revealColor;
+      body.appendChild(bar);
+      const dur = B.revealMs * 1.6;
+      bar.style.transformOrigin = '0 50%';
+      const a1 = bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'both' });
+      quiet(a1.finished.then(() => {
+        if (g !== gen) return;
+        const img = body.querySelector('img.bk-photo');
+        if (img) img.remove();
+        vid.classList.add('on');
+        rate();
+        quiet(vid.play());
+        if (onSwap) onSwap();
+        bar.style.transformOrigin = '100% 50%';
+        const a2 = bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: dur, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'both' });
+        a1.cancel();
+        return a2.finished.then(() => bar.remove());
+      }));
+    }, delayMs);
   }
 
   function flipTo(kind, data) {
@@ -418,7 +475,8 @@ export function createBookUI(o) {
 
   return {
     guide, caption,
-    place, setFront, flipTo, addPiece, openQuestion, showTutorial, hideTutorial, setHint,
+    place, setFront, flipTo, video, hideCaption,
+    liveVideo: () => root.querySelector('.bk-face:not(.hidden) .bk-video.blend.on'),     // 天空背景跟着它取颜色 addPiece, openQuestion, showTutorial, hideTutorial, setHint,
     set on(handlers) { onFace = handlers; },
     get face() { return current; },
     get tutorial() { return tutorial; },

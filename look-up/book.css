@@ -19,6 +19,10 @@
 #bk .bk-shade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
 #bk .bk-body { position: absolute; inset: 0; }
 #bk .bk-photo { width: 100%; height: 100%; display: block; }
+#bk .bk-video { position: absolute; inset: 0; object-fit: cover; visibility: hidden; }   /* 换上来的视频：竖的，裁成卡片的形状 */
+#bk .bk-video.on { visibility: visible; }
+#bk .bk-video.blend.on { opacity: 0.001; }          /* 融进背景的：main.js 画在 canvas 上，这里只是放着（不能完全隐藏，不然手机上会暂停） */
+#bk .bk-wipe { position: absolute; inset: 0; transform: scaleX(0); pointer-events: none; }
 #bk .bk-text { position: absolute; letter-spacing: -0.01em; }
 #bk .bk-arrow { position: absolute; bottom: 0.4em; line-height: 1; }
 
