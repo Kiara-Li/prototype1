@@ -29,7 +29,7 @@ window.LOOKUP = {
   // groups 是书里的组号（跨页右页的页码，和 Sightline 页面右边那列数字一样）。
   book: {
     enabled: true,              // false = 回到原来的竖向照片
-    background: '#f5f5f5',      // 和 dashboard 一样
+    background: '#e4e4e4',      // 和 dashboard 一样（切下来的洞也是这个颜色）
     ink: '#000000',
     historicalPhotos: true,     // 书里的历史照片（人的照片）：true = 放原图，false = 用下面的浅灰色块代替
     historical: '#d9d9d9',
@@ -57,7 +57,12 @@ window.LOOKUP = {
     introMs: 9000,              // 介绍卡停多久再翻成「再抬头 ↑」/「Ready?」（点一下卡片也会翻）
     noIntroMs: 1600,            // 没有介绍的页（每个 section 第一页以外）：切到之后多久翻
     flipMs: 1100,               // 卡片翻一次（和 dashboard 一样）
-    cutTint: 'rgba(122, 86, 214, 0.72)',   // 切下来的方块加一层色调（先随便放：紫）；null = 不加
+    zoom: false,                // 电脑上框里的画面要不要放大（手机的捏合放大一直有）
+    cutCover: 0.3,              // 切鸽子：鸽子有这么多在框里就算框住了（或者鸽子中心在框附近）
+    cutDwellMs: 400,            //         框住这么久 → 框自己缩成鸽子的大小
+    snapMs: 420,                //         框缩小要多久，缩完就切
+    cutPad: 1.15,               //         切下来的正方形比鸽子大多少
+    cutTint: null,              // 切下来的方块加一层色调，例如 'rgba(122, 86, 214, 0.72)'（紫）；null = 不加
     tutorialHandScale: 0.55,    // 教学的手：dashboard 上手的大小 × 这个
     pieceU: 9,                  // 右上角每一块的大小（网格单位）
     pieceFlyMs: 900,            // 切下来的方块飞过去要多久
@@ -178,7 +183,7 @@ window.LOOKUP = {
   // ---------------------------------------------------------------- 区段：颜色、模糊、雾随高度变（阶段 D）
   // 每一行是一个关键高度（英寸），中间按对数高度插值
   zones: [
-    { h: 0,     blur: 0,   fog: 0.10, gray: 0.55, bg: '#e6e6e3' },   // 地面：灰、安静，接近书
+    { h: 0,     blur: 0,   fog: 0.10, gray: 0.55, bg: '#e4e4e4' },   // 地面：灰、安静，接近书
     { h: 60,    blur: 0.4, fog: 0.14, gray: 0.62, bg: '#e3e4e3' },   // 人的视线：第一个转折
     { h: 300,   blur: 1.4, fog: 0.22, gray: 0.7,  bg: '#dfe2e5' },   // 城市构件：变软
     { h: 600,   blur: 2.4, fog: 0.30, gray: 0.76, bg: '#d9dfe5' },   // 屋顶以上

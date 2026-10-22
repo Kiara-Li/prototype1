@@ -11,7 +11,7 @@
 // 都只写 input/state.js 里的 lookValue、zoomValue、frame…；下面的画面只读这些值。
 
 import { createWorld, layoutWorld, tickWorld, heightToY, yToHeight, screenY, photoRects, drawRuler, fmtHeight } from './world.js';
-import { setPigeons, updateFinding, drawFoundOnPhoto, drawSpots, updateSpots, found, pending, pigeonsOf } from './observe.js';
+import { setPigeons, updateFinding, drawFoundOnPhoto, drawSpots, updateSpots, found, pending, pigeonsOf, isFound, markFound } from './observe.js';
 import { createFlock, drawFlock, flockDone } from './flight.js';
 import { startAudio, setAudioHeight, playFeather } from './audio.js';
 import { sky, loadSky, skyColors, windVector, hex, rgb } from './sky.js';
@@ -324,6 +324,8 @@ function cardRect(now) {
 
 function bookUpdate(now, dt) {
   const B = C.book;
+  // 一进来就是第一页（不先放一句指引）
+  if (bk.phase === 'guide' && bk.sec === -1) enterSection(0, now);
   if (bk.phase === 'guide' || bk.phase === 'skyguide') {
     // 判定很宽松：抬一下头就算
     if (app.pausedQ === null && input.lookValue > B.lookAbove) {
@@ -358,31 +360,124 @@ function bookUpdate(now, dt) {
   }
 
   // 找鸽子：框的中心（手机：屏幕中心）停在一只鸽子上
-  const p = input.probe;
-  const before = found.length;
-  const rects = bk.phase === 'section' ? bookRects(now) : [];
-  app.finding = updateFinding(rects, p ? { x: p.x, y: p.y, w: 0, h: 0 } : null, now);
-  if (found.length > before) cutOut(found[found.length - 1], rects, now);
+  updateCutting(bk.phase === 'section' ? bookRects(now) : [], now);
 
   // 卡片跟着书页走
   bookUI.place(bk.phase === 'section' || bk.phase === 'question' || bk.phase === 'guide' || bk.phase === 'skyguide' ? cardRect(now) : null);
 }
 
-// 切下来：框（正方形）里的这一块 → 一张小图（加一层色调）飞到右上角；照片上留下一个和背景一样颜色的洞
-function cutOut(f, rects, now) {
-  const B = C.book;
-  const r = rects.find((x) => x.item.photo.id === f.photoId);
-  if (!r) return;
-  let sq;
+// ---- 切鸽子：判定很宽松（框大致罩住一只鸽子就行），停一下 → 框自己缩成刚好包住这只鸽子的正方形 → 切下来
+//   bk.aim   正在瞄准的鸽子（四角标记慢慢出现）
+//   bk.snap  框正在缩小（from → to，屏幕上看到的位置），缩完就切
+
+// 书页上要不要放大框里的画面：手机（捏合就是放大）要；电脑默认不要，框就是一把刀，看到哪切哪
+const bookZoom = () => input.mode === 'mobile' || C.book.zoom;
+
+// 用户的框（屏幕坐标）。手机：放大时屏幕中间的一块
+function frameBox() {
+  if (!input.frame.active) return null;
   const fr = input.frame.rect;
   if (input.mode === 'mobile' || !fr) {
-    const side = (Math.min(app.W, app.H) / Math.max(1, input.zoomValue)) * 0.5;
-    const c = input.probe || { x: f.x, y: f.y };
-    sq = { x: c.x - side / 2, y: c.y - side / 2, w: side, h: side };
-  } else {
-    const side = Math.min(fr.w, fr.h);
-    sq = { x: fr.x + (fr.w - side) / 2, y: fr.y + (fr.h - side) / 2, w: side, h: side };
+    const side = (Math.min(app.W, app.H) / Math.max(1, input.zoomValue)) * 0.7;
+    const c = input.probe || { x: app.W / 2, y: app.H / 2 };
+    return { x: c.x - side / 2, y: c.y - side / 2, w: side, h: side };
   }
+  return fr;
+}
+// 放大镜开着时，照片上的位置 → 屏幕上看到的位置
+function toDisplay(b) {
+  const fr = input.frame;
+  if (!bookZoom() || !(fr.alpha > 0 && fr.rect) || input.zoomValue <= 1) return b;
+  const m = input.zoomValue;
+  const c = input.zoomCenter;
+  return { x: c.x + (b.x - c.x) * m, y: c.y + (b.y - c.y) * m, w: b.w * m, h: b.h * m };
+}
+function pigeonBox(r, pg) {
+  const xs = pg.polygon.map((q) => q[0]);
+  const ys = pg.polygon.map((q) => q[1]);
+  const x0 = Math.min(...xs);
+  const y0 = Math.min(...ys);
+  return { x: r.x + x0 * r.w, y: r.y + y0 * r.h, w: (Math.max(...xs) - x0) * r.w, h: (Math.max(...ys) - y0) * r.h };
+}
+
+function updateCutting(rects, now) {
+  const B = C.book;
+  if (bk.snap) {
+    if (now - bk.snap.at >= B.snapMs) {
+      const s = bk.snap;
+      bk.snap = null;
+      const f = markFound(s.rect, s.index, now);
+      if (f) cutOut(s.rect, s.sq, s.to, now);
+    }
+    return;
+  }
+  // 框（用户比的 / 鼠标拖的）：就按框出来的这一块判断，宽松
+  const F = frameBox();
+  let best = null;
+  if (F) {
+    for (const r of rects) {
+      pigeonsOf(r.item.photo.id).forEach((pg, i) => {
+        if (isFound(r.item.photo.id, i)) return;
+        const b = pigeonBox(r, pg);
+        const ix = Math.max(0, Math.min(b.x + b.w, F.x + F.w) - Math.max(b.x, F.x));
+        const iy = Math.max(0, Math.min(b.y + b.h, F.y + F.h) - Math.max(b.y, F.y));
+        const cover = (ix * iy) / Math.max(1, b.w * b.h);
+        const pad = 0.25 * Math.max(F.w, F.h);
+        const cx = b.x + b.w / 2;
+        const cy = b.y + b.h / 2;
+        const near = cx > F.x - pad && cx < F.x + F.w + pad && cy > F.y - pad && cy < F.y + F.h + pad;
+        const score = cover + (near ? 0.3 : 0);
+        if ((cover >= B.cutCover || near) && (!best || score > best.score)) best = { r, i, b, score };
+      });
+    }
+  }
+  if (!best) { bk.aim = null; return; }
+  const key = `${best.r.item.photo.id}#${best.i}`;
+  if (!bk.aim || bk.aim.key !== key) bk.aim = { key, since: now };
+  bk.aim.box = best.b;
+  bk.aim.progress = Math.min(1, (now - bk.aim.since) / B.cutDwellMs);
+  if (bk.aim.progress >= 1) {
+    const side = Math.max(16, Math.max(best.b.w, best.b.h) * B.cutPad);
+    const sq = { x: best.b.x + best.b.w / 2 - side / 2, y: best.b.y + best.b.h / 2 - side / 2, w: side, h: side };
+    bk.snap = { rect: best.r, index: best.i, sq, from: { ...frameBox() }, to: toDisplay(sq), at: now };
+    bk.aim = null;
+  }
+}
+
+// 瞄准时：角标从外面收到鸽子身边；收缩时：角标从你的框缩到鸽子的正方形
+// 只有右上、左下两个角（和网站上其他的角标一样），不画完整的方框
+function corners(b, len, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = C.book.ink;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (const [x, y, dx, dy] of [[b.x + b.w, b.y, -1, 1], [b.x, b.y + b.h, 1, -1]]) {
+    ctx.moveTo(x + dx * len, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * len);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+function drawCutting(now) {
+  if (bk.aim && bk.aim.box) {
+    const b = toDisplay(bk.aim.box);
+    const p = bk.aim.progress;
+    const g = (1 - p) * 0.35 * Math.max(b.w, b.h);       // 四角从外面收到鸽子身边
+    corners({ x: b.x - g, y: b.y - g, w: b.w + 2 * g, h: b.h + 2 * g }, Math.max(8, 0.28 * Math.min(b.w, b.h)), 0.25 + 0.75 * p);
+  }
+  if (bk.snap) {
+    const k = ease(Math.min(1, (now - bk.snap.at) / C.book.snapMs));
+    const a = bk.snap.from;
+    const t = bk.snap.to;
+    const b = { x: a.x + (t.x - a.x) * k, y: a.y + (t.y - a.y) * k, w: a.w + (t.w - a.w) * k, h: a.h + (t.h - a.h) * k };
+    corners(b, Math.max(8, 0.28 * Math.min(b.w, b.h)), 1);
+  }
+}
+
+// 切下来：鸽子的正方形 → 一张小图（加一层色调）从屏幕上看到的位置飞到右上角；照片上留下一个和背景一样颜色的洞
+function cutOut(r, sq, shown, now) {
+  const B = C.book;
+  const f = { photoId: r.item.photo.id };
   const img = r.item.img;
   const n = 360;
   const c = document.createElement('canvas');
@@ -410,7 +505,7 @@ function cutOut(f, rects, now) {
     g.fillRect(0, 0, n, n);
     g.globalCompositeOperation = 'source-over';
   }
-  bookUI.addPiece(c, sq, r.item.photo.height_in);
+  bookUI.addPiece(c, shown, r.item.photo.height_in);
   if (bookUI.tutorial) { bk.tutorialDone = true; bookUI.hideTutorial(); }
   // 这一页第一次切到：卡片翻过来，介绍这个构件（只有每个 section 的第一页有介绍）
   if (bk.card === 'front') {
@@ -564,7 +659,6 @@ function drawBookScene(now) {
     }
   }
 
-  drawGroundFeathers();
   if (app.state !== 'dashboard' && app.state !== 'end') drawHeights(now, L);
 }
 
@@ -659,7 +753,7 @@ function draw(now) {
     ctx.fillStyle = z.bgCss;
     ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.rect(r.x, r.y, r.w, r.h); ctx.fill('evenodd');
     ctx.restore();
-    const m = input.zoomValue;
+    const m = BOOK && !bookZoom() ? 1 : input.zoomValue;
     const cx = input.zoomCenter.x;
     const cy = input.zoomCenter.y;
     ctx.save();
@@ -671,12 +765,14 @@ function draw(now) {
     if (input.frameMarks) {
       ctx.save();
       ctx.globalAlpha = frame.alpha;
-      drawFrameMarks(ctx, r, FRAME_CFG, inkCss());
+      if (BOOK) corners(r, Math.max(10, 0.22 * Math.min(r.w, r.h)), frame.alpha);     // 书页：只有右上、左下两个角
+      else drawFrameMarks(ctx, r, FRAME_CFG, inkCss());
       ctx.restore();
     }
   }
 
   if (BOOK && bookUI) bookUI.guide(guideText());
+  if (BOOK && bk.phase === 'section') drawCutting(now);
 
   // 停顿问问题时：画面淡下去，问题浮在上面
   app.pauseFade = Math.max(0, Math.min(1, (app.pauseFade || 0) + (app.pausedQ !== null ? 0.06 : -0.06)));

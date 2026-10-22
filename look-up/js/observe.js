@@ -94,6 +94,20 @@ export function updateFinding(rects, frameRect, now) {
   return { ...hit, progress };
 }
 
+// 书页上用：不用框的中心精确停在鸽子身上，main.js 自己判断「大致框住了」之后直接记为找到
+export const isFound = (photoId, index) => foundKeys.has(`${photoId}#${index}`);
+export function markFound(rect, index, now) {
+  const pigeon = pigeonsOf(rect.item.photo.id)[index];
+  const key = `${rect.item.photo.id}#${index}`;
+  if (!pigeon || foundKeys.has(key)) return null;
+  if (!sampled.has(key)) sampled.set(key, sampleNeck(rect.item, pigeon));
+  foundKeys.add(key);
+  const f = { key, photoId: rect.item.photo.id, height: rect.item.photo.height_in, hsl: sampled.get(key),
+    x: rect.x + pigeon.neck[0] * rect.w, y: rect.y + pigeon.neck[1] * rect.h, at: now, seed: found.length * 7919 + 13 };
+  found.push(f);
+  return f;
+}
+
 // ================================================================ 取色
 
 function pixelsOf(item) {

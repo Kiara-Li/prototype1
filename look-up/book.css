@@ -14,7 +14,7 @@
 #bk .bk-rot { position: absolute; inset: 0; transform-style: preserve-3d; }
 #bk .bk-face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 #bk .bk-face.b { transform: rotateY(180deg); }
-#bk .bk-face.grey { background: #d9d9d9; }
+#bk .bk-face.paper { background: #fff; }         /* 介绍卡、Ready、再往上：白色的纸 */
 #bk .bk-face.hidden { pointer-events: none; }
 #bk .bk-shade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
 #bk .bk-body { position: absolute; inset: 0; }
@@ -41,7 +41,7 @@
 #bk .bk-stack { inset: 0; }
 
 /* 面板：填空 */
-#bk .bk-panel { display: none; background: #d9d9d9; pointer-events: auto; transform-origin: 0 0; }
+#bk .bk-panel { display: none; background: #fff; pointer-events: auto; transform-origin: 0 0; }
 #bk .bk-pbody { position: absolute; inset: calc(var(--u) * 2.5); }
 #bk .bk-q { font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; }
 #bk .bk-fill, #bk .bk-poem { margin-top: calc(var(--u) * 2.5); font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 3.6); letter-spacing: -0.01em; }

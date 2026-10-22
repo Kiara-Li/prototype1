@@ -113,7 +113,7 @@ export function createBookUI(o) {
   }
 
   function fill(face, kind, data) {
-    face.classList.toggle('grey', kind !== 'front');
+    face.classList.toggle('paper', kind !== 'front');
     face.classList.toggle('clear', kind === 'front' && !data);
     const body = face.querySelector('.bk-body');
     body.innerHTML = faceHtml(kind, data);
