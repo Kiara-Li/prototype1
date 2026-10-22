@@ -18,6 +18,7 @@
 
   /* 全局颗粒：哑光、印刷感 */
   #grain { position: fixed; inset: -40px; pointer-events: none; z-index: 50; mix-blend-mode: multiply; }
+  html.book #grain { display: none; }          /* 书：不加颗粒、不加滤镜 */
 
   /* dashboard：平的大色块外框，中间是照片窗口 */
   #dash { position: fixed; inset: 0; z-index: 20; pointer-events: none; }

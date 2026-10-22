@@ -20,6 +20,7 @@ import { drawFrameMarks } from '../../frame.js';
 import { input } from './input/state.js';
 import { isMobileDevice } from './input/device.js';
 import { createDashboard } from './dashboard.js';
+import { loadBook, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal, skySpread } from './book.js';
 
 const C = window.LOOKUP;
 const T = window.CONTENT;
@@ -34,6 +35,9 @@ document.documentElement.classList.toggle('mobile', MOBILE);
 const PARAMS = new URLSearchParams(location.search);
 const NEW_DASH = !MOBILE && !PARAMS.has('olddash');
 document.documentElement.classList.toggle('newdash', NEW_DASH);
+// 书：按 book.pdf 的跨页，7 次抬头 = 7 个 section（config.book）。false = 原来的竖向照片
+const BOOK = C.book && C.book.enabled;
+document.documentElement.classList.toggle('book', !!BOOK);
 let driver;              // 输入：电脑或手机（boot 里按设备加载，手机不加载摄像头和手势模型）
 let dash = null;
 
@@ -72,6 +76,7 @@ async function boot() {
   setPigeons(photos, marks, sugg);
   world = createWorld(photos, (id) => pigeonsOf(id).length);
   window.lookUp.world = world;
+  if (BOOK) await setupBook();
   try { app.answers = JSON.parse(localStorage.getItem(C.storage.answers)) || []; } catch { app.answers = []; }
   app.groundFeathers = await feathers.all();
   loadSky();
@@ -79,7 +84,7 @@ async function boot() {
   resize();
   setupDashboard();
   if (NEW_DASH) setupNewDashboard();
-  setState('dashboard');
+  if (app.state === 'loading') setState('dashboard');
   requestAnimationFrame(loop);
 }
 
@@ -128,6 +133,8 @@ function setupNewDashboard() {
     },
   });
   window.lookUp.dash = dash;
+  // 调试：?skipdash 跳过 dashboard，直接进入
+  if (PARAMS.has('skipdash')) { setState('calibrate'); driver.begin(); driver.calibrate.start(); return; }
   dash.show();
 }
 
@@ -157,9 +164,9 @@ function update(now, dt) {
   driver.update(now, dt, app.state);
   if (dash) dash.update(now);
 
-  // 滚轮之类的一次性位移
+  // 滚轮之类的一次性位移（书：不用）
   if (input.scrollDelta) {
-    if (app.state === 'ascent' && app.pausedQ === null && !frame.active) {
+    if (!BOOK && app.state === 'ascent' && app.pausedQ === null && !frame.active) {
       app.camY = Math.max(0, Math.min(world.topY, app.camY + input.scrollDelta));
     }
     input.scrollDelta = 0;
@@ -188,7 +195,7 @@ function update(now, dt) {
       setState('ascent');
     }
   } else if (app.state === 'ascent') {
-    ascend(now, dt);
+    if (BOOK) bookUpdate(now, dt); else ascend(now, dt);
   } else if (app.state === 'top') {
     if (!app.flock) app.flock = C.flight.enabled ? createFlock(found, app.W, app.H, windVector()) : [];
     const done = app.flock.length ? since > 1500 && flockDone(app.flock, since - 1500) : since > 4500;
@@ -244,13 +251,202 @@ function ascend(now, dt) {
   app.finding = updateFinding(rects, p ? { x: p.x, y: p.y, w: 0, h: 0 } : null, now);
 }
 
+// ================================================================ 书：指引 → section（跨页自己翻）→ 下一个指引 …… → 天空
+//
+// guide     屏幕上一句指引；抬一下头（lookValue 超过 lookAbove，保持 lookHoldMs）→ 进入下一个 section
+// section   这个 section 的跨页一页页自己翻（框鸽子 / 回答问题的时候停住）；低头不影响
+// skyguide  7 个 section 之后：看天空的指引 → 天空也是一个 section：飞行照片一张一页，尽量大，
+//           底边还在基线上（不全屏，水平线还在）；最后一张之后 → top（羽毛落下）
+
+let book = null;
+let skyItems = [];
+const bk = {
+  phase: 'guide', next: 0, sec: -1, idx: 0, cur: null, prev: null, prevEnter: false,
+  switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0, turnAt: 0,
+  targetH: 0,
+};
+window.lookUp.bk = bk;
+
+async function setupBook() {
+  const items = new Map();
+  for (const row of world.rows) for (const it of row.items) items.set(it.photo.id, it);
+  book = await loadBook(items);
+  book.sections = C.book.sections.map((s) => ({ ...s, groups: s.groups.map((id) => book.groups.get(id)).filter(Boolean) }));
+  // 天空：飞行照片（原图），从低到高，一张一页
+  skyItems = [...items.values()].filter((it) => /^In flight/.test(it.photo.caption) && /^data\//.test(it.photo.src))
+    .sort((a, b) => a.photo.height_in - b.photo.height_in);
+  if (skyItems.length) book.sections.push({ key: 'sky', sky: true, groups: skyItems.map((it) => skySpread(it, book.spread)) });
+  window.lookUp.book = book;
+}
+
+function bookUpdate(now, dt) {
+  const B = C.book;
+  const hold = input.frame.active || app.pausedQ !== null || pending.key !== null;
+  if (bk.phase === 'guide' || bk.phase === 'skyguide') {
+    // 判定很宽松：抬一下头就算
+    if (app.pausedQ === null && input.lookValue > B.lookAbove) {
+      if (!bk.upSince) bk.upSince = now;
+      if (now - bk.upSince > B.lookHoldMs) {
+        bk.upSince = 0;
+        enterSection(bk.next, now);
+      }
+    } else bk.upSince = 0;
+  } else if (bk.phase === 'section') {
+    if (hold) bk.turnAt += dt;                 // 在框鸽子 / 回答问题：先不翻
+    if (now >= bk.turnAt) {
+      const sec = book.sections[bk.sec];
+      if (bk.idx + 1 < sec.groups.length) showSpread(bk.idx + 1, now, false);
+      else if (bk.sec + 1 < book.sections.length) {
+        bk.next = bk.sec + 1;
+        bk.phase = book.sections[bk.next].sky ? 'skyguide' : 'guide';
+        bk.guideAt = now;
+      } else {
+        bk.phase = 'done';
+        bk.doneAt = now;
+        driver.releaseFrame();
+        setState('top');
+      }
+    }
+  }
+
+  // 高度尺跟着现在这一页的高度慢慢走
+  const ty = heightToY(world, bk.targetH);
+  app.camY += (ty - app.camY) * (1 - Math.exp(-dt / 900));
+
+  // 基线慢慢移到这一组的位置（和 Sightline 一样）
+  if (bk.cur) {
+    const L = bookLayout(book, app.W, app.H, B);
+    const target = baselineOf(bk.cur, L);
+    if (bk.baseY === null) bk.baseY = target;
+    bk.baseY += (target - bk.baseY) * (1 - Math.exp(-dt / 400));
+  }
+
+  // 找鸽子：框的中心（手机：屏幕中心）停在一只鸽子上
+  const p = input.probe;
+  app.finding = updateFinding(bookRects(now), p ? { x: p.x, y: p.y, w: 0, h: 0 } : null, now);
+}
+
+function enterSection(i, now) {
+  bk.sec = i;
+  bk.phase = 'section';
+  bk.enterAt = now;
+  showSpread(0, now, true);
+}
+
+function showSpread(j, now, entering) {
+  const B = C.book;
+  const g = book.sections[bk.sec].groups[j];
+  bk.prev = bk.cur;
+  bk.prevEnter = entering;
+  bk.idx = j;
+  bk.cur = g;
+  bk.switchedAt = now;
+  if (entering) bk.baseY = null;
+  const own = g.images.filter((im) => im.own).length;
+  // 翻页：上一页的照片先被黑块一张张收走，然后这一页一张张拉出来
+  const rv = { stagger: B.revealStaggerMs, dur: B.revealMs };
+  bk.outAt = now;
+  bk.inAt = entering ? now : now + (bk.prev ? revealTotal(bk.prev, rv) * 0.75 : 0);
+  const shown = entering ? now + B.enterMs : bk.inAt + revealTotal(g, rv);
+  const stay = book.sections[bk.sec].sky ? B.skyPhotoMs : B.spreadMs + B.perPhotoMs * own;
+  bk.turnAt = shown + stay;
+  bk.targetH = g.height_in;
+  maybeAsk();
+}
+
+// 问题：这一页的高度过了某个问题的高度，就停下来问（一次一个）
+function maybeAsk() {
+  if (app.pausedQ !== null) return;
+  for (let i = 0; i < C.pauses.length; i++) {
+    if (app.asked.has(i) || !T.questions[i]) continue;
+    if (bk.targetH >= C.pauses[i]) { ask(i); return; }
+  }
+}
+
+// 进入 section：新的跨页从上面落下来，上一页往下走（像抬头）
+function enterOffset(now) {
+  const k = Math.min(1, (now - bk.enterAt) / C.book.enterMs);
+  return ease(k);
+}
+
+function bookRects(now) {
+  if (bk.phase === 'done') return [];
+  if (!bk.cur || bk.baseY === null) return [];
+  const L = bookLayout(book, app.W, app.H, C.book);
+  const e = bk.prevEnter ? enterOffset(now) : 1;
+  return spreadRects(bk.cur, L, bk.baseY - (1 - e) * app.H);
+}
+
+function drawBookScene(now) {
+  const { W, H } = app;
+  const B = C.book;
+  ctx.fillStyle = B.background;
+  ctx.fillRect(-W, -H, W * 3, H * 3);
+  const o = { ink: B.ink, historical: B.historical, sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawFoundOnPhoto(ctx, r, now) };
+  const L = bookLayout(book, W, H, B);
+
+  if (bk.phase === 'done') {
+    // 最后：最后一页的照片被黑块收走，后面是纽约此刻的天空颜色（羽毛在这里落下）
+    const s = skyColors();
+    const k = Math.min(1, (now - bk.doneAt) / 1600);
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, rgb(s.top, k));
+    g.addColorStop(1, rgb(s.bottom, k));
+    ctx.fillStyle = g;
+    ctx.fillRect(-W, -H, W * 3, H * 3);
+    if (bk.cur && bk.baseY !== null) {
+      const rv = { stagger: B.revealStaggerMs, dur: B.revealMs, now, start: bk.doneAt, mode: 'out' };
+      drawSpread(ctx, bk.cur, L, bk.baseY, 1, { ...o, reveal: rv });
+      drawBaseline(ctx, bk.cur, L, bk.baseY, W, B.ink, 1 - k);
+    }
+  } else if (bk.cur && bk.baseY !== null) {
+    if (bk.prevEnter) {
+      const e = enterOffset(now);
+      if (bk.prev && e < 1) {
+        const pb = baselineOf(bk.prev, L) + e * H;
+        drawSpread(ctx, bk.prev, L, pb, 1, o);
+        drawBaseline(ctx, bk.prev, L, pb, W, B.ink, 1 - e);
+      }
+      const y = bk.baseY - (1 - e) * H;
+      drawSpread(ctx, bk.cur, L, y, 1, o);
+      drawBaseline(ctx, bk.cur, L, y, W, B.ink, 1);
+    } else {
+      // 翻页：黑块把上一页的照片一张张收走，再把这一页一张张拉出来；基线慢慢移过去
+      const rv = { stagger: B.revealStaggerMs, dur: B.revealMs, now };
+      if (bk.prev && now < bk.inAt + revealTotal(bk.cur, rv)) {
+        drawSpread(ctx, bk.prev, L, baselineOf(bk.prev, L), 1, { ...o, reveal: { ...rv, start: bk.outAt, mode: 'out' } });
+      }
+      drawSpread(ctx, bk.cur, L, bk.baseY, 1, { ...o, reveal: { ...rv, start: bk.inAt, mode: 'in' } });
+      drawBaseline(ctx, bk.cur, L, bk.baseY, W, B.ink, 1);
+    }
+  }
+
+  drawGroundFeathers();
+  if (app.state !== 'dashboard' && app.state !== 'end') drawRuler(ctx, world, app.camY, app.h || 0, B.ink, 1, `10px ${monoFont()}`);
+}
+
+// 指引：屏幕上方中间一句话（Kiara 之后设计）
+function drawGuide(now) {
+  if (app.state !== 'ascent' || (bk.phase !== 'guide' && bk.phase !== 'skyguide') || app.pausedQ !== null) return;
+  const text = bk.phase === 'skyguide' ? T.guideSky : T.guides[bk.next];   // TODO 指引之后 Kiara 设计
+  if (!text) return;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, (now - bk.guideAt) / 600);
+  ctx.fillStyle = C.book.ink;
+  ctx.font = `${C.book.guidePx}px ${sansFont()}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`↑  ${text}`, app.W / 2, Math.max(24, bookLayout(book, app.W, app.H, C.book).oy / 2 + 6));
+  ctx.restore();
+}
+
 // ================================================================ 绘制
 
 function draw(now) {
   const { W, H } = app;
   ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
   const h = app.h || 0;
-  const z = zoneAt(h);
+  const z = BOOK ? { bgCss: C.book.background, blur: 0, fog: 0, gray: 0, skyness: 0 } : zoneAt(h);
 
   ctx.save();
   if (app.view.s !== 1 || app.view.dy) {
@@ -289,6 +485,8 @@ function draw(now) {
     }
   }
 
+  if (BOOK) drawGuide(now);
+
   // 停顿问问题时：画面淡下去，问题浮在上面
   app.pauseFade = Math.max(0, Math.min(1, (app.pauseFade || 0) + (app.pausedQ !== null ? 0.06 : -0.06)));
   if (app.pauseFade > 0) {
@@ -313,6 +511,7 @@ function draw(now) {
 // 整个世界：背景 → 每一行（照片、基线、图注、被找到的鸽子）→ 地面上的羽毛 → 雾 → 事实 → 高度尺
 // clear = 取景框里面：不模糊、不加雾
 function drawScene(now, z, clear) {
+  if (BOOK && book) { drawBookScene(now); return; }
   const { W, H } = app;
   // 背景：低处是灰，越往上越接近纽约此刻的天空
   ctx.fillStyle = z.bgCss;
@@ -526,6 +725,7 @@ function zoneAt(h) {
 
 // 字和线的颜色：天空暗的时候（夜里）变浅
 function inkCss() {
+  if (BOOK) return C.book.ink;
   const z = app.h > 3000 ? skyColors() : null;
   if (z && z.phase === 'night') return 'rgba(236,238,242,0.9)';
   return 'rgba(29,35,40,0.95)';
@@ -750,6 +950,7 @@ function renderDebug() {
     `height    ${fmtHeight(app.h || 0)}`,
     `frame     ${input.frame.active ? 'on' : 'off'}`,
     `found     ${found.length}`,
+    ...(BOOK ? [`book      ${bk.phase} · section ${bk.sec + 1} · spread ${bk.cur ? bk.cur.id : '—'} · next ${bk.next + 1}`] : []),
     `sky       ${sky.source} · wind ${sky.windDirection}° ${sky.windSpeed} km/h · ${skyColors().phase}`,
   ].join('\n');
 }
@@ -783,6 +984,7 @@ function resize() {
   const ratio = world.topY ? app.camY / world.topY : 0;
   layoutWorld(world, app.W, app.H);
   app.camY = ratio * world.topY;
+  bk.baseY = null;
   if (app.state === 'dashboard' && !NEW_DASH) { app.view.dy = dashDy(); layoutDashboard(1); }
   if (app.state === 'end') layoutDashboard(1);
 }

@@ -68,6 +68,18 @@ window.CONTENT = {
     featherFace: ['This is your feather.', 'Print it, fold it, keep it.'],
   },
 
+  // ---- 书：每个 section 之前的指引（TODO 占位，Kiara 之后设计）。顺序和 config.book.sections 一样
+  guides: [
+    'Look up until you can see 18″.',
+    'Look up a little more, to the park fence.',
+    'Look up to the awnings.',
+    'Look up to the ledges and window sills.',
+    'Look up to the fire escapes.',
+    'Look up to the traffic lights.',
+    'Look up to the streetlights.',
+  ],
+  guideSky: 'Now look up at the sky.',
+
   calibrate: 'Look at the screen.',
   calibrateMobile: 'Hold still.',                     // 手机：记下开始时的姿态
   rotate: 'Please turn your phone upright.',          // 手机横过来时
