@@ -162,7 +162,7 @@ export function createDashboard(o) {
     },
     feather: () => `<canvas class="dx-fcanvas"></canvas><div class="dx-ftext">${T.featherFace.map(rv).join('')}</div>
       <div class="dx-flinks"><a data-act="download">${esc(o.T.dashboard.download)}</a>
-      <span>${esc(o.T.dashboard.tutorial)}</span><a data-act="again">${esc(o.T.dashboard.again)}</a></div>`,
+      <a data-act="fold">${esc(o.T.dashboard.tutorial)}</a><a data-act="again">${esc(o.T.dashboard.again)}</a></div>`,
   };
   function text(lines) { return `<div class="dx-ctext">${lines.map(rv).join('')}</div>`; }
   function btn(act, label) { return `<button class="dx-btn" data-act="${act}">${rv(label)}</button>`; }
@@ -596,6 +596,7 @@ export function createDashboard(o) {
       else if (a === 'go' && step === 'hands') startClosing();
       else if (a === 'download') o.feather.download();
       else if (a === 'print') o.feather.print();
+      else if (a === 'fold') o.feather.fold();
       else if (a === 'again') o.feather.again();
       return;
     }

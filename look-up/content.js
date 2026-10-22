@@ -23,7 +23,7 @@ window.CONTENT = {
     ],
     download: 'Your sheet',                         // 打开最后的纸（碎片拼成的网格 + 诗），在那里下载 / 打印
     print: 'Print',
-    tutorial: 'Folding steps — coming soon',          // TODO 之后放折叠教程（扫描 + 步骤图）
+    tutorial: 'Folding steps',                      // 打开折羽毛的 12 步（js/fold.js）
     again: 'Look up again',
     clear: 'Clear feathers on the ground',
     clearConfirm: 'Clear all feathers on the ground? Press Y to confirm.',
@@ -160,6 +160,7 @@ window.CONTENT = {
     download: 'Download A4',
     print: 'Print',
     close: 'Close',
+    fold: 'Folding steps',
     // 旧版（没有书页时）的背面
     heights: 'Pigeons you found',
     answers: 'Your answers',

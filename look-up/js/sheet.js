@@ -7,6 +7,7 @@
 //   下载   两面并排放在一张 A4（横）上，一个 PNG；打印同一张图，A4 横放，不缩放就是 130mm 的正方形
 
 import { EASE, EASE_OUT, rv, quiet, reveal } from './motion.js';
+import { openFold } from './fold.js';
 
 const MM = 300 / 25.4;                 // 300 dpi
 const SQ_MM = 130;                     // 每一面的边长（mm）
@@ -297,6 +298,7 @@ export async function openSheet(o) {
     <div class="sh-btns" style="top:${py + P + 3 * u}px;opacity:0">
       <button class="sh-btn" data-act="download">${rv(T.download)}</button>
       <button class="sh-btn" data-act="print">${rv(T.print)}</button>
+      <button class="sh-btn" data-act="fold">${rv(T.fold)}</button>
       <button class="sh-btn sh-quiet" data-act="close">${rv(T.close)}</button>
     </div>`;
   document.body.appendChild(root);
@@ -390,6 +392,7 @@ export async function openSheet(o) {
     if (!act) return;
     if (act.dataset.act === 'download') download(sheet(), `look-up-${new Date().toISOString().slice(0, 10)}.png`);
     else if (act.dataset.act === 'print') print(sheet());
+    else if (act.dataset.act === 'fold') openFold(T);
     else if (act.dataset.act === 'close') close(root);
   });
 }

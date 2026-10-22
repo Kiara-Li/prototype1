@@ -24,6 +24,7 @@ import { loadBook, loadGroup, bookLayout, baselineOf, spreadRects, drawSpread, d
 import { createBookUI } from './bookui.js';
 import { createSkySound } from './skysound.js';
 import { openSheet } from './sheet.js';
+import { openFold } from './fold.js';
 import { createSectionSound } from './sectionsound.js';
 
 const C = window.LOOKUP;
@@ -131,6 +132,7 @@ function setupNewDashboard() {
       },
       download: () => showSheet(),
       print: () => showSheet(),
+      fold: () => openFold(T.sheet),
       again: () => location.reload(),
     },
   });
@@ -1095,10 +1097,12 @@ function drawGroundFeathers() {
 }
 
 // 羽毛从最高处慢慢落下，镜头跟着回到地面
+// 落下来的是 Kiara 折好的纸羽毛（扫描的最后两张：两个面）。像一片叶子：左右摆、慢慢转，
+// 翻过去的时候（变窄到侧面）换成另一面
+const fallImgs = ['assets/fold/step11.png', 'assets/fold/step12.png'].map((src) => { const i = new Image(); i.src = src; return i; });
 function drawFalling(now) {
   const { W, H } = app;
   const since = now - app.stateAt;
-  const colors = featherColors(found);
   if (app.state === 'top') return;
   const k = Math.min(1, since / C.ending.featherFallMs);
   const wind = windVector();
@@ -1106,8 +1110,20 @@ function drawFalling(now) {
   const drift = wind.x * wind.strength * W * 0.12 * Math.sin(k * Math.PI);
   const x = W / 2 + sway + drift;
   const y = H * (0.12 + 0.55 * Math.min(1, k * 1.2));
-  const ang = Math.sin(since / 1400 + 0.6) * 0.5 + 0.15;
-  drawFeather(ctx, x, y, ang, C.ending.featherLengthPx, C.ending.featherWidthPx, colors, 7);
+  const ang = Math.sin(since / 1400 + 0.6) * 0.45 + 0.1;
+  const turn = Math.cos(since / C.ending.featherTurnMs * Math.PI);       // 1 → -1 → 1：翻一面再翻回来
+  const img = fallImgs[turn >= 0 ? 0 : 1];
+  if (!img.complete || !img.naturalWidth) {
+    drawFeather(ctx, x, y, ang, C.ending.featherLengthPx, C.ending.featherWidthPx, featherColors(found), 7);
+    return;
+  }
+  const s = C.ending.featherLengthPx / Math.max(img.naturalWidth, img.naturalHeight);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(ang);
+  ctx.scale(Math.max(0.08, Math.abs(turn)), 1);
+  ctx.drawImage(img, (-img.naturalWidth * s) / 2, (-img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
+  ctx.restore();
 }
 
 function landFeather(now) {
@@ -1209,6 +1225,8 @@ function setupDashboard() {
   $('eDownload').textContent = T.dashboard.download;
   $('ePrint').textContent = T.dashboard.print;
   $('eTutorial').textContent = T.dashboard.tutorial;
+  $('eTutorial').style.cursor = 'pointer';
+  $('eTutorial').onclick = () => openFold(T.sheet);
   $('eAgain').textContent = T.dashboard.again;
   $('dClear').textContent = app.groundFeathers.length ? `${app.groundFeathers.length} feather${app.groundFeathers.length > 1 ? 's' : ''} on the ground · X to clear` : '';
   renderCircles();
@@ -1238,6 +1256,7 @@ function showSheet() {
   });
 }
 window.lookUp.sheet = showSheet;
+window.lookUp.fold = () => openFold(T.sheet);
 
 function sheetData() {
   return { found, answers: app.answers, questions: BOOK && T.sections ? T.sections.map((x) => x.question.prompt) : T.questions, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), fmtHeight };

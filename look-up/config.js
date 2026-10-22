@@ -81,7 +81,7 @@ window.LOOKUP = {
       fadeInSec: 2.5,
       fadeOutSec: 1.5,
       sections: {
-        awning: { src: 'sound/sections/rain_awning.m4a', mode: 'loop', vol: 0.14 },              // 雨打在雨棚上
+        // awning：雨声去掉了（Kiara：太莫名其妙）；文件还在 sound/sections/rain_awning.m4a
         sign:   { src: 'sound/sections/shop_bell.m4a', mode: 'spread', vol: 0.12, firstMs: 900 }, // 开门的铃声
         signal: { src: 'sound/sections/aps_tick.m4a', mode: 'loop', vol: 0.10 },                 // 路口给盲人的提示音（暂时用英国的，之后换纽约录的）
         fire:   { src: 'sound/sections/fire_escape_steps.m4a', mode: 'every', vol: 0.14, everyMs: [7000, 14000], firstMs: 1800 }, // 踩在铁梯上
@@ -282,7 +282,8 @@ window.LOOKUP = {
     featherFallMs: 5000,        // 羽毛从最高处落到地面（镜头跟着下来），要快
     lastLineMs: 6000,           // 「Now look up from your screen.」停留
     featherWidthPx: 70,
-    featherLengthPx: 290,
+    featherLengthPx: 340,       // 落下来的纸羽毛多大（最长的一边）
+    featherTurnMs: 1700,        // 翻一面要多久
   },
 
   // ---------------------------------------------------------------- 全局质感（阶段 F）
