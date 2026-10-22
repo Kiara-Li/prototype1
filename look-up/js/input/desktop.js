@@ -9,7 +9,7 @@ import { createFrameState, updateFrame, zoomFor } from '../../../frame.js';
 export function createDesktopInput({ app, C, FRAME_CFG, cv, getWorld }) {
   const keysOnly = new URLSearchParams(location.search).get('input') === 'keys';
   const frame = createFrameState();
-  const s = { pitch: null, zero: 0, keyUp: false, keyDown: false, calib: [], dragFrom: null };
+  const s = { pitch: null, zero: 0, keyUp: false, keyDown: false, calib: [], dragFrom: null, faceAt: -1e9 };
   input.mode = 'desktop';
   input.frame = frame;
   input.frameMarks = true;
@@ -20,6 +20,7 @@ export function createDesktopInput({ app, C, FRAME_CFG, cv, getWorld }) {
 
     // 头的角度（平滑）
     if (vision.faceOk && vision.pitch !== null) {
+      s.faceAt = now;
       const p = (vision.pitch - s.zero) * (C.control.invertPitch ? -1 : 1);
       const a = 1 - Math.exp(-dt / C.control.pitchSmoothingMs);
       s.pitch = s.pitch === null ? p : s.pitch + (p - s.pitch) * a;
@@ -37,7 +38,8 @@ export function createDesktopInput({ app, C, FRAME_CFG, cv, getWorld }) {
     let look = 0;
     if (s.keyUp) look = c.keyScreensPerSec / c.maxScreensPerSec;
     else if (s.keyDown) look = -c.keyScreensPerSec / c.maxScreensPerSec;
-    else if (!keysOnly && vision.faceOk && s.pitch !== null) {
+    // 头抬得很高时摄像头常常一下子认不出脸：丢了不到 1.5 秒，还按丢之前的角度算（不然越抬头越没反应）
+    else if (!keysOnly && (vision.faceOk || now - s.faceAt < 1500) && s.pitch !== null) {
       const a = Math.abs(s.pitch);
       if (a > c.deadzoneDeg) {
         const t = Math.min(1, (a - c.deadzoneDeg) / (c.maxDeg - c.deadzoneDeg));

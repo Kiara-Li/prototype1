@@ -80,6 +80,12 @@ async function boot() {
   let sugg = null;
   try { marks = await (await fetch('data/pigeons.json', { cache: 'no-store' })).json(); } catch { /* 还没标 */ }
   try { sugg = await (await fetch('data/suggestions.json')).json(); } catch { /* */ }
+  // YOLO 没认出来的几只（手标的大概范围），补进去：不然那一页切不到鸽子，就走不下去
+  try {
+    const extra = await (await fetch('data/suggestions_manual.json', { cache: 'no-cache' })).json();
+    sugg = sugg || {};
+    for (const [id, list] of Object.entries(extra)) if (Array.isArray(list) && !(sugg[id] && sugg[id].length)) sugg[id] = list;
+  } catch { /* */ }
   setPigeons(photos, marks, sugg);
   world = createWorld(photos, (id) => pigeonsOf(id).length);
   window.lookUp.world = world;
@@ -375,8 +381,20 @@ function bookUpdate(now, dt) {
         enterSection(bk.next, now);
       }
     } else bk.upSince = 0;
-  } else if (bk.phase === 'section') {
+    if (bk.sec >= 0 && now - bk.guideAt > B.lookHintMs && !bk.upSince) lookHint(null);
+  }
+  // 抬头的提示：状态变了（翻了卡片、上升了、进了下一段）就收走
+  if (lookHinted && lookHinted !== hintKey()) { lookHinted = ''; if (!bookUI.tutorial) bookUI.setHint(''); }
+  if (bk.phase === 'section') {
     const settled = !bk.prevEnter || enterOffset(now) >= 1;
+    // 还没切到鸽子、停了一会儿：两只手再示范一次（一比出框就收走）
+    if (bk.card === 'front' && settled && !bk.snap && !bk.cutHinted && !bookUI.tutorial && !input.frame.active
+        && now - Math.max(bk.switchedAt, bk.enterAt) > B.cutHintMs + (bk.prevEnter ? B.enterMs : 0)) {
+      bk.cutHinted = true;
+      showCutTutorial();
+    }
+    // 该抬头了、还没抬：卡片旁边一句提示
+    if (bk.card === 'up' && bk.upAt && now - bk.upAt > B.lookHintMs && !bk.upSince) lookHint(cardRect(now));
     // 教学：第一次用手比出框 → 手离开
     if (bookUI.tutorial && input.frame.active) { bk.tutorialDone = true; bookUI.hideTutorial(); }
     if (bk.card === 'intro' && now > bk.introUntil) toNext();
@@ -545,7 +563,7 @@ function cutOut(r, sq, shown, now) {
   if (bookUI.tutorial) { bk.tutorialDone = true; bookUI.hideTutorial(); }
   // 这一页第一次切到：卡片翻过来，介绍这个构件（只有每个 section 的第一页有介绍）
   if (bk.card === 'front') {
-    const text = bk.idx === 0 ? sectionText().intro : '';
+    const text = (bk.cur.id && T.photoIntros && T.photoIntros[bk.cur.id]) || (bk.idx === 0 ? sectionText().intro : '');
     bk.card = 'intro';
     bk.introUntil = text ? Infinity : now + B.noIntroMs;      // 有介绍：等你点 Next
     if (text) bookUI.flipTo('intro', { label: sectionLabel(), text });
@@ -560,6 +578,7 @@ const sectionText = () => (T.sections && T.sections[bk.sec]) || { intro: '', que
 function toNext() {
   const last = bk.idx + 1 >= book.sections[bk.sec].groups.length;
   bk.card = last ? 'ready' : 'up';
+  bk.upAt = performance.now() + C.book.flipMs;
   bookUI.flipTo(bk.card);
 }
 
@@ -607,6 +626,31 @@ function preloadSection(i) {
   for (const k of [i, i + 1]) if (book.sections[k]) book.sections[k].groups.forEach(loadGroup);
 }
 
+// 两只手示范怎么比框（框在第一张自己拍的照片上）
+function showCutTutorial() {
+  const r = bookRects(performance.now())[0];
+  if (!r) return;
+  const side = Math.min(r.w, r.h) * 0.6;
+  const v = driver.vision;
+  const noCam = driver.keysOnly || !v || v.status === 'no-camera' || v.status === 'error';
+  bookUI.showTutorial({ x: r.x + r.w / 2 - side / 2, y: r.y + r.h / 2 - side / 2, w: side, h: side },
+    MOBILE ? T.book.tutorialMobile : noCam ? T.book.noCam : T.book.tutorial);
+}
+
+// 抬头的提示：r = 卡片（放在卡片下面）；null = 屏幕下方中间（指引的时候）
+let lookHinted = '';
+const hintKey = () => `${bk.phase}|${bk.sec}|${bk.idx}|${bk.card}`;
+function lookHint(r) {
+  const key = hintKey();
+  if (lookHinted === key) return;
+  lookHinted = key;
+  const v = driver.vision;
+  const keys = MOBILE ? false : driver.keysOnly || !v || v.status !== 'ready';
+  const u = Math.min(app.W / 96, app.H / 62);
+  const at = r ? { x: r.x, y: r.y + r.h + u } : { x: app.W / 2 - 10 * u, y: app.H * 0.72 };
+  bookUI.hintAt(at.x, at.y, keys ? T.book.lookHintKeys : T.book.lookHint);
+}
+
 function enterSection(i, now) {
   bk.sec = i;
   preloadSection(i);
@@ -622,14 +666,9 @@ function enterSection(i, now) {
   // 第一次：两只手示范怎么比框（框在第一张自己拍的照片上）
   if (!bk.tutorialDone) {
     setTimeout(() => {
-      if (bk.tutorialDone || bk.phase !== 'section') return;
-      const r = bookRects(performance.now())[0];
-      if (!r) return;
-      const side = Math.min(r.w, r.h) * 0.6;
-      const v = driver.vision;
-      const noCam = driver.keysOnly || !v || v.status === 'no-camera' || v.status === 'error';
-      bookUI.showTutorial({ x: r.x + r.w / 2 - side / 2, y: r.y + r.h / 2 - side / 2, w: side, h: side },
-        MOBILE ? T.book.tutorialMobile : noCam ? T.book.noCam : T.book.tutorial);
+      if (bk.tutorialDone || bk.phase !== 'section' || bk.card !== 'front') return;
+      bk.cutHinted = true;
+      showCutTutorial();
     }, C.book.enterMs);
   }
 }
@@ -642,6 +681,9 @@ function showSpread(j, now, entering) {
   if (rise) bk.enterAt = now;
   bk.enterDir = !bk.cur ? 1 : -1;               // 第一页：从下面滑上来；之后：从上面落下来
   if (sectionSound && !entering) sectionSound.spread();
+  bk.cutHinted = false;
+  bk.upAt = 0;
+  if (!bookUI.tutorial) bookUI.setHint('');
   bk.prev = bk.cur;
   bk.prevEnter = rise;
   bk.idx = j;
@@ -931,7 +973,7 @@ function drawHoles(r) {
 function guideText() {
   if (app.state !== 'ascent' || (bk.phase !== 'guide' && bk.phase !== 'skyguide')) return '';
   if (bk.sec === -1) return '';                  // 第一页不需要指引（进来直接就是）
-  return (bk.phase === 'skyguide' ? T.guideSky : T.guides[bk.next]) || '';
+  return T.book.up;                              // 往上走的 LOOK UP（不用句子）
 }
 
 // ================================================================ 绘制

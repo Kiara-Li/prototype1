@@ -29,7 +29,7 @@ export function createBookUI(o) {
     <div class="bk-hint">${rv('')}</div>
     <div class="bk-cap"><div class="bk-capmeta"></div><div class="bk-captitle"></div></div>
     <div class="bk-capv"></div>
-    <div class="bk-guide"><span class="bk-garrow">↑</span><div class="bk-gtext">${rv('')}</div></div>
+    <div class="bk-guide"><div class="bk-gtext"></div></div>
     <img class="bk-hand" data-k="bl" src="${HAND.bl.src}" alt="" draggable="false">
     <img class="bk-hand" data-k="tr" src="${HAND.tr.src}" alt="" draggable="false">`;
   const q = (s) => root.querySelector(s);
@@ -187,7 +187,7 @@ export function createBookUI(o) {
       return `<div class="bk-lookup" style="font-size:${fs}px;left:${pad}px;top:${pad}px;bottom:${pad}px;width:${fs}px"><span>${esc(TB.up)}</span></div>`;
     }
     if (kind === 'ready') {
-      const { fs, lines } = fit(TB.ready, 4 * u);
+      const { fs, lines } = fit(TB.ready, btnPx * 7);
       return `<div class="bk-text bk-bottom" style="left:${pad}px;bottom:${pad}px;font-size:${fs}px;line-height:${fs * 1.28}px">
         ${lines.map(rv).join('')}
         <div class="bk-btns"><button class="bk-btn" data-act="yes" style="font-size:${btnPx}px">${rv(TB.yes)}</button>
@@ -485,6 +485,11 @@ export function createBookUI(o) {
     }
     setHint('');
   }
+  // 提示放在指定的位置（左上角）
+  function hintAt(x, y, text) {
+    Object.assign(el.hint.style, { left: `${Math.max(u, Math.min(x, window.innerWidth - 21 * u))}px`, top: `${y}px` });
+    setHint(text);
+  }
   function setHint(text) {
     // 按宽度断好行，每一行一条方块（黑块一行一行把字拉出来）
     el.hint.innerHTML = text ? wrap(text, 20 * u, 1.24 * u, sans()).map(rv).join('') : '';
@@ -502,15 +507,21 @@ export function createBookUI(o) {
     }
     el.guide.getAnimations().forEach((x) => x.cancel());
     el.guide.style.opacity = 1;
-    setText(el.gtext, text);
-    reveal(el.gtext, { delay: 250 });
-    el.guide.querySelector('.bk-garrow').animate([{ opacity: 0, transform: 'translateY(0.6em)' }, { opacity: 1, transform: 'none' }], { duration: 700, easing: EASE_OUT });
+    // 和 dashboard 上的 LOOK UP 一样：字从下面往上走，走到上面淡掉，再从下面来一次（视线跟着往上）
+    el.gtext.textContent = text;
+    el.gtext.getAnimations().forEach((x) => x.cancel());
+    el.gtext.animate([
+      { transform: 'translateY(55vh)', opacity: 0 },
+      { opacity: 1, offset: 0.15 },
+      { opacity: 1, offset: 0.75 },
+      { transform: 'translateY(0)', opacity: 0 },
+    ], { duration: 2600, easing: 'cubic-bezier(.3,0,.25,1)', iterations: Infinity });
   }
 
   return {
     guide, caption,
     place, setFront, flipTo, video, hideCaption,
-    addPiece, openQuestion, showTutorial, hideTutorial, setHint,
+    addPiece, openQuestion, showTutorial, hideTutorial, setHint, hintAt,
     liveVideo: () => root.querySelector('.bk-face:not(.hidden) .bk-video.blend.on'),     // 天空背景跟着它取颜色
     set on(handlers) { onFace = handlers; },
     get face() { return current; },

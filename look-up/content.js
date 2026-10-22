@@ -73,8 +73,10 @@ window.CONTENT = {
     tutorial: 'Make a window with your hands, like these. Hold it over a pigeon until it comes loose.',
     tutorialMobile: 'Pinch until a pigeon fills the screen. Hold still until it comes loose.',
     noCam: 'No camera? Draw a square around a pigeon, and wait.',
-    up: 'LOOK UP',                                  // 卡片上竖着排，从下往上走
-    ready: 'Before you climb any higher, one question.',
+    up: 'LOOK UP',                                  // 卡片上竖着排，从下往上走；指引也是这两个字往上走
+    lookHint: 'Tilt your head up, and hold it there.',   // 该抬头、过一会儿还没抬：出现在旁边
+    lookHintKeys: 'Press ↑ to look up.',
+    ready: 'Before you look up again, I want to ask you something.',
     yes: 'Ask me',
     done: 'Keep this',
     next: 'Go higher',
@@ -90,7 +92,7 @@ window.CONTENT = {
   sections: [
     { name: 'Awning',
       intro: 'Before air conditioning, a shop kept cool with canvas.',
-      question: { prompt: 'When did you last wait out the rain under someone else’s awning?',
+      question: { prompt: 'Where did you last wait out the rain?',
         sentence: 'I waited out the rain under the [awning] of a ___.' }, height: 120 },
     { name: 'Projecting sign',
       intro: 'A sign that sticks out from the wall turns sideways to talk to people on foot, not in cars.',
@@ -118,7 +120,29 @@ window.CONTENT = {
         sentence: 'When I looked up, the [sky] was ___.' }, height: 960 },
   ],
 
-  // ---- 书：每个 section 之前的指引（一句比一句往上）。顺序和 config.book.sections 一样
+  // ---- 每一页卡片上的历史照片：切到这一页的鸽子以后，卡片翻过来是这一句（组号 → 一句）
+  // 只写图注上有的、或者有把握的事；不确定的就不写
+  photoIntros: {
+    '35': 'Before air conditioning, a shop kept cool with canvas.',
+    '43': 'The glass canopy at Zero Irving on East 14th Street, photographed in 2023.',
+    '45': 'James and Karla Murray have spent decades photographing New York storefronts and their signs.',
+    '51': 'Some signs outgrow their shops. The Hollywood Sign, 2013.',
+    '55': 'Berenice Abbott photographed this poultry shop in 1937 for Changing New York.',
+    '39': 'Helen Levitt photographed the streets of New York, mostly children at play.',
+    '53': 'André Kertész photographed this glass bust on his window in 1978.',
+    '59': 'The same corner in the 1950s, under the Academy of Music’s marquee.',
+    '63': 'Berkeley, 1968. A man climbs onto the traffic light at Haste and Telegraph.',
+    '49': 'In 1934 the city photographed the backs of tenements, with people sitting out on the fire escapes.',
+    '67': 'On hot nights people slept on the fire escapes. Weegee, around 1938.',
+    '69': 'Two men balance between a fire escape and a utility line.',
+    '47': 'Tom Otterness’s small bronze figures in Nelson Rockefeller Park, among the Type B lampposts.',
+    '71': 'Around 1910, lamp trimmers climbed up to service each arc lamp by hand.',
+    '73': 'Mark Handforth’s Lamppost, made for the Public Art Fund in 2003.',
+    '75': 'Alexander Rodchenko pointed his camera straight up a fire escape in Moscow, 1925.',
+    '77': 'Lewis Hine photographed the men who built the Empire State Building. He called this one Icarus.',
+  },
+
+  // ---- 书：每个 section 之前的指引（现在屏幕上只出现往上走的 LOOK UP，这些句子不用了）（一句比一句往上）。顺序和 config.book.sections 一样
   guides: [
     'Look up, not far. Just to where the shops keep their shade.',
     'A little higher, to the signs that lean out over the sidewalk.',
