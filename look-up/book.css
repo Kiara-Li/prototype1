@@ -47,15 +47,23 @@
 #bk .bk-fill, #bk .bk-poem { margin-top: calc(var(--u) * 2.5); font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 3.6); letter-spacing: -0.01em; }
 #bk .bk-in { font: inherit; letter-spacing: inherit; color: #000; background: transparent; border: 0; border-bottom: 2px solid #000;
              border-radius: 0; padding: 0 0.15em; margin: 0 0.25em; outline: none; min-width: 3em; }
-#bk .bk-done { position: absolute; right: 0; bottom: 0; font-size: calc(var(--u) * 1.4); }
+#bk .bk-pbtns { position: absolute; right: 0; bottom: 0; display: flex; gap: calc(var(--u) * 1.5); align-items: flex-end; }
+#bk .bk-pbtns .bk-btn { font-size: calc(var(--u) * 1.4); }
+#bk .bk-btns { display: flex; gap: 0.8em; align-items: flex-end; }
+#bk .bk-cardbtn { position: absolute; margin: 0; }
+/* 次要的按钮（Skip）：灰一点，没有角标 */
+#bk .bk-quiet { color: #8a8a8a; }
+#bk .bk-quiet::before, #bk .bk-quiet::after { display: none; }
+#bk .bk-quiet:hover { color: #000; }
 #bk .bk-w { margin-right: 0.25em; }
 #bk .bk-ans { border-bottom: 2px solid #000; }
 #bk .bk-br { font-family: var(--mono); margin: 0 0.15em; }
-#bk .bk-slot { display: inline-block; width: calc(var(--u) * 4.4); height: calc(var(--u) * 3.2); vertical-align: middle; overflow: hidden; }
+#bk .bk-slot { display: inline-block; width: calc(var(--u) * 4.4); height: calc(var(--u) * 3.2); vertical-align: middle; overflow: hidden; margin: 0 0.3em; }
 #bk .bk-slot .bk-piece { position: static; }
 
 /* 提示（教学、没有摄像头时） */
-#bk .bk-hint { left: 50%; top: calc(var(--u) * 1.6); transform: translateX(-50%); font-size: calc(var(--u) * 1.24); white-space: nowrap; }
+/* 提示：放在要做的动作旁边（位置由 bookui.js 给），最多三四行宽 */
+#bk .bk-hint { font-size: calc(var(--u) * 1.24); line-height: 1.35; }
 
 /* 教学的手 */
 #bk .bk-hand { display: none; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; user-select: none; }
@@ -85,3 +93,10 @@
 #bk .bk-poem .bk-w, #bk .bk-poem .bk-br { display: inline-block; }
 #bk .bk-slot { box-shadow: 0 0 0 1px rgba(0,0,0,0.06); }
 #bk .bk-grp { display: inline-block; white-space: nowrap; margin-right: 0.25em; }
+
+/* 历史照片的信息：卡片上面一行（摄影师, 标题），右边竖排（年份 · 收藏） */
+#bk .bk-cap { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); opacity: 0; }
+#bk .bk-capmeta { display: none; font-family: var(--mono); font-size: calc(var(--u) * 1.0); letter-spacing: 0.06em; color: #6b6b6b; }
+#bk .bk-cap.with-meta .bk-capmeta { display: block; }
+#bk .bk-capv { font-size: calc(var(--u) * 1.24); line-height: calc(var(--u) * 1.5); writing-mode: vertical-rl; transform: rotate(180deg);
+               white-space: nowrap; overflow: hidden; opacity: 0; }

@@ -27,6 +27,8 @@ export function createBookUI(o) {
     <div class="bk-stack"><div class="bk-h">${rv('')}</div></div>
     <div class="bk-panel"><div class="bk-pbody"></div></div>
     <div class="bk-hint">${rv('')}</div>
+    <div class="bk-cap"><div class="bk-capmeta"></div><div class="bk-captitle"></div></div>
+    <div class="bk-capv"></div>
     <div class="bk-guide"><span class="bk-garrow">↑</span><div class="bk-gtext">${rv('')}</div></div>
     <img class="bk-hand" data-k="bl" src="${HAND.bl.src}" alt="" draggable="false">
     <img class="bk-hand" data-k="tr" src="${HAND.tr.src}" alt="" draggable="false">`;
@@ -35,6 +37,7 @@ export function createBookUI(o) {
     card: q('.bk-card'), rot: q('.bk-rot'), faces: [...root.querySelectorAll('.bk-face')],
     stack: q('.bk-stack'), h: q('.bk-h'), panel: q('.bk-panel'), pbody: q('.bk-pbody'), hint: q('.bk-hint'),
     guide: q('.bk-guide'), gtext: q('.bk-gtext'),
+    cap: q('.bk-cap'), capMeta: q('.bk-capmeta'), capTitle: q('.bk-captitle'), capV: q('.bk-capv'),
     hands: { bl: q('.bk-hand[data-k="bl"]'), tr: q('.bk-hand[data-k="tr"]') },
   };
   for (const k of ['bl', 'tr']) el.hands[k].style.width = `${HAND[k].w}px`;
@@ -57,10 +60,46 @@ export function createBookUI(o) {
   const shown = () => el.faces[angle === 0 ? 0 : 1];
   const back = () => el.faces[angle === 0 ? 1 : 0];
 
-  function place(r) {
+  // opts.room：卡片右边空出来多少（px，放竖排的那行字）；opts.cap：要不要显示照片的信息
+  function place(r, opts = {}) {
     rect = r;
+    placeCaption(r, opts);
     if (!r) { el.card.style.display = 'none'; return; }
     Object.assign(el.card.style, { display: 'block', left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
+  }
+
+  // ---- 历史照片的信息，排在卡片四周（和 dashboard 卡片四周的字一样）：
+  //   上面一行「摄影师, 标题」；右边竖排「年份 · 收藏」（右边放不下：变成上面一行灰色小字）
+  let capShown = false;
+  function caption(c, delay = 0) {
+    for (const e of [el.cap, el.capV]) e.getAnimations().forEach((a) => a.cancel());
+    capShown = !!c;
+    if (!c) { el.cap.style.opacity = 0; el.capV.style.opacity = 0; return; }
+    el.capTitle.textContent = c.title;
+    el.capMeta.textContent = c.meta;
+    el.capV.textContent = c.meta;
+    // 浮现：往上浮一点、淡入
+    const frames = [{ opacity: 0, transform: 'translateY(0.7em)' }, { opacity: 1, transform: 'none' }];
+    el.cap.animate(frames, { duration: 1100, delay, easing: EASE_OUT, fill: 'both' });
+    el.capV.animate([{ opacity: 0, transform: 'rotate(180deg) translateY(-0.7em)' }, { opacity: 1, transform: 'rotate(180deg)' }],
+      { duration: 1100, delay: delay + 250, easing: EASE_OUT, fill: 'both' });
+  }
+  function placeCaption(r, opts) {
+    const on = r && capShown && opts.cap;
+    el.cap.style.visibility = on ? 'visible' : 'hidden';
+    el.capV.style.visibility = on ? 'visible' : 'hidden';
+    if (!on) return;
+    const side = (opts.room || 0) >= 1.9 * u && el.capV.textContent;
+    el.cap.classList.toggle('with-meta', !side && !!el.capMeta.textContent);
+    el.capV.style.display = side ? 'block' : 'none';
+    // 上面一行可以往右写宽一点（尽量一行放完，卡片贴着页顶时上面放不下几行）
+    Object.assign(el.cap.style, { left: `${r.x}px`, bottom: `${window.innerHeight - r.y + 0.55 * u}px`, maxWidth: `${Math.max(r.w, window.innerWidth - r.x - u)}px` });
+    if (side) {
+      // 竖排：从下往上读，结束在卡片顶端（和 dashboard 卡片左边那行一样）
+      const lh = 1.5 * u;
+      Object.assign(el.capV.style, { left: `${r.x + r.w + Math.min(opts.room / 2, 1.5 * u) - lh / 2}px`,
+        top: `${r.y}px`, bottom: '', maxHeight: `${r.h}px` });
+    }
   }
 
   // 字按卡片宽度断行，每一行一条方块（黑块拉出来的动画一行一行走）
@@ -101,13 +140,19 @@ export function createBookUI(o) {
     const lab = Math.max(10, Math.min(1.1 * u, cw * 0.075));
     const label = (t) => `<div class="bk-label" style="left:${pad}px;top:${pad}px;font-size:${lab}px">${rv(t)}</div>`;
     if (kind === 'front') return data ? `<img class="bk-photo" src="${esc(data)}" alt="">` : '';
-    if (kind === 'intro') return label(data.label) + text(data.text, pad + lab * 2.6, lab * 2.6);
+    const btnPx = Math.max(12, cardFont() * 0.72);
+    if (kind === 'intro') {
+      // 介绍不会自己翻走：读完点 Next
+      return label(data.label) + text(data.text, pad + lab * 2.6, lab * 2.6 + btnPx * 3.2)
+        + `<button class="bk-btn bk-cardbtn" data-act="next" style="left:${pad}px;bottom:${pad * 0.6}px;font-size:${btnPx}px">${rv(TB.read)}</button>`;
+    }
     if (kind === 'up') return `${text(TB.up, pad)}<div class="bk-arrow" style="font-size:${cardFont() * 2.2}px;left:${pad}px">↑</div>`;
     if (kind === 'ready') {
       const { fs, lines } = fit(TB.ready, 4 * u);
       return `<div class="bk-text bk-bottom" style="left:${pad}px;bottom:${pad}px;font-size:${fs}px;line-height:${fs * 1.28}px">
         ${lines.map(rv).join('')}
-        <button class="bk-btn" data-act="yes" style="font-size:${Math.max(12, fs * 0.72)}px">${rv(TB.yes)}</button></div>`;
+        <div class="bk-btns"><button class="bk-btn" data-act="yes" style="font-size:${btnPx}px">${rv(TB.yes)}</button>
+        <button class="bk-btn bk-quiet" data-act="skip" style="font-size:${btnPx}px">${rv(TB.skip)}</button></div></div>`;
     }
     return '';
   }
@@ -184,16 +229,20 @@ export function createBookUI(o) {
     img.src = canvas.toDataURL('image/jpeg', 0.9);
     Object.assign(img.style, { left: `${s.x}px`, top: `${s.y}px`, width: `${s.size}px`, height: `${s.size}px`, transform: `rotate(${s.rot}deg)` });
     root.appendChild(img);
-    // 先从洞里被拎起来一点（稍微放大），然后划一道弧飞到右上角，落下时转到它的角度、轻轻停住
+    // 先在原地放大（停一下，看清这只鸽子），再划一道弧飞到右上角，落下时转到它的角度、轻轻停住
     const k = from.w / s.size;
     const dx = from.x - s.x;
     const dy = from.y - s.y;
-    const lift = Math.min(3 * u, from.w * 0.25);
+    const big = Math.min(B.pieceZoom, (window.innerHeight * 0.4) / from.w);       // 放大到多少倍（最大不超过屏幕高的 40%）
+    const grow = (from.w * (big - 1)) / 2;                                         // 放大时以中心为准
+    const bx = dx - grow;
+    const by = dy - grow;
     img.animate([
       { transform: `translate(${dx}px, ${dy}px) scale(${k}) rotate(0deg)`, offset: 0 },
-      { transform: `translate(${dx - 0.04 * from.w}px, ${dy - lift}px) scale(${k * 1.08}) rotate(-2deg)`, offset: 0.22, easing: 'cubic-bezier(.45,0,.2,1)' },
-      { transform: `translate(${dx * 0.35}px, ${Math.min(dy * 0.35, -2 * u) - 4 * u}px) scale(${(k + 1) / 2}) rotate(${s.rot * 0.5}deg)`, offset: 0.62 },
-      { transform: `translate(0px, ${0.4 * u}px) scale(0.97) rotate(${s.rot * 1.15}deg)`, offset: 0.86 },
+      { transform: `translate(${bx}px, ${by}px) scale(${k * big}) rotate(-1deg)`, offset: 0.28, easing: 'cubic-bezier(.3,0,.2,1)' },
+      { transform: `translate(${bx}px, ${by}px) scale(${k * big}) rotate(-1deg)`, offset: 0.5, easing: 'cubic-bezier(.55,0,.3,1)' },
+      { transform: `translate(${bx * 0.35}px, ${Math.min(by * 0.35, -2 * u) - 4 * u}px) scale(${(k * big + 1) / 2}) rotate(${s.rot * 0.5}deg)`, offset: 0.78 },
+      { transform: `translate(0px, ${0.4 * u}px) scale(0.97) rotate(${s.rot * 1.15}deg)`, offset: 0.92 },
       { transform: `translate(0px, 0px) scale(1) rotate(${s.rot}deg)`, offset: 1 },
     ], { duration: B.pieceFlyMs, easing: 'linear' });
     pieces.push({ el: img, h });
@@ -228,7 +277,8 @@ export function createBookUI(o) {
       <div class="bk-plabel">${rv(poemLabel)}</div>
       <div class="bk-q">${wrap(question.prompt, pw - 5 * u, 2.11 * u, sans()).map(rv).join('')}</div>
       <div class="bk-fill">${parts.map((p, i) => `<span>${esc(p)}</span>${i < parts.length - 1 ? `<input class="bk-in" data-i="${i}" size="6" autocomplete="off" spellcheck="false">` : ''}`).join('')}</div>
-      <button class="bk-btn bk-done" data-act="done">${rv(TB.done)}</button>`;
+      <div class="bk-pbtns"><button class="bk-btn bk-quiet" data-act="pskip">${rv(TB.skip)}</button>
+      <button class="bk-btn bk-done" data-act="done">${rv(TB.done)}</button></div>`;
     el.pbody.querySelectorAll('.rv-t').forEach((t) => { t.style.visibility = 'hidden'; });
     setTimeout(() => reveal(el.pbody), B.panelMs * 0.7);
     const ins = [...el.pbody.querySelectorAll('.bk-in')];
@@ -241,6 +291,7 @@ export function createBookUI(o) {
       });
     });
     el.pbody.querySelector('.bk-done').onclick = () => compose(question, poemLabel);
+    el.pbody.querySelector('[data-act="pskip"]').onclick = () => closePanel(null);   // 不回答，直接往上
     setTimeout(() => ins[0] && ins[0].focus(), B.panelMs);
   }
 
@@ -255,14 +306,14 @@ export function createBookUI(o) {
       html += `<span class="bk-w">${esc(p)}</span>`;
       if (i < parts.length - 1) {
         // 你的词和它后面的 { 鸽子 } 绑在一起，不在中间断行
-        const piece = n < pieces.length ? `<span class="bk-br">{</span><span class="bk-slot" data-n="${n++}"></span><span class="bk-br">}</span>` : '';
+        const piece = n < pieces.length ? `<span class="bk-slot" data-n="${n++}"></span>` : '';
         html += `<span class="bk-grp"><span class="bk-w bk-ans">${esc(answers[i] || '…')}</span>${piece}</span>`;
       }
     });
-    while (n < pieces.length) html += `<span class="bk-grp"><span class="bk-br">{</span><span class="bk-slot" data-n="${n++}"></span><span class="bk-br">}</span></span>`;
+    while (n < pieces.length) html += `<span class="bk-grp"><span class="bk-slot" data-n="${n++}"></span></span>`;
     el.pbody.innerHTML = `<div class="bk-poemwrap"><div class="bk-plabel">${rv(label || '')}</div><div class="bk-poem">${html}</div></div>
-      <button class="bk-btn bk-done" data-act="next">${rv(TB.next)}</button>`;
-    el.pbody.querySelectorAll('.bk-w, .bk-br').forEach((w, i) => w.animate([{ opacity: 0, transform: 'translateY(0.25em)' }, { opacity: 1, transform: 'none' }],
+      <div class="bk-pbtns"><button class="bk-btn bk-done" data-act="next">${rv(TB.next)}</button></div>`;
+    el.pbody.querySelectorAll('.bk-w').forEach((w, i) => w.animate([{ opacity: 0, transform: 'translateY(0.25em)' }, { opacity: 1, transform: 'none' }],
       { duration: 700, delay: 80 + i * 45, easing: EASE_OUT, fill: 'backwards' }));
     reveal(el.pbody.querySelector('.bk-plabel'), { delay: 200 });
     // 方块从右上角飞到句子里
@@ -278,10 +329,10 @@ export function createBookUI(o) {
       img.animate([
         { transform: `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width})`, transformOrigin: '0 0' },
         { transform: 'none', transformOrigin: '0 0' },
-      ], { duration: B.pieceFlyMs, delay: i * 120, easing: EASE, fill: 'backwards' });
+      ], { duration: B.poemFlyMs, delay: i * 120, easing: EASE, fill: 'backwards' });
     });
     setText(el.h, '');
-    setTimeout(() => reveal(el.pbody.querySelector('.bk-done')), B.pieceFlyMs + slots.length * 120);
+    setTimeout(() => reveal(el.pbody.querySelector('.bk-done')), B.poemFlyMs + slots.length * 120);
     el.pbody.querySelector('.bk-done').onclick = () => closePanel(answers);
   }
 
@@ -323,6 +374,11 @@ export function createBookUI(o) {
       h.animate([{ transform: a[k], opacity: 0 }, { transform: a[k], opacity: 1, offset: 0.15 }, { transform: b[k], opacity: 1, offset: 0.55 },
         { transform: b[k], opacity: 1, offset: 0.8 }, { transform: a[k], opacity: 1 }], { duration: 2600, iterations: Infinity, easing: 'ease-in-out' });
     }
+    // 提示放在要做的动作旁边：示范的手上方，左边和照片对齐
+    const k = B.tutorialHandScale;
+    const sTr = (HAND.tr.scale * u * k) / 18;
+    const top = r.y - HAND.tr.corner[1] * sTr - 3 * u - 3.5 * u;
+    Object.assign(el.hint.style, { left: `${Math.max(u, r.x - 2.5 * u)}px`, top: `${Math.max(u, top)}px` });
     setHint(hint);
   }
   function hideTutorial() {
@@ -339,8 +395,9 @@ export function createBookUI(o) {
     setHint('');
   }
   function setHint(text) {
-    setText(el.hint, text || '');
-    if (text) reveal(el.hint);
+    // 按宽度断好行，每一行一条方块（黑块一行一行把字拉出来）
+    el.hint.innerHTML = text ? wrap(text, 20 * u, 1.24 * u, sans()).map(rv).join('') : '';
+    if (text) reveal(el.hint, { stagger: 90 });
   }
 
   // 指引：屏幕上方，一个慢慢浮动的箭头 + 一句话（字用黑块拉出来）
@@ -360,7 +417,7 @@ export function createBookUI(o) {
   }
 
   return {
-    guide,
+    guide, caption,
     place, setFront, flipTo, addPiece, openQuestion, showTutorial, hideTutorial, setHint,
     set on(handlers) { onFace = handlers; },
     get face() { return current; },

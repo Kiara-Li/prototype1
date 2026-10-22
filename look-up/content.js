@@ -78,6 +78,8 @@ window.CONTENT = {
     yes: 'Ask me',
     done: 'Keep this',
     next: 'Go higher',
+    read: 'Next',
+    skip: 'Skip',
     inch: 'inch',
   },
 

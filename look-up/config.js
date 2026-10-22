@@ -54,8 +54,7 @@ window.LOOKUP = {
     lookAbove: 0.2,             // 抬头判定：lookValue 超过这个（约 8°）……
     lookHoldMs: 250,            //          ……保持这么久就算
     enterMs: 1400,              // 进入一个 section / 同一个 section 里高度变了：跨页从上面落下来（上升）
-    introMs: 9000,              // 介绍卡停多久再翻成「再抬头 ↑」/「Ready?」（点一下卡片也会翻）
-    noIntroMs: 1600,            // 没有介绍的页（每个 section 第一页以外）：切到之后多久翻
+    noIntroMs: 1600,            // 介绍卡等你点 Next 才翻；没有介绍的页：切到之后多久翻成「再抬头 ↑」/「Ready?」            // 没有介绍的页（每个 section 第一页以外）：切到之后多久翻
     flipMs: 1100,               // 卡片翻一次（和 dashboard 一样）
     zoom: false,                // 电脑上框里的画面要不要放大（手机的捏合放大一直有）
     cutCover: 0.3,              // 切鸽子：鸽子有这么多在框里就算框住了（或者鸽子中心在框附近）
@@ -65,7 +64,9 @@ window.LOOKUP = {
     cutTint: null,              // 切下来的方块加一层色调，例如 'rgba(122, 86, 214, 0.72)'（紫）；null = 不加
     tutorialHandScale: 0.55,    // 教学的手：dashboard 上手的大小 × 这个
     pieceU: 9,                  // 右上角每一块的大小（网格单位）
-    pieceFlyMs: 900,            // 切下来的方块飞过去要多久
+    pieceFlyMs: 2200,           // 切下来的方块：先在原地放大、停一下，再飞到右上角，一共多久
+    pieceZoom: 2.6,             //               原地放大到几倍
+    poemFlyMs: 900,             // 填完之后，方块飞进句子要多久
     panelMs: 900,               // 卡片放大成填空面板
     revealColor: '#d9d9d9',     // 同一个高度换页：灰色方块拉出来 / 收回去
     revealMs: 320,              //                各要多久

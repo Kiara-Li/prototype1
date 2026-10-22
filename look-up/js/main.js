@@ -108,10 +108,9 @@ function setupNewDashboard() {
     C, T, driver, unlocked, chapters,
     onPlay: () => driver.begin(),
     onEnter: () => {
+      // 平视角度已经在 dashboard 的抬头测试里记过了：不再闪「Look at the screen」，线框散开后直接是书页
       startAudio();
-      setState('calibrate');
-      driver.calibrate.start();
-      showLine(driver.calibrate.prompt());
+      setState('ascent');
     },
     feather: {
       draw: (canvas) => {
@@ -136,7 +135,7 @@ function setupNewDashboard() {
   });
   window.lookUp.dash = dash;
   // 调试：?skipdash 跳过 dashboard，直接进入
-  if (PARAMS.has('skipdash')) { setState('calibrate'); driver.begin(); driver.calibrate.start(); return; }
+  if (PARAMS.has('skipdash')) { setState('calibrate'); driver.begin(); driver.calibrate.start(); app.quietCalib = true; return; }
   dash.show();
 }
 
@@ -190,6 +189,7 @@ function update(now, dt) {
       showLine(driver.calibrate.prompt());
     }
   } else if (app.state === 'calibrate') {
+    if (app.quietCalib) showLine('');
     driver.calibrate.sample();
     if (driver.calibrate.ready(since)) {
       driver.calibrate.end();
@@ -270,6 +270,7 @@ const bk = {
   phase: 'guide', next: 0, sec: -1, idx: 0, cur: null, prev: null, prevEnter: false,
   switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0,
   targetH: 0,
+  enterDir: 1,
   card: 'front',               // 这一页卡片：front → intro → up / ready → question
   introUntil: 0,
   tutorialDone: false,
@@ -296,8 +297,9 @@ async function setupBook() {
   window.lookUp.book = book;
   bookUI = createBookUI({ C, T });
   bookUI.on = {
-    card: () => { if (bk.card === 'intro') toNext(); },
+    next: () => { if (bk.card === 'intro') toNext(); },     // 介绍读完
     yes: () => askSection(),
+    skip: () => { if (bk.card === 'ready') finishSection(); },   // 不回答，直接往上
   };
   window.lookUp.bookUI = bookUI;
   window.lookUp.rects = () => bookRects(performance.now());     // 调试：这一页照片在屏幕上的位置
@@ -311,21 +313,46 @@ function cardOf(g) {
   for (const im of g.images) if (!im.own && (!best || im.w * im.h > best.w * best.h)) best = im;
   return best;
 }
+// 历史照片的图注「摄影师 / 标题 / 年份 / 收藏」→ { title: '摄影师 / 标题', meta: '年份 · 收藏' }
+function parseCaption(cap) {
+  if (!cap) return null;
+  const parts = cap.split(' / ').map((p) => p.replace(/\s*—\s*Source$/, '').trim())
+    .filter((p) => p && !/^Source image:/i.test(p));
+  const yi = parts.findIndex((p) => /^(c\.\s*)?\d{4}|^n\.d\.$/.test(p));
+  const head = yi >= 0 ? parts.slice(0, yi) : parts;
+  const tail = yi >= 0 ? parts.slice(yi) : [];
+  return { title: head.join(' / '), meta: tail.join(' · ') };      // 和书里的图注一样用 /
+}
+
+// 卡片上半截右边空出来多少（到旁边下一张照片，或者屏幕边）
+function cardRoom(r) {
+  const im = cardOf(bk.cur);
+  if (!im || !r) return 0;
+  const L = bookLayout(book, app.W, app.H, C.book);
+  let next = app.W;
+  for (const o of bk.cur.images) {
+    if (o === im || o.virtual) continue;
+    const ox = L.ox + o.x * L.s;
+    const overlap = o.y < im.y + im.h * 0.45 && o.y + o.h > im.y;     // 竖排那行贴着卡片上半截：只看上半截旁边有没有东西
+    if (overlap && ox >= r.x + r.w - 1) next = Math.min(next, ox);
+  }
+  return next - (r.x + r.w);
+}
+
 function cardRect(now) {
   if (!bk.cur || bk.baseY === null) return null;
   const im = cardOf(bk.cur);
   if (!im) return null;
   const L = bookLayout(book, app.W, app.H, C.book);
-  const e = bk.prevEnter ? enterOffset(now) : 1;
-  const base = bk.baseY - (1 - e) * app.H;
+  const base = bk.baseY + enterShift(now);
   const s = L.s;
   return { x: L.ox + im.x * s, y: base - (bk.cur.baseline_y - im.y) * s, w: im.w * s, h: im.h * s };
 }
 
 function bookUpdate(now, dt) {
   const B = C.book;
-  // 一进来就是第一页（不先放一句指引）
-  if (bk.phase === 'guide' && bk.sec === -1) enterSection(0, now);
+  // 一进来就是第一页（不先放一句指引）：等 dashboard 的线框完全散开、只剩空白，再从下面滑上来
+  if (bk.phase === 'guide' && bk.sec === -1 && !(dash && dash.step === 'leaving')) enterSection(0, now);
   if (bk.phase === 'guide' || bk.phase === 'skyguide') {
     // 判定很宽松：抬一下头就算
     if (app.pausedQ === null && input.lookValue > B.lookAbove) {
@@ -363,7 +390,8 @@ function bookUpdate(now, dt) {
   updateCutting(bk.phase === 'section' ? bookRects(now) : [], now);
 
   // 卡片跟着书页走
-  bookUI.place(bk.phase === 'section' || bk.phase === 'question' || bk.phase === 'guide' || bk.phase === 'skyguide' ? cardRect(now) : null);
+  const cr = bk.phase === 'section' || bk.phase === 'question' || bk.phase === 'guide' || bk.phase === 'skyguide' ? cardRect(now) : null;
+  bookUI.place(cr, { room: cardRoom(cr), cap: bk.phase === 'section' });
 }
 
 // ---- 切鸽子：判定很宽松（框大致罩住一只鸽子就行），停一下 → 框自己缩成刚好包住这只鸽子的正方形 → 切下来
@@ -444,7 +472,7 @@ function updateCutting(rects, now) {
   }
 }
 
-// 瞄准时：角标从外面收到鸽子身边；收缩时：角标从你的框缩到鸽子的正方形
+// 收缩时：你的框的角标往鸽子缩，一边缩一边淡掉（贴着鸽子的那一块没有角标）
 // 只有右上、左下两个角（和网站上其他的角标一样），不画完整的方框
 function corners(b, len, alpha) {
   ctx.save();
@@ -459,18 +487,12 @@ function corners(b, len, alpha) {
   ctx.restore();
 }
 function drawCutting(now) {
-  if (bk.aim && bk.aim.box) {
-    const b = toDisplay(bk.aim.box);
-    const p = bk.aim.progress;
-    const g = (1 - p) * 0.35 * Math.max(b.w, b.h);       // 四角从外面收到鸽子身边
-    corners({ x: b.x - g, y: b.y - g, w: b.w + 2 * g, h: b.h + 2 * g }, Math.max(8, 0.28 * Math.min(b.w, b.h)), 0.25 + 0.75 * p);
-  }
   if (bk.snap) {
     const k = ease(Math.min(1, (now - bk.snap.at) / C.book.snapMs));
     const a = bk.snap.from;
     const t = bk.snap.to;
     const b = { x: a.x + (t.x - a.x) * k, y: a.y + (t.y - a.y) * k, w: a.w + (t.w - a.w) * k, h: a.h + (t.h - a.h) * k };
-    corners(b, Math.max(8, 0.28 * Math.min(b.w, b.h)), 1);
+    corners(b, Math.max(8, 0.28 * Math.min(b.w, b.h)), 1 - k);      // 缩到鸽子身边时已经淡没了：贴着鸽子的那一块不要角标
   }
 }
 
@@ -511,7 +533,7 @@ function cutOut(r, sq, shown, now) {
   if (bk.card === 'front') {
     const text = bk.idx === 0 ? sectionText().intro : '';
     bk.card = 'intro';
-    bk.introUntil = now + (text ? B.introMs : B.noIntroMs);
+    bk.introUntil = text ? Infinity : now + B.noIntroMs;      // 有介绍：等你点 Next
     if (text) bookUI.flipTo('intro', { label: sectionLabel(), text });
   }
 }
@@ -527,6 +549,24 @@ function toNext() {
   bookUI.flipTo(bk.card);
 }
 
+// 这个 section 结束（回答完 / 跳过）：卡片翻回历史照片 → 下一个 section 的指引（7 个都完了 → 羽毛落下）
+function finishSection() {
+  const now = performance.now();
+  const im = cardOf(bk.cur);
+  bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
+  bk.card = 'front';
+  if (bk.sec + 1 < book.sections.length) {
+    bk.next = bk.sec + 1;
+    bk.phase = book.sections[bk.next].sky ? 'skyguide' : 'guide';
+    bk.guideAt = now;
+  } else {
+    bk.phase = 'done';
+    bk.doneAt = now;
+    driver.releaseFrame();
+    setState('top');
+  }
+}
+
 // Yes：卡片放大成填空；填完 → 下一个 section 的指引（7 个都完了 → 羽毛落下）
 function askSection() {
   if (bk.card !== 'ready') return;
@@ -536,23 +576,12 @@ function askSection() {
   const sec = bk.sec;
   const q = sectionText().question;
   bookUI.openQuestion(q, (answers) => {
-    const parts = q.sentence.split('___');
-    app.answers[sec] = parts.map((p, i) => p + (i < answers.length ? answers[i] || '…' : '')).join('').trim();
-    try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
-    const now = performance.now();
-    const im = cardOf(bk.cur);
-    bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
-    bk.card = 'front';
-    if (bk.sec + 1 < book.sections.length) {
-      bk.next = bk.sec + 1;
-      bk.phase = book.sections[bk.next].sky ? 'skyguide' : 'guide';
-      bk.guideAt = now;
-    } else {
-      bk.phase = 'done';
-      bk.doneAt = now;
-      driver.releaseFrame();
-      setState('top');
+    if (answers) {
+      const parts = q.sentence.split('___');
+      app.answers[sec] = parts.map((p, i) => p + (i < answers.length ? answers[i] || '…' : '')).join('').trim();
+      try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
     }
+    finishSection();
   }, `${sectionText().name || ''} · from ${inches()} up`);
 }
 
@@ -582,6 +611,7 @@ function showSpread(j, now, entering) {
   // 同一个 section 里：高度变了 → 直接上升（像进入 section 一样，新的一页从上面落下来）；高度一样 → 方块翻页
   const rise = entering || !bk.cur || g.height_in !== bk.cur.height_in;
   if (rise) bk.enterAt = now;
+  bk.enterDir = !bk.cur ? 1 : -1;               // 第一页：从下面滑上来；之后：从上面落下来
   bk.prev = bk.cur;
   bk.prevEnter = rise;
   bk.idx = j;
@@ -594,13 +624,19 @@ function showSpread(j, now, entering) {
   bk.outAt = now;
   bk.inAt = rise ? now : now + (bk.prev ? revealTotal(bk.prev, rv) * 0.75 : 0);
   bk.targetH = g.height_in;
-  // 这一页的卡片：先是历史照片（天空：空的）
+  // 这一页的卡片：先是历史照片（天空：空的）；照片的信息等这一页落定以后浮现在卡片四周
   bk.card = 'front';
   const im = cardOf(g);
   bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
+  bookUI.caption(im && !im.virtual && B.historicalPhotos ? parseCaption(im.caption) : null, rise ? B.enterMs : revealTotal(g, rv));
 }
 
-// 进入 section：新的跨页从上面落下来，上一页往下走（像抬头）
+// 进入 section：新的跨页滑进来。第一页从下面滑上来（线框散开之后）；之后从上面落下来，上一页往下走（像抬头）
+// 返回这一页现在离它该在的位置差多少（px，正 = 在下面）
+function enterShift(now) {
+  const e = bk.prevEnter ? enterOffset(now) : 1;
+  return (1 - e) * app.H * bk.enterDir;
+}
 function enterOffset(now) {
   const k = Math.min(1, (now - bk.enterAt) / C.book.enterMs);
   return ease(k);
@@ -610,8 +646,7 @@ function bookRects(now) {
   if (bk.phase === 'done') return [];
   if (!bk.cur || bk.baseY === null) return [];
   const L = bookLayout(book, app.W, app.H, C.book);
-  const e = bk.prevEnter ? enterOffset(now) : 1;
-  return spreadRects(bk.cur, L, bk.baseY - (1 - e) * app.H);
+  return spreadRects(bk.cur, L, bk.baseY + enterShift(now));
 }
 
 function drawBookScene(now) {
@@ -641,11 +676,11 @@ function drawBookScene(now) {
     if (bk.prevEnter) {
       const e = enterOffset(now);
       if (bk.prev && e < 1) {
-        const pb = baselineOf(bk.prev, L) + e * H;
+        const pb = baselineOf(bk.prev, L) - e * H * bk.enterDir;
         drawSpread(ctx, bk.prev, L, pb, 1, o);
         drawBaseline(ctx, bk.prev, L, pb, W, B.ink, 1 - e);
       }
-      const y = bk.baseY - (1 - e) * H;
+      const y = bk.baseY + enterShift(now);
       drawSpread(ctx, bk.cur, L, y, 1, { ...o, skip: cardOf(bk.cur) });
       drawBaseline(ctx, bk.cur, L, y, W, B.ink, 1);
     } else {
@@ -680,8 +715,7 @@ function drawHeights(now, L) {
   const cur = bk.phase !== 'done' && bk.cur && bk.baseY !== null;
   let curY = null;
   if (cur) {
-    const e = bk.prevEnter ? enterOffset(now) : 1;
-    curY = bk.baseY - (1 - e) * app.H;
+    curY = bk.baseY + enterShift(now);
     used.push(curY);
   }
   for (const [h, by] of bk.marks) {
@@ -722,6 +756,7 @@ function drawHoles(r) {
 // 指引的字（bookui.js 画在屏幕上方）
 function guideText() {
   if (app.state !== 'ascent' || (bk.phase !== 'guide' && bk.phase !== 'skyguide')) return '';
+  if (bk.sec === -1) return '';                  // 第一页不需要指引（进来直接就是）
   return (bk.phase === 'skyguide' ? T.guideSky : T.guides[bk.next]) || '';
 }
 
