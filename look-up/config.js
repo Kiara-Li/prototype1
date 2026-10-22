@@ -89,9 +89,13 @@ window.LOOKUP = {
       },
     },
     sheetDelayMs: 2600,         // 回到 dashboard 以后多久，碎片拼成最后那张纸
+    // 建筑那几页：这一页落定以后，视频在自己拍的鸽子照片上快速放一遍，放完淡回原来的照片
+    // （43 = 屋檐 Zero Irving 那页，IMG_7641 截 3–7 秒、向左转；71 = 路灯那页，IMG_7643）
+    photoVideos: {
+      '43': { src: 'assets/video/awning.mp4', rate: 2, delayMs: 1200 },
+      '71': { src: 'assets/video/streetlight.mp4', rate: 2, delayMs: 1200 },
+    },
     videos: {
-      '43': { src: 'assets/video/awning.mp4', rate: 2, delayMs: 2500, loop: true },         // 屋檐里高的那页（Zero Irving 玻璃雨棚）；IMG_7641 往上看高楼
-      '71': { src: 'assets/video/streetlight.mp4', rate: 2, delayMs: 2500, loop: true },
       last: { src: 'assets/video/sky.mp4', rate: 1, delayMs: 1500, loop: true, blend: true },   // blend：四边羽化，融进背景             // 最后：天空最后一页右边那一栏；IMG_7637 天空和鸽子，去掉了声音
     },
     // 没放进来的组：01–33（低于视线，或者不在白名单）、37、41、57、61、65、79、81

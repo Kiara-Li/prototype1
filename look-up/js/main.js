@@ -577,6 +577,7 @@ function finishSection() {
     bk.phase = 'done';
     bk.doneAt = now;
     if (sectionSound) sectionSound.stop();
+    stopPhotoVideo();
     driver.releaseFrame();
     setState('top');
   }
@@ -659,10 +660,62 @@ function showSpread(j, now, entering) {
   bookUI.setFront(im && !im.virtual ? `../data/${im.file}` : null);
   const settle = rise ? B.enterMs : revealTotal(g, rv);
   bookUI.caption(im && !im.virtual && B.historicalPhotos ? parseCaption(im.caption) : null, settle);
-  // 有的页：历史照片过一会儿换成一段视频（照片的信息跟着淡出）；天空的最后一页（'last'）：右边空着的那一栏出现视频
+  // 天空的最后一页：右边空着的那一栏出现天空视频
   const last = book.sections[bk.sec].sky && j === book.sections[bk.sec].groups.length - 1;
-  const v = B.videos && (last ? B.videos.last : g.id && B.videos[g.id]);
-  if (v && im) bookUI.video(v, settle + v.delayMs, bookUI.hideCaption);
+  if (last && B.videos && B.videos.last && im) bookUI.video(B.videos.last, settle + B.videos.last.delayMs, bookUI.hideCaption);
+  // 建筑那几页：视频在自己拍的鸽子照片上快速放一遍
+  stopPhotoVideo();
+  const pv = B.photoVideos && g.id && B.photoVideos[g.id];
+  if (pv) startPhotoVideo(g, pv, settle + pv.delayMs);
+}
+
+// ---- 鸽子照片上放一遍视频（config.book.photoVideos），放完淡回原来的照片。画在书页的 canvas 上
+let photoVid = null;            // { item, el, onAt, offAt, timer }
+const PHOTO_VIDEO_FADE = 350;
+function startPhotoVideo(g, cfg, delay) {
+  const im = g.images.find((x) => x.own);
+  if (!im) return;
+  const el = document.createElement('video');
+  Object.assign(el, { muted: true, playsInline: true, preload: 'auto', src: cfg.src });
+  el.setAttribute('muted', '');
+  el.setAttribute('playsinline', '');
+  el.className = 'hidden-video';
+  document.body.appendChild(el);
+  const rate = () => { el.defaultPlaybackRate = cfg.rate || 1; el.playbackRate = cfg.rate || 1; };
+  el.addEventListener('loadedmetadata', rate);
+  const pv = { item: im.item, el, onAt: 0, offAt: 0, timer: 0 };
+  el.addEventListener('ended', () => { pv.offAt = performance.now(); });
+  pv.timer = setTimeout(() => {
+    if (photoVid !== pv) return;
+    rate();
+    el.play().then(() => { pv.onAt = performance.now(); }).catch(() => stopPhotoVideo());
+  }, delay);
+  photoVid = pv;
+}
+function stopPhotoVideo() {
+  const pv = photoVid;
+  if (!pv) return;
+  photoVid = null;
+  clearTimeout(pv.timer);
+  pv.el.pause();
+  pv.el.remove();
+}
+function drawPhotoVideo(r) {
+  const pv = photoVid;
+  if (!pv || pv.item !== r.item || !pv.onAt) return;
+  const now = performance.now();
+  const a = pv.offAt ? 1 - (now - pv.offAt) / PHOTO_VIDEO_FADE : Math.min(1, (now - pv.onAt) / PHOTO_VIDEO_FADE);
+  if (a <= 0) { stopPhotoVideo(); return; }
+  const v = pv.el;
+  if (v.readyState < 2 || !v.videoWidth) return;
+  // 裁成照片的形状（cover）
+  const k = Math.max(r.w / v.videoWidth, r.h / v.videoHeight);
+  const sw = r.w / k;
+  const sh = r.h / k;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  ctx.drawImage(v, (v.videoWidth - sw) / 2, (v.videoHeight - sh) / 2, sw, sh, r.x, r.y, r.w, r.h);
+  ctx.restore();
 }
 
 // 进入 section：新的跨页滑进来。第一页从下面滑上来（线框散开之后）；之后从上面落下来，上一页往下走（像抬头）
@@ -691,7 +744,7 @@ function drawBookScene(now) {
   const L = bookLayout(book, W, H, B);
   drawSkyBg(now, L);
   const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, historicalPhotos: B.historicalPhotos, captions: B.captions, numbers: B.numbers,
-    sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawHoles(r) };
+    sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => { drawPhotoVideo(r); drawHoles(r); } };
 
   if (bk.phase === 'done') {
     // 最后：最后一页的照片被黑块收走，后面是纽约此刻的天空颜色（羽毛在这里落下）
