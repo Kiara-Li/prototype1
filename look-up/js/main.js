@@ -393,7 +393,7 @@ function drawBookScene(now) {
   const B = C.book;
   ctx.fillStyle = B.background;
   ctx.fillRect(-W, -H, W * 3, H * 3);
-  const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, captions: B.captions, numbers: B.numbers,
+  const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, historicalPhotos: B.historicalPhotos, captions: B.captions, numbers: B.numbers,
     sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => drawFoundOnPhoto(ctx, r, now) };
   const L = bookLayout(book, W, H, B);
 

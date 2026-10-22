@@ -31,7 +31,8 @@ window.LOOKUP = {
     enabled: true,              // false = 回到原来的竖向照片
     background: '#f5f5f5',      // 和 dashboard 一样
     ink: '#000000',
-    historical: '#d9d9d9',      // 历史照片的位置：浅灰色块（之后换成别的）
+    historicalPhotos: true,     // 书里的历史照片（人的照片）：true = 放原图，false = 用下面的浅灰色块代替
+    historical: '#d9d9d9',
     captions: false,            // 竖排小图注（太小看不清，先不显示）
     numbers: false,             // 组号
     heightPx: 11,               // 左边高度尺的字号

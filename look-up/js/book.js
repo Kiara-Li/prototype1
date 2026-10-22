@@ -1,7 +1,7 @@
 // Look Up · 书的跨页（和 Sightline 页面同一套数据：../data/groups.json，从 book.pdf 拆出来的）
 //
 // 跨页 828 × 702pt，居中放在屏幕上；照片底边对齐基线，竖排小图注，组号。
-// 自己拍的照片照原样画（不加滤镜、不模糊）；历史照片的位置先用一块浅灰色代替（之后换）。
+// 照片照原样画（不加滤镜、不模糊）。历史照片：config.book.historicalPhotos = false 时用一块浅灰色代替。
 // 找鸽子用的矩形（spreadRects）和 observe.js 的格式一样：{ x, y, w, h, item: { photo, img } }。
 
 const idOf = (file) => file.replace(/^.*\//, '').replace(/\.\w+$/, '');
@@ -12,7 +12,11 @@ export async function loadBook(photoItems) {
   const groups = new Map();
   for (const g of data.groups) {
     const images = g.images.map((im) => {
-      if (im.kind !== 'own') return { ...im, own: false };
+      if (im.kind !== 'own') {
+        const img = new Image();
+        img.src = `../data/${im.file}`;
+        return { ...im, own: false, img };
+      }
       const id = idOf(im.file);
       let item = photoItems.get(id);
       if (!item) {
@@ -90,6 +94,8 @@ export function drawSpread(ctx, g, L, baselineY, alpha, o) {
       const img = im.item.img;
       if (img.complete && img.naturalWidth) ctx.drawImage(img, x, y, w, h);
       if (o.drawOnPhoto) o.drawOnPhoto({ item: im.item, x, y, w, h });
+    } else if (o.historicalPhotos && im.img.complete && im.img.naturalWidth) {
+      ctx.drawImage(im.img, x, y, w, h);
     } else {
       ctx.fillStyle = o.historical;
       ctx.fillRect(x, y, w, h);
