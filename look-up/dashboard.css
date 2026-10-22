@@ -74,19 +74,23 @@ html.dx-on #grain { display: none; }
 #dx .dx-face { position: absolute; inset: 0; overflow: hidden; background: #fff; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 #dx .dx-face.b { transform: rotateY(180deg); }
 #dx .dx-face.grey { background: var(--dx-grey); }
+#dx .dx-face.clear { background: transparent; }
+#dx .dx-face.clear .dx-shade { display: none; }
 #dx .dx-face.hidden { pointer-events: none; }
 #dx .dx-shade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
 #dx .dx-body { position: absolute; inset: 0; transition: opacity 350ms; }
 
 #dx .dx-art { position: absolute; inset: var(--u); background: url("assets/dash/card_front.png") center / 100% 100% no-repeat; }
-#dx .dx-pigeon { position: absolute; inset: 0; background: url("assets/dash/pigeon_icon.png") center / cover no-repeat; }
+#dx .dx-pigeon { position: absolute; inset: 0; background: url("assets/dash/pigeon_icon.png") center / contain no-repeat; }
 
 #dx .dx-ctext { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 10.6); width: calc(var(--u) * 21);
                 font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; white-space: nowrap; }
 #dx .dx-btn { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 26.5); width: calc(var(--u) * 20); height: calc(var(--u) * 4.5);
-              padding: 0 0 0 calc(var(--u) * 3.5); box-sizing: border-box; border: 0; background: none; color: inherit; cursor: pointer;
-              font: inherit; font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 4.5); text-align: left; letter-spacing: -0.01em; }
-#dx .dx-btn .rv { display: inline-block; }
+              display: flex; align-items: center; justify-content: center; padding: 0; border: 0; background: none; color: var(--dx-ink); cursor: pointer;
+              font-family: var(--mono); font-size: calc(var(--u) * 1.5); line-height: 1; letter-spacing: 0.04em; }
+#dx .dx-btn .rv { display: inline-block; transition: transform 350ms cubic-bezier(.3,0,.2,1); }
+#dx .dx-btn .rv-bar { top: -0.05em; bottom: -0.1em; }
+#dx .dx-btn:hover .rv { transform: scale(1.04); }
 #dx .dx-btn::before, #dx .dx-btn::after, #dx .dx-mark { content: ""; position: absolute; width: calc(var(--u) * 2.75); height: calc(var(--u) * 3);
               border: 0 solid var(--dx-ink); transition: transform 350ms cubic-bezier(.3,0,.2,1); }
 #dx .dx-btn::before, #dx .dx-mark.bl { left: 0; bottom: 0; border-left-width: 2px; border-bottom-width: 2px; }
@@ -114,6 +118,13 @@ html.dx-on #grain { display: none; }
 #dx .dx-flinks a { border-bottom: 1px solid currentColor; }
 #dx .dx-flinks a:hover { opacity: 0.55; }
 #dx .dx-flinks span { opacity: 0.55; }
+
+/* 摄像头小窗（两个测试的时候）：正方形、黑白、镜像，左下 / 右上两个角标 */
+#dx .dx-cam { opacity: 0; pointer-events: none; }
+#dx .dx-camvideo { position: absolute; inset: 0; overflow: hidden; background: var(--dx-grey); }
+#dx .dx-camvideo video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); filter: grayscale(1) contrast(1.05); display: block; }
+#dx .dx-cam .dx-mark.bl { left: calc(var(--u) * -0.75); bottom: calc(var(--u) * -0.75); }
+#dx .dx-cam .dx-mark.tr { right: calc(var(--u) * -0.75); top: calc(var(--u) * -0.75); }
 
 /* 手势成功：缩小卡片的四角标记 */
 #dx .dx-marks { pointer-events: none; opacity: 0; }

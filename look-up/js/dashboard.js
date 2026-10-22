@@ -25,7 +25,8 @@ const HAND = {
 const EASE = 'cubic-bezier(.65,0,.35,1)';
 const EASE_OUT = 'cubic-bezier(.16,.7,.25,1)';
 const EASE_IN = 'cubic-bezier(.55,0,.75,.2)';
-const GREY = new Set(['congrats', 'pigeon']);
+const GREY = new Set(['congrats']);
+const CLEAR = new Set(['pigeon']);      // 透明底：只有鸽子
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const rv = (text) => `<span class="rv"><span class="rv-t">${esc(text)}</span><span class="rv-bar"></span></span>`;
@@ -66,7 +67,8 @@ export function createDashboard(o) {
     </div>
     <img class="dx-hand" data-k="bl" src="${HAND.bl.src}" alt="" draggable="false">
     <img class="dx-hand" data-k="tr" src="${HAND.tr.src}" alt="" draggable="false">
-    <div class="dx-marks"><span class="dx-mark bl"></span><span class="dx-mark tr"></span></div>`;
+    <div class="dx-marks"><span class="dx-mark bl"></span><span class="dx-mark tr"></span></div>
+    <div class="dx-cam"><div class="dx-camvideo"><video muted playsinline></video></div><span class="dx-mark bl"></span><span class="dx-mark tr"></span></div>`;
 
   const q = (s) => root.querySelector(s);
   const el = {
@@ -78,6 +80,7 @@ export function createDashboard(o) {
     marks: q('.dx-marks'), ticks: q('.dx-ticks'), chap: q('.dx-chap'), about: q('.dx-about'),
     hands: { bl: q('.dx-hand[data-k="bl"]'), tr: q('.dx-hand[data-k="tr"]') },
     grid: q('.dx-gridview'),
+    cam: q('.dx-cam'), camVideo: q('.dx-cam video'),
   };
   const ui = [...root.querySelectorAll('.ui')];
   for (const k of ['bl', 'tr']) el.hands[k].style.width = `${HAND[k].w}px`;
@@ -120,6 +123,9 @@ export function createDashboard(o) {
       if (k === 'r') at(e, { left: c.r + 2 * u - lh / 2, bottom: H - c.b });
     }
     at(el.card, { left: c.l, top: c.t, width: card, height: card });
+    // 摄像头小窗：右栏，和 tips 同一个位置（左边、下边对齐）
+    const cs = Math.min(16 * u, W - cr - 3 * u);
+    at(el.cam, { left: cr + 1.5 * u, top: c.b - cs, width: cs, height: cs });
     const s = Math.round(D.smallCard * u);
     at(el.marks, { left: cx - s / 2, top: cy - s / 2, width: s, height: s });
     // chapter 刻度：按高度（对数）排在中间一栏里
@@ -136,7 +142,8 @@ export function createDashboard(o) {
     }
     // 动画中的东西：按现在的状态放好
     for (const k of ['bl', 'tr']) { el.hands[k].getAnimations().forEach((a) => a.cancel()); el.hands[k].style.transform = handTf(handMode)[k]; }
-    if (smallSteps.has(step)) el.card.style.transform = `scale(${D.smallCard / 40})`;
+    if (step === 'closing') applyClose();
+    else if (smallSteps.has(step)) el.card.style.transform = `scale(${D.smallCard / 40})`;
     fitBig();
   }
 
@@ -178,7 +185,7 @@ export function createDashboard(o) {
     window: (i) => {
       const ch = o.chapters[i];
       return `<div class="dx-hole">${ch.src ? `<img src="${esc(ch.src)}" alt="">` : ''}</div>
-              <div class="dx-holelabel">${rv(`chapter ${i + 1} · ${ch.label}`)}</div>`;
+              <div class="dx-holelabel">${rv(`Chapter ${i + 1} · ${ch.label}`)}</div>`;
     },
     feather: () => `<canvas class="dx-fcanvas"></canvas><div class="dx-ftext">${T.featherFace.map(rv).join('')}</div>
       <div class="dx-flinks"><a data-act="download">${esc(o.T.dashboard.download)}</a><a data-act="print">${esc(o.T.dashboard.print)}</a>
@@ -197,6 +204,7 @@ export function createDashboard(o) {
 
   function fill(face, kind, data) {
     face.classList.toggle('grey', GREY.has(kind));
+    face.classList.toggle('clear', CLEAR.has(kind));
     face.dataset.kind = kind;
     const body = face.querySelector('.dx-body');
     body.style.opacity = 1;
@@ -275,8 +283,13 @@ export function createDashboard(o) {
 
   let handMode = 'away';
   function handTf(mode) {
-    const { W, H, u, cx, cy } = L;
+    const pos = handPos(mode);
     const out = {};
+    for (const k of ['bl', 'tr']) out[k] = `translate(${pos[k][0]}px, ${pos[k][1]}px) scale(${pos.s[k]})`;
+    return out;
+  }
+  function handPos(mode) {
+    const { W, H, u, cx, cy } = L;
     const s = { bl: (HAND.bl.scale * u) / 18, tr: (HAND.tr.scale * u) / 18 };
     const rest = { bl: [0, H - HAND.bl.h * s.bl], tr: [W - HAND.tr.w * s.tr, 0] };
     let pos;
@@ -292,8 +305,8 @@ export function createDashboard(o) {
         tr: [cx + half + g - HAND.tr.corner[0] * s.tr, cy - half - g - HAND.tr.corner[1] * s.tr],
       };
     }
-    for (const k of ['bl', 'tr']) out[k] = `translate(${pos[k][0]}px, ${pos[k][1]}px) scale(${s[k]})`;
-    return out;
+    pos.s = s;
+    return pos;
   }
 
   function moveHands(mode, dur, easing, fade = mode === 'away' ? undefined : 1) {
@@ -339,7 +352,7 @@ export function createDashboard(o) {
   // ================================================================ 流程
 
   let step = 'intro';
-  const smallSteps = new Set(['pigeon', 'framed', 'leaving']);
+  const smallSteps = new Set(['framed', 'leaving']);
   let hover = false;
   let pinned = false;
   let idleNext = Infinity;
@@ -351,6 +364,11 @@ export function createDashboard(o) {
   let upSince = 0;
   let pigeonAt = 0;
   let hinted = false;
+  let closeP = 0;              // 合拢进度：0 = 手在角落、卡片原大；1 = 手合拢、卡片缩小
+  let closeLast = 0;
+  let pigeonShown = false;
+  let enterAsap = false;       // 已经检测到手势：鸽子一出现就进入
+  let camWanted = false;
 
   function applyLock() {
     el.feather.classList.toggle('locked', !unlocked);
@@ -378,6 +396,7 @@ export function createDashboard(o) {
 
   function startHead() {
     step = 'head';
+    showCam(true);
     headAt = performance.now();
     calib = 'wait';
     upSince = 0;
@@ -392,34 +411,113 @@ export function createDashboard(o) {
       { duration: D.riseMs, easing: 'cubic-bezier(.5,0,.2,1)', fill: 'forwards' });
   }
 
+  // 两只手往中间合：没人动的时候自己慢慢合（closeMs）；摄像头看到两只手时，跟着真实两只手之间的距离开合
   function startClosing() {
     step = 'closing';
     shown().querySelector('.dx-body').style.opacity = 0;
-    const k = D.smallCard / 40;
-    const a = el.card.animate([{ transform: 'scale(1)' }, { transform: `scale(${k})` }], { duration: D.closeMs, easing: EASE, fill: 'forwards' });
-    moveHands('closed', D.closeMs, EASE);
-    quiet(a.finished.then(() => {
-      el.card.style.transform = `scale(${k})`;
-      a.cancel();
-      return flipTo('pigeon');
-    }).then(() => {
-      step = 'pigeon';
-      pigeonAt = performance.now();
-      hinted = false;
-      input.wantFrame = true;
-    }));
+    closeP = 0;
+    closeLast = performance.now();
+    pigeonShown = false;
+    enterAsap = false;
+    pigeonAt = 0;
+    hinted = false;
+    input.wantFrame = true;
+    handMode = 'closing';
+    for (const k of ['bl', 'tr']) {
+      const h = el.hands[k];
+      h.style.opacity = 1;
+      h.getAnimations().forEach((x) => x.cancel());
+      h.style.transition = '--hf 1600ms ease';
+      h.classList.add('soft');
+    }
+    showCam(true);
   }
 
+  const easeIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  function applyClose() {
+    const e = easeIO(closeP);
+    const r = handPos('rest');
+    const c = handPos('closed');
+    for (const k of ['bl', 'tr']) {
+      const x = r[k][0] + (c[k][0] - r[k][0]) * e;
+      const y = r[k][1] + (c[k][1] - r[k][1]) * e;
+      el.hands[k].style.transform = `translate(${x}px, ${y}px) scale(${r.s[k]})`;
+    }
+    if (!pigeonShown) el.card.style.transform = `scale(${1 + (D.smallCard / 40 - 1) * e})`;
+  }
+
+  // 用户自己两只手之间的距离 → 合拢进度（看不到两只手：null）
+  function userClose() {
+    const v = driver.vision;
+    const hs = input.frame && input.frame.hands;
+    if (!v || v.status !== 'ready' || !hs || hs.length < 2) return null;
+    const a = hs[0].landmarks[5];
+    const b = hs[1].landmarks[5];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    return Math.max(0, Math.min(1, (D.handsFar - d) / (D.handsFar - D.handsNear)));
+  }
+
+  function updateClosing(now) {
+    const dt = Math.min(100, now - closeLast);
+    closeLast = now;
+    if (input.frame && input.frame.active) enterAsap = true;
+    const user = userClose();
+    const goal = enterAsap ? 1 : user !== null ? user : 1;
+    const speed = enterAsap ? 1 / 450 : user !== null ? 1 / 500 : 1 / D.closeMs;
+    const step0 = speed * dt;
+    closeP += Math.max(-step0, Math.min(step0, goal - closeP));
+    if (pigeonShown) closeP = Math.max(closeP, 0.8);      // 鸽子出来以后，手不会再张得太开
+    applyClose();
+    // 合到底：卡片翻过来，出现鸽子（透明底）
+    if (!pigeonShown && closeP >= 0.999) {
+      pigeonShown = true;
+      el.card.style.transform = `scale(${D.smallCard / 40})`;
+      flipTo('pigeon').then(() => {
+        pigeonAt = performance.now();
+        if (enterAsap) framed();
+      });
+    }
+    if (pigeonShown && pigeonAt && enterAsap && step === 'closing') framed();
+    // 没有摄像头：提示点卡片
+    if (pigeonAt && !hinted && now - pigeonAt > D.noCameraHintMs) {
+      const v = driver.vision;
+      if (!v || v.status !== 'ready') { hinted = true; setText(el.chap, T.noCamHands); el.chap.style.opacity = 1; reveal(el.chap); }
+    }
+  }
+
+  // 检测到手势：四角标记一闪，马上进入
   function framed() {
+    if (step === 'framed' || step === 'leaving') return;
     step = 'framed';
     input.wantFrame = false;
     driver.releaseFrame();
+    showCam(false);
     for (const e of ui) e.style.opacity = 0;
     el.marks.style.opacity = 1;
     const u = L.u;
-    el.marks.querySelector('.bl').animate([{ transform: `translate(${-u}px, ${u}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: EASE_OUT });
-    el.marks.querySelector('.tr').animate([{ transform: `translate(${u}px, ${-u}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: EASE_OUT });
-    setTimeout(leave, 520 + D.handsHoldMs);
+    el.marks.querySelector('.bl').animate([{ transform: `translate(${-u}px, ${u}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: EASE_OUT });
+    el.marks.querySelector('.tr').animate([{ transform: `translate(${u}px, ${-u}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: EASE_OUT });
+    setTimeout(leave, 320 + D.handsHoldMs);
+  }
+
+  // ---- 摄像头小窗：只在两个测试（抬头、手势）的时候出现，在 tips 的位置
+  function showCam(on) {
+    camWanted = on;
+    if (!on && el.cam.classList.contains('on')) {
+      el.cam.classList.remove('on');
+      el.cam.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.6)', opacity: 0 }], { duration: 420, easing: EASE_IN, fill: 'forwards' });
+      el.tips.style.opacity = '';
+    }
+  }
+  function updateCam() {
+    if (!camWanted || el.cam.classList.contains('on')) return;
+    const v = driver.vision;
+    if (!v || !v.video || v.status === 'no-camera') return;
+    if (el.camVideo.srcObject !== v.video.srcObject) { el.camVideo.srcObject = v.video.srcObject; quiet(el.camVideo.play()); }
+    el.cam.classList.add('on');
+    el.tips.style.opacity = 0;
+    el.cam.getAnimations().forEach((x) => x.cancel());
+    el.cam.animate([{ transform: 'scale(0.6)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 520, delay: 200, easing: EASE_OUT, fill: 'both' });
   }
 
   function leave() {
@@ -459,20 +557,17 @@ export function createDashboard(o) {
       const safe = calib === 'done' || calib === 'skip' || !(v && v.faceOk);
       if (safe && input.lookValue > D.lookUpAbove) {
         if (!upSince) upSince = now;
-        if (now - upSince > D.lookUpHoldMs) { step = 'nice'; flipTo('nice'); }
+        if (now - upSince > D.lookUpHoldMs) { step = 'nice'; showCam(false); flipTo('nice'); }
       } else upSince = 0;
       if (!hinted && now - headAt > D.noCameraHintMs && (!v || v.status !== 'ready')) {
         hinted = true;
         const h = shown().querySelector('.dx-hint .rv');
         if (h) { setText(h, T.noCamUp); reveal(h); }
       }
-    } else if (step === 'pigeon') {
-      if (input.frame && input.frame.active) framed();
-      else if (!hinted && now - pigeonAt > D.noCameraHintMs) {
-        const v = driver.vision;
-        if (!v || v.status !== 'ready') { hinted = true; setText(el.chap, T.noCamHands); el.chap.style.opacity = 1; reveal(el.chap); }
-      }
+    } else if (step === 'closing') {
+      updateClosing(now);
     }
+    updateCam();
   }
 
   // ================================================================ 点击、悬停
@@ -495,7 +590,7 @@ export function createDashboard(o) {
     if (step === 'idle' && (target === 'front' || target === 'congrats')) {
       pinned = true;
       if (target === 'front') flipTo('congrats');
-    } else if (step === 'pigeon' && performance.now() - pigeonAt > D.noCameraHintMs) framed();
+    } else if (step === 'closing' && pigeonAt && performance.now() - pigeonAt > D.noCameraHintMs) framed();
   });
   el.card.addEventListener('mouseenter', () => {
     hover = true;
@@ -532,7 +627,7 @@ export function createDashboard(o) {
     if (peek === i) return;
     peek = i;
     [...el.ticks.children].forEach((x) => x.classList.toggle('on', x === t));
-    setText(el.chap, `chapter ${i + 1} · ${o.chapters[i].label}`);
+    setText(el.chap, `Chapter ${i + 1} · ${o.chapters[i].label}`);
     reveal(el.chap, { dur: 220 });
     pulseHands();
     flipTo('window', i);
@@ -591,5 +686,6 @@ export function createDashboard(o) {
     show, showEnd, update,
     get step() { return step; },
     get face() { return current; },
+    get debug() { return { closeP, pigeonShown, pigeonAt, enterAsap, flipping, target }; },
   };
 }

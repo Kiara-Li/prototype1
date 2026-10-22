@@ -206,9 +206,11 @@ window.LOOKUP = {
     lookUpAbove: 0.35,          // 抬头：lookValue 超过这个（约 11°）……
     lookUpHoldMs: 350,          //       ……并保持这么久，算抬头了
     noCameraHintMs: 5000,       // 摄像头这么久还没好：提示用 ↑ / 点击
-    closeMs: 2600,              // 两只手往中间合拢、卡片缩小
+    closeMs: 6000,              // 没人动的时候：两只手自己慢慢合拢、卡片缩小要这么久
+    handsNear: 0.2,             // 用户两只手（食指根）在画面里的距离：这么近 = 合拢……
+    handsFar: 0.6,              //                                    ……这么远 = 张开
     smallCard: 11,              // 缩小后的卡片边长（u）
-    handsHoldMs: 700,           // 检测到手势之后，四角标记出现、停一会儿再进入
+    handsHoldMs: 0,             // 检测到手势之后，四角标记出现、再停这么久进入（0 = 马上）
     leaveMs: 1500,              // 进入网站：手往两边移开，dashboard 淡出
     chapters: [0, 12, 60, 180, 600, 2400, 12000, 60000],   // TODO 占位：chapter 的刻度（英寸），之后按真正的 chapter 改
   },
