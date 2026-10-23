@@ -40,6 +40,7 @@ window.LOOKUP = {
     heightPx: 11,               // 左边高度尺的字号
     heightTickPx: 28,           // 刻度线长度
     visitedInk: '#a3a3a3',      // 去过的高度：浅灰
+    holeColor: '#ffffff',       // 照片上切掉鸽子的洞（试过蓝天，太突兀）
     minHeight: 60,              // 低于人的视线（60″）的照片不放
     // 白名单：每个 section 只用这些构件；照书里的跨页整页放（混着别的构件的 47、53、55 也整页放）
     // 每个 section 里按高度从低到高（一样高按页码）。In flight 书里没有成形的跨页 → 用记录表里的飞行照片，一张一页
