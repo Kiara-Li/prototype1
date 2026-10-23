@@ -74,7 +74,12 @@
 
 /* 提示（教学、没有摄像头时） */
 /* 提示：放在要做的动作旁边（位置由 bookui.js 给），最多三四行宽 */
-#bk .bk-hint { font-size: calc(var(--u) * 1.24); line-height: 1.35; }
+#bk .bk-hint { display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--u) * 0.35); }
+/* 提示的小方块：白底、黑框、大写，浮在画面上（像不同的图层），各自轻轻浮动 */
+#bk .bk-tag { box-sizing: border-box; height: 2.1em; line-height: calc(2.1em - 3px); padding: 0 0.7em; background: #fff; border: 1.5px solid #000;
+              white-space: nowrap; overflow: hidden; letter-spacing: 0.02em; transform-origin: 0 50%;
+              animation: bk-tagfloat 3.6s ease-in-out infinite alternate; }
+@keyframes bk-tagfloat { from { translate: 0 0; } to { translate: 0.25em -0.35em; } }
 
 /* 教学的手 */
 #bk .bk-hand { display: none; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; user-select: none; }

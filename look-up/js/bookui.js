@@ -26,7 +26,7 @@ export function createBookUI(o) {
     </div></div>
     <div class="bk-stack"><div class="bk-h">${rv('')}</div></div>
     <div class="bk-panel"><div class="bk-pbody"></div></div>
-    <div class="bk-hint">${rv('')}</div>
+    <div class="bk-hint"></div>
     <div class="bk-cap"><div class="bk-capmeta"></div><div class="bk-captitle"></div></div>
     <div class="bk-capv"></div>
     <div class="bk-guide"><div class="bk-gtext"></div></div>
@@ -542,10 +542,25 @@ export function createBookUI(o) {
     Object.assign(el.hint.style, { left: `${Math.max(u, Math.min(x, window.innerWidth - 21 * u))}px`, top: `${y}px` });
     setHint(text);
   }
+  // 提示：每一行是一个白底黑框的小方块，浮在画面上（像在不同的图层上），左右错开一点、各自轻轻浮动。
+  // 一块一块出来：先是一个小正方形 → 横着拉开成一条 → 字才出现
   function setHint(text) {
-    // 按宽度断好行，每一行一条方块（黑块一行一行把字拉出来）
-    el.hint.innerHTML = text ? wrap(text, 20 * u, 1.24 * u, sans()).map(rv).join('') : '';
-    if (text) reveal(el.hint, { stagger: 90 });
+    for (const t of el.hint.querySelectorAll('.bk-tag')) t.getAnimations().forEach((a) => a.cancel());
+    el.hint.innerHTML = '';
+    if (!text) return;
+    const fs = Math.max(12, 1.15 * u);
+    const lines = wrap(text.toUpperCase(), 17 * u, fs * 1.05, sans());
+    el.hint.innerHTML = lines.map((l, i) => `<div class="bk-tag" style="font-size:${fs}px;margin-left:${[0, 1.1, 0.4, 1.6][i % 4] * u}px;animation-delay:${-i * 0.9}s"><span class="bk-tagt">${esc(l)}</span></div>`).join('');
+    [...el.hint.querySelectorAll('.bk-tag')].forEach((tag, i) => {
+      const w = tag.offsetWidth;
+      const h = tag.offsetHeight;
+      const d = i * 260;
+      tag.style.width = `${h}px`;
+      tag.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'none' }], { duration: 220, delay: d, easing: EASE_OUT, fill: 'backwards' });
+      const grow = tag.animate([{ width: `${h}px` }, { width: `${w}px` }], { duration: 380, delay: d + 240, easing: EASE, fill: 'forwards' });
+      quiet(grow.finished).then(() => { tag.style.width = `${w}px`; grow.cancel(); });
+      tag.querySelector('.bk-tagt').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: d + 560, easing: EASE_OUT, fill: 'backwards' });
+    });
   }
 
   // 指引：屏幕上方，一个慢慢浮动的箭头 + 一句话（字用黑块拉出来）
