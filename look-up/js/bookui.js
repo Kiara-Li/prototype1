@@ -542,24 +542,29 @@ export function createBookUI(o) {
     Object.assign(el.hint.style, { left: `${Math.max(u, Math.min(x, window.innerWidth - 21 * u))}px`, top: `${y}px` });
     setHint(text);
   }
-  // 提示：每一行是一个白底黑框的小方块，浮在画面上（像在不同的图层上），左右错开一点、各自轻轻浮动。
-  // 一块一块出来：先是一个小正方形 → 横着拉开成一条 → 字才出现
+  // 提示：一块饱和的蓝色色块（参考 Kiara 给的图），每行一条、宽度不一、左边错开，上下贴在一起拼成阶梯状的一块。
+  // 先从左上角一格一格地打开（像素一样的步进），打开以后白色的字一个个随机跳出来
+  let hintTimers = [];
   function setHint(text) {
-    for (const t of el.hint.querySelectorAll('.bk-tag')) t.getAnimations().forEach((a) => a.cancel());
+    hintTimers.forEach(clearTimeout);
+    hintTimers = [];
+    el.hint.getAnimations({ subtree: true }).forEach((a) => a.cancel());
     el.hint.innerHTML = '';
     if (!text) return;
-    const fs = Math.max(12, 1.15 * u);
-    const lines = wrap(text.toUpperCase(), 17 * u, fs * 1.05, sans());
-    el.hint.innerHTML = lines.map((l, i) => `<div class="bk-tag" style="font-size:${fs}px;margin-left:${[0, 1.1, 0.4, 1.6][i % 4] * u}px;animation-delay:${-i * 0.9}s"><span class="bk-tagt">${esc(l)}</span></div>`).join('');
-    [...el.hint.querySelectorAll('.bk-tag')].forEach((tag, i) => {
-      const w = tag.offsetWidth;
-      const h = tag.offsetHeight;
-      const d = i * 260;
-      tag.style.width = `${h}px`;
-      tag.animate([{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'none' }], { duration: 220, delay: d, easing: EASE_OUT, fill: 'backwards' });
-      const grow = tag.animate([{ width: `${h}px` }, { width: `${w}px` }], { duration: 380, delay: d + 240, easing: EASE, fill: 'forwards' });
-      quiet(grow.finished).then(() => { tag.style.width = `${w}px`; grow.cancel(); });
-      tag.querySelector('.bk-tagt').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: d + 560, easing: EASE_OUT, fill: 'backwards' });
+    const fs = Math.max(12, 1.1 * u);
+    const lines = wrap(text, 16 * u, fs * 1.15, getComputedStyle(root).getPropertyValue('--mono') || 'monospace');
+    const offs = [0, 1.6, 0.6, 2.4, 1.1];
+    el.hint.innerHTML = `<div class="bk-hbox">${lines.map((l, i) => `<div class="bk-hl" style="font-size:${fs}px;margin-left:${offs[i % offs.length] * u}px">${
+      [...l].map((c) => `<span>${c === ' ' ? '&nbsp;' : esc(c)}</span>`).join('')}</div>`).join('')}</div>`;
+    const box = el.hint.querySelector('.bk-hbox');
+    const open = 560;
+    box.animate([{ clipPath: 'inset(0 100% 100% 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: open, easing: 'steps(7, end)', fill: 'backwards' });
+    // 字：随机的顺序一个个跳出来
+    const chars = [...box.querySelectorAll('.bk-hl span')];
+    chars.forEach((c) => { c.style.opacity = 0; });
+    const order = chars.map((c, i) => [Math.random(), i]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+    order.forEach((ci, k) => {
+      hintTimers.push(setTimeout(() => { chars[ci].style.opacity = 1; }, open + 80 + (k / order.length) * 520));
     });
   }
 
