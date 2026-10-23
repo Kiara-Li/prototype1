@@ -126,6 +126,12 @@
     a.addEventListener('ended', () => stopSound(s));
   });
 
+  // ---- 不让一个词单独落到下一行：每段字最后两个词之间换成不断行的空格
+  $$('.t1, .t2, .tq, .body, figcaption').forEach((e) => {
+    if (e.children.length) return;
+    e.textContent = e.textContent.replace(/\s+(\S+)\s*$/, '\u00a0$1');
+  });
+
   // ---- 开始
   const start = indexOf(location.hash.slice(1));
   go(start >= 0 ? start : 0);
