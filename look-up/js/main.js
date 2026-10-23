@@ -108,8 +108,9 @@ async function boot() {
 function setupNewDashboard() {
   app.view.s = 1;
   app.view.dy = 0;
+  // chapter 和羽毛：这一次从头看到天空才打开（不记在浏览器里：展览时下一个人还是从锁着开始）
   let unlocked = false;
-  try { unlocked = localStorage.getItem(C.storage.unlocked) === '1'; } catch { /* */ }
+  try { localStorage.removeItem(C.storage.unlocked); } catch { /* 以前存过的清掉 */ }
   if (PARAMS.has('unlock')) unlocked = true;
   if (PARAMS.has('lock')) unlocked = false;
   // chapter 刻度：书里的每一章。窗口里放这一章第一页最大的那张自己拍的照片（天空：云）；点一下从这一章进去
@@ -1683,7 +1684,6 @@ async function toEnd() {
   if (skyScene.vid) skyScene.vid.pause();
   if (skyScene.first) skyScene.first.pause();
   if (BOOK && book) { try { app.endImages = await sheetImages(sheetArgs()); } catch { /* 没有就放纸羽毛 */ } }
-  try { localStorage.setItem(C.storage.unlocked, '1'); } catch { /* */ }
   if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(); return; }
   $('dash').style.display = 'block';
   $('dStart').style.display = 'none';
