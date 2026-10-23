@@ -20,7 +20,7 @@ import { drawFrameMarks } from '../../frame.js';
 import { input } from './input/state.js';
 import { isMobileDevice } from './input/device.js';
 import { createDashboard } from './dashboard.js';
-import { loadBook, loadGroup, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal, skySpread } from './book.js';
+import { loadBook, loadGroup, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal } from './book.js';
 import { createBookUI } from './bookui.js';
 import { createSkySound } from './skysound.js';
 import { openSheet } from './sheet.js';
@@ -279,7 +279,6 @@ function ascend(now, dt) {
 //           底边还在基线上（不全屏，水平线还在）；最后一张之后 → top（羽毛落下）
 
 let book = null;
-let skyItems = [];
 const bk = {
   phase: 'guide', next: 0, sec: -1, idx: 0, cur: null, prev: null, prevEnter: false,
   switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0,
@@ -305,11 +304,8 @@ async function setupBook() {
     groups: s.groups.map((id) => book.groups.get(id)).filter(Boolean)
       .sort((a, b) => a.height_in - b.height_in || Number(a.id) - Number(b.id)),
   }));
-  // 天空：飞行照片（原图），从低到高，一张一页
-  skyItems = [...items.values()].filter((it) => /^In flight/.test(it.photo.caption) && /^data\//.test(it.photo.src)
-      && it.photo.height_in >= C.book.minHeight)
-    .sort((a, b) => a.photo.height_in - b.photo.height_in);
-  if (skyItems.length) book.sections.push({ key: 'sky', sky: true, groups: skyItems.map((it) => skySpread(it, book.spread)) });
+  // 天空：不再一页一页切鸽子。抬头以后背景渐变成蓝天、天空视频浮现、一路切下来的鸽子飞上去（startSky）
+  book.sections.push({ key: 'sky', sky: true, groups: [] });
   preloadSection(0);                                  // 第一个 section 的图片现在就开始下载（看 dashboard 的时候）
   window.lookUp.book = book;
   bookUI = createBookUI({ C, T });
@@ -407,10 +403,18 @@ function bookUpdate(now, dt) {
     } else if (bk.card === 'up') bk.upSince = 0;
   }
 
-  // 尺子上的数字：跟着这一页的高度往上数（和书页上升一样快）
+  // 尺子上的数字：跟着这一页的高度往上数（和书页上升一样快）；天空：一路冲到天空的高度
   if (bk.cur) {
     if (bk.rulerH === null) bk.rulerH = C.book.minHeight;     // 第一页：从视线的高度（60″）往上数
-    bk.rulerH += (bk.cur.height_in - bk.rulerH) * (1 - Math.exp(-dt / 420));
+    const sk = bk.skyAt >= 0;
+    const target = sk ? C.book.skyScene.height : bk.cur.height_in;
+    bk.rulerH += (target - bk.rulerH) * (1 - Math.exp(-dt / (sk ? 1100 : 420)));
+  }
+  // 天空：鸽子飞完以后问最后一句
+  if (bk.phase === 'sky' && !bk.skyAsked && now - bk.skyAt > skyScene.askAt) {
+    bk.skyAsked = true;
+    bk.card = 'ready';
+    askSection();
   }
   // 高度尺跟着现在这一页的高度慢慢走
   const ty = heightToY(world, bk.targetH);
@@ -428,7 +432,7 @@ function bookUpdate(now, dt) {
   updateCutting(bk.phase === 'section' ? bookRects(now) : [], now);
 
   // 卡片跟着书页走
-  const cr = bk.phase === 'section' || bk.phase === 'question' || bk.phase === 'guide' || bk.phase === 'skyguide' ? cardRect(now) : null;
+  const cr = bk.skyAt < 0 && (bk.phase === 'section' || bk.phase === 'question' || bk.phase === 'guide' || bk.phase === 'skyguide') ? cardRect(now) : null;
   bookUI.place(cr, { room: cardRoom(cr), cap: bk.phase === 'section' });
 }
 
@@ -656,6 +660,89 @@ function lookHint(r) {
   bookUI.hintAt(at.x, at.y, keys ? T.book.lookHintKeys : T.book.lookHint);
 }
 
+// ================================================================ 天空
+// 抬头进入天空：最后那页书往下沉、淡掉；背景从灰渐变成天空视频的蓝；尺子上的数字一路冲上去；
+// 天空视频在中间浮现（四边羽化，背景跟着视频取颜色，看不出边）；一路切下来的鸽子从下面一只只飞上去；
+// 最后问天空那一句（不答也会自己跳过）→ 结尾
+const skyScene = { vid: null, birds: [], askAt: 0 };
+function startSky(now) {
+  const S = C.book.skyScene;
+  bk.phase = 'sky';
+  bk.skyAt = now;
+  bk.skyAsked = false;
+  bk.card = 'front';
+  stopPhotoVideo();
+  bookUI.caption(null);
+  bookUI.place(null);                                  // 历史照片的卡片收掉（天空里没有书页了）
+  if (!bookUI.tutorial) bookUI.setHint('');
+  if (!skyScene.vid) {
+    const v = document.createElement('video');
+    Object.assign(v, { muted: true, playsInline: true, loop: true, preload: 'auto', src: S.video });
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    v.className = 'hidden-video';
+    document.body.appendChild(v);
+    skyScene.vid = v;
+  }
+  quiet(skyScene.vid.play());
+  // 鸽子：一路切下来的那些，从屏幕底下错开飞上去
+  const n = app.pieces.length;
+  skyScene.birds = app.pieces.map((p, i) => ({
+    canvas: p.canvas,
+    x: 0.18 + ((i * 0.618) % 1) * 0.64,                 // 横向散开（黄金比例错开，不会挤在一起）
+    delay: S.birdsAt + i * S.birdStaggerMs,
+    sway: (i % 2 ? 1 : -1) * (0.02 + ((i * 7) % 5) * 0.008),
+    rot: ((i * 37) % 21) - 10,
+  }));
+  skyScene.askAt = Math.max(S.askMinMs, S.birdsAt + n * S.birdStaggerMs + S.birdFlyMs * 0.6);
+}
+// 天空视频在屏幕上的位置：竖的，在中间，差不多一屏高
+function skyVideoRect() {
+  const { W, H } = app;
+  const h = H * C.book.skyScene.videoHeight;
+  const w = Math.min(W * 0.6, (h * 9) / 16);
+  return { x: (W - w) / 2, y: (H - h) / 2, w, h };
+}
+function quiet(p) { return p && p.catch ? p.catch(() => {}) : p; }
+
+function drawSkyScene(now, L, o) {
+  const { W, H } = app;
+  const S = C.book.skyScene;
+  const t = now - bk.skyAt;
+  // 最后那页书往下沉、淡掉（我们往上了）
+  const sink = ease(Math.min(1, t / S.sinkMs));
+  if (bk.cur && bk.baseY !== null && sink < 1) {
+    ctx.save();
+    ctx.globalAlpha = 1 - sink;
+    const y = bk.baseY + sink * H * 0.9;
+    drawSpread(ctx, bk.cur, L, y, 1, o);
+    ctx.restore();
+  }
+  // 基线（地平线）留着，把两边的尺子连起来
+  if (bk.cur && bk.baseY !== null) drawBaseline(ctx, bk.cur, L, bk.baseY, W, C.book.ink, 1 - 0.65 * sink);
+  // 天空视频：慢慢浮现，四边羽化
+  const v = skyScene.vid;
+  if (v && v.readyState >= 2 && t > S.videoAt) {
+    drawFeathered(v, skyVideoRect(), Math.min(1, (t - S.videoAt) / C.book.skyBg.videoFadeMs));
+  }
+  // 鸽子飞上去：从屏幕底下出来，左右轻轻摆，飞出屏幕上方
+  const u = Math.min(W / 96, H / 62);
+  const size = S.birdU * u;
+  for (const b of skyScene.birds) {
+    const k = (t - b.delay) / S.birdFlyMs;
+    if (k <= 0 || k >= 1) continue;
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    const x = W * (b.x + Math.sin(k * Math.PI * 2) * b.sway);
+    const y = H + size - e * (H + 2 * size);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(((b.rot * (1 - k)) * Math.PI) / 180);
+    ctx.globalAlpha = Math.min(1, k * 8);
+    ctx.drawImage(b.canvas, -size / 2, -size / 2, size, size);
+    ctx.restore();
+  }
+}
+
 function enterSection(i, now) {
   bk.sec = i;
   preloadSection(i);
@@ -663,8 +750,8 @@ function enterSection(i, now) {
   const sec = book.sections[i];
   if (skySound && sec.key === C.book.skySound.startSection) skySound.start();
   if (skySound && sec.sky) skySound.toFinale();
-  if (sec.sky) bk.skyAt = now;                 // 天空：背景慢慢变成视频里的蓝
   if (sectionSound) sectionSound.enter(sec.key);      // 这个 section 自己的一点声音（雨、铃声、嘀嗒……）
+  if (sec.sky) { startSky(now); return; }
   bk.phase = 'section';
   bk.enterAt = now;
   showSpread(0, now, true);
@@ -794,7 +881,9 @@ function drawBookScene(now) {
   const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, historicalPhotos: B.historicalPhotos, captions: B.captions, numbers: B.numbers,
     sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => { drawPhotoVideo(r); drawHoles(r); } };
 
-  if (bk.phase === 'done') {
+  if (bk.skyAt >= 0) {
+    drawSkyScene(now, L, o);
+  } else if (bk.phase === 'done') {
     // 最后：最后一页的照片被黑块收走，后面是纽约此刻的天空颜色（羽毛在这里落下）
     const s = skyColors();
     const k = Math.min(1, (now - bk.doneAt) / 1600);
@@ -830,7 +919,6 @@ function drawBookScene(now) {
     }
   }
 
-  drawSkyVideo(now);
   if (app.state !== 'dashboard' && app.state !== 'end') drawHeights(now, L);
 }
 
@@ -842,12 +930,11 @@ function drawSkyBg(now, L) {
   const S = C.book.skyBg;
   if (!S || bk.skyAt < 0) return;
   const k = ease(Math.min(1, (now - bk.skyAt) / S.fadeMs));
-  const col = book.sections[book.sections.length - 1].groups[0].images.find((im) => im.virtual);
-  const top = L.oy + col.y * L.s;
+  const r = skyVideoRect();
   if (!skyLive.stops) skyLive.stops = S.stops.map((c) => hex(c));
-  const v = bookUI && bookUI.liveVideo();
-  if (v && v.readyState >= 2) sampleVideo(v, col.w / col.h);
-  const g = ctx.createLinearGradient(0, top, 0, top + col.h * L.s);
+  const v = skyScene.vid;
+  if (v && v.readyState >= 2 && now - bk.skyAt > C.book.skyScene.videoAt) sampleVideo(v, r.w / r.h);
+  const g = ctx.createLinearGradient(0, r.y, 0, r.y + r.h);
   const n = skyLive.stops.length;
   skyLive.stops.forEach((c, i) => g.addColorStop(i / (n - 1), `rgb(${c.map(Math.round).join(',')})`));
   ctx.save();
@@ -859,10 +946,7 @@ function drawSkyBg(now, L) {
 // 融进背景的视频画在书页的 canvas 上（不用 <video> 直接显示：浏览器显示视频和画 canvas 的颜色不完全一样，
 // 画在同一个 canvas 上，和背景取的颜色才对得上）：裁成那一栏的形状，四边羽化，慢慢浮现
 let featherCv = null;
-function drawSkyVideo(now) {
-  const v = bookUI && bookUI.liveVideo();
-  const r = v && v.readyState >= 2 ? cardRect(now) : null;
-  if (!r) return;
+function drawFeathered(v, r, alpha) {
   const S = C.book.skyBg;
   const dpr = devicePixelRatio;
   const w = Math.round(r.w * dpr);
@@ -889,7 +973,7 @@ function drawSkyVideo(now) {
   g.fillStyle = gy;
   g.fillRect(0, 0, w, h);
   ctx.save();
-  ctx.globalAlpha = Math.min(1, (now - Number(v.dataset.on || now)) / S.videoFadeMs);
+  ctx.globalAlpha = alpha;
   ctx.drawImage(featherCv, r.x, r.y, r.w, r.h);
   ctx.restore();
 }
@@ -936,12 +1020,18 @@ function drawHeights(now, L) {
   const mono = monoFont();
   const xl = Math.round(Math.min(B.sidePx * 0.62, L.ox - 2 * u)) + 0.5;    // 两根尺子线
   const xr = Math.round(W - (xl - 0.5)) - 0.5;
+  // 天空里：线和字变成白色（灰色在蓝天上看不清），跟着背景一起变
+  const skyK = bk.skyAt >= 0 ? ease(Math.min(1, (now - bk.skyAt) / C.book.skyBg.fadeMs)) : 0;
+  const mixC = (a, b) => { const x = hex(a); const y = hex(b); return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * skyK)).join(',')})`; };
+  const lineC = mixC(B.rulerLine, '#ffffff');
+  const inkC = mixC(B.ink, '#ffffff');
+  const visitedC = mixC(B.visitedInk, '#dce8f8');
   const guiding = bk.phase === 'guide' || bk.phase === 'skyguide';
   const wave = guiding ? ((now - bk.guideAt) % 1800) / 1800 : -1;           // 指引：一道光从基线往上走
   const waveY = guiding ? y0 - ease(wave) * (y0 - 3 * u) : -1e9;
   ctx.save();
   // 两根线
-  ctx.strokeStyle = B.rulerLine;
+  ctx.strokeStyle = lineC;
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(xl, 0); ctx.lineTo(xl, H); ctx.moveTo(xr, 0); ctx.lineTo(xr, H); ctx.stroke();
   // 刻度和数字
@@ -955,17 +1045,17 @@ function drawHeights(now, L) {
     const lit = guiding && y < y0 - u && Math.abs(y - waveY) < 2.4 * u;
     const len = (foot ? 1.3 * u : 0.6 * u) * (lit ? 2 : 1);
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = lit ? B.ink : B.rulerLine;
+    ctx.strokeStyle = lit ? inkC : lineC;
     ctx.lineWidth = lit ? 2 : 1;
     ctx.beginPath(); ctx.moveTo(xl, y); ctx.lineTo(xl + len, y); ctx.moveTo(xr, y); ctx.lineTo(xr - len, y); ctx.stroke();
     if (foot && Math.abs(y - y0) > 1.8 * u) {
-      ctx.fillStyle = lit ? B.ink : B.rulerLine;
+      ctx.fillStyle = lit ? inkC : lineC;
       ctx.textAlign = 'right'; ctx.fillText(`${h}″`, xl - 0.6 * u, y);
       ctx.textAlign = 'left'; ctx.fillText(`${h}″`, xr + 0.6 * u, y);
     }
   }
   // 去过的高度：浅灰的长刻度
-  ctx.strokeStyle = B.visitedInk;
+  ctx.strokeStyle = visitedC;
   ctx.lineWidth = 1;
   for (const h of bk.marks.keys()) {
     if (Math.abs(h - hNow) < 1) continue;
@@ -975,8 +1065,8 @@ function drawHeights(now, L) {
   }
   // 现在的高度：粗刻度 + 大一号的数字（上升时一路往上数）
   const y = Math.round(y0) + 0.5;
-  ctx.strokeStyle = B.ink;
-  ctx.fillStyle = B.ink;
+  ctx.strokeStyle = inkC;
+  ctx.fillStyle = inkC;
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(xl - 1.2 * u, y); ctx.lineTo(xl + 2.4 * u, y); ctx.moveTo(xr + 1.2 * u, y); ctx.lineTo(xr - 2.4 * u, y); ctx.stroke();
   ctx.font = `${Math.max(13, 1.3 * u)}px ${mono}`;

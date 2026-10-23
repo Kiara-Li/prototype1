@@ -70,9 +70,22 @@ window.LOOKUP = {
     // 历史照片换成视频：组号 → 视频。这一页落定、照片信息浮现之后再过 delayMs，灰色方块把照片换成视频
     // （71 = 路灯里最大的那张历史照片 PECO Lamp Trimmer；视频都是 Kiara 拍的原片转成的 H.264）
     // 天空这个 section 的背景：和天空视频一样的蓝（照浏览器里播出来的视频从上到下取的颜色，对齐视频那一栏）；进入天空时 fadeMs 慢慢变过去
+    // 天空（js/main.js 的 startSky）：抬头以后的一场，不切鸽子
+    skyScene: {
+      height: 960,              // 尺子冲到这里（英寸）
+      video: 'assets/video/sky.mp4',   // IMG_7637，天空和鸽子，没有声音
+      videoHeight: 0.84,        // 视频占屏幕多高（竖的，放在中间）
+      sinkMs: 3200,             // 最后那页书往下沉、淡掉
+      videoAt: 3400,            // 背景差不多全蓝了视频才开始浮现（不然半灰的背景上会看出一条）
+      birdsAt: 2600,            // 鸽子开始飞
+      birdStaggerMs: 380,       //   一只接一只
+      birdFlyMs: 5600,          //   从下飞到上要多久
+      birdU: 6.5,               //   多大（u）
+      askMinMs: 8000,           // 最早多久以后问天空那一句
+    },
     skyBg: {
       stops: ['#3a78cb', '#3674c5', '#316fbf', '#2d6bba', '#2b68b7', '#2a68b7', '#2a69b9', '#2c6dbe', '#3072c5', '#3478ce'],
-      fadeMs: 2400,
+      fadeMs: 4000,             // 从灰渐变成蓝要多久
       featherX: 0.3,            // 视频左右各羽化多少（那一栏宽度的比例）
       featherY: 0.1,            //     上下
       videoFadeMs: 2500,        // 视频慢慢浮现
