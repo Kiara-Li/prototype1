@@ -574,12 +574,11 @@ const inches = () => `${Math.round(bk.cur ? bk.cur.height_in : 0)}″`;      // 
 const sectionLabel = () => `${sectionText().name || ''} · ${inches()}`;
 const sectionText = () => (T.sections && T.sections[bk.sec]) || { intro: '', question: { prompt: '', sentence: '___' } };
 
-// 介绍看完：上面还有 →「再抬头 ↑」；最后一页 →「Ready? Yes」
+// 介绍看完：同一个 section 还有下一页 → 自动往上走（不用再抬头）；最后一页 → 直接问这一段的问题
 function toNext() {
   const last = bk.idx + 1 >= book.sections[bk.sec].groups.length;
-  bk.card = last ? 'ready' : 'up';
-  bk.upAt = performance.now() + C.book.flipMs;
-  bookUI.flipTo(bk.card);
+  if (last) { bk.card = 'ready'; askSection(); return; }
+  showSpread(bk.idx + 1, performance.now(), false);
 }
 
 // 这个 section 结束（回答完 / 跳过）：卡片翻回历史照片 → 下一个 section 的指引（7 个都完了 → 羽毛落下）
@@ -1346,7 +1345,8 @@ function showSheet() {
   const secs = book.sections.map((s, i) => T.sections[i]).filter(Boolean);
   openSheet({
     pieces: app.pieces, sections: secs, answers: app.answerParts, T: T.sheet,
-    heights: secs.map((s, i) => s.height || (book.sections[i].groups[0] ? book.sections[i].groups[0].height_in : 0)),
+    // 尺子上的高度：这一段最后一页（问问题的那一页）的高度；天空用 content.js 里的
+    heights: secs.map((s, i) => { const gs = book.sections[i].groups; return book.sections[i].sky ? s.height : gs.length ? gs[gs.length - 1].height_in : 0; }),
     date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
   });
 }

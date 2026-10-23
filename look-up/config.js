@@ -42,13 +42,13 @@ window.LOOKUP = {
     // 白名单：每个 section 只用这些构件；照书里的跨页整页放（混着别的构件的 47、53、55 也整页放）
     // 每个 section 里按高度从低到高（一样高按页码）。In flight 书里没有成形的跨页 → 用记录表里的飞行照片，一张一页
     sections: [
-      { key: 'awning',  groups: ['35', '43'] },                          // Awning / canopy, metal + Storefront canopy, glass
-      { key: 'sign',    groups: ['45', '51', '55'] },                    // Projecting storefront sign
-      { key: 'ledge',   groups: ['39', '53', '59'] },                    // Building ledge + Window sill
-      { key: 'signal',  groups: ['63'] },                                // Traffic signal on mast arm
-      { key: 'fire',    groups: ['49', '67', '69'] },                    // Fire escape
-      { key: 'light',   groups: ['47', '71', '73', '75', '77'] },        // Streetlight
-      // 第 7 个 In flight 自动加在最后（photos.json 里所有 In flight、≥ minHeight 的原图）
+      // 每个 section 只留最清楚、最有话说的一两页（Kiara 2026-10-23：页数太多太累）
+      { key: 'awning',  groups: ['35', '43'] },     // 1900 年 Mulberry 街的帆布雨棚 → 今天 Zero Irving 的玻璃雨棚（有视频）
+      { key: 'sign',    groups: ['55'] },           // Berenice Abbott，家禽店，1937
+      { key: 'ledge',   groups: ['53'] },           // Kertész 窗台上的玻璃胸像（对上「从我的窗台望出去」）
+      { key: 'signal',  groups: ['63'] },           // 只有这一页
+      { key: 'fire',    groups: ['49', '67'] },     // 1934 年坐在消防梯上的人 → Weegee，热天夜里睡在消防梯上
+      { key: 'light',   groups: ['71', '77'] },     // 点灯工人（有视频）→ Hine 的 Icarus，接到天空
     ],
     // 去天空之前的那段声音（js/skysound.js）：在 startSection 开始时从头播放、慢慢变大；
     // 抬头进入天空的那一刻接到 jumpTo，一秒后是翅膀拍动（录音里 30.5–33.5 秒）

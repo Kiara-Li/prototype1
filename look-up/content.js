@@ -92,8 +92,8 @@ window.CONTENT = {
   sections: [
     { name: 'Awning',
       intro: 'Before air conditioning, a shop kept cool with canvas.',
-      question: { prompt: 'Where did you last wait out the rain?',
-        sentence: 'I waited out the rain under the [awning] of a ___.' }, height: 120 },
+      question: { prompt: 'Where do you usually wait for a friend?',
+        sentence: 'I waited for a friend under the [awning] of ___.' }, height: 120 },
     { name: 'Projecting sign',
       intro: 'A sign that sticks out from the wall turns sideways to talk to people on foot, not in cars.',
       question: { prompt: 'Which shop do you walk past every day?',
