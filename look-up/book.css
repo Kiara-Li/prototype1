@@ -79,7 +79,9 @@
                 letter-spacing: 0.25em; white-space: nowrap; opacity: 0; transition: opacity 400ms; }
 /* 提示：饱和的蓝色色块，白色等宽字；每行一条，宽度不一、左边错开，拼成阶梯状的一块 */
 #bk .bk-hbox { display: flex; flex-direction: column; align-items: flex-start; }
-#bk .bk-hl { background: #1f45e6; color: #fff; font-family: var(--mono); line-height: 1; padding: 0.5em 0.7em; white-space: nowrap; letter-spacing: 0.02em; }
+#bk .bk-hint { z-index: 3; }                      /* 在示范的手上面 */
+/* 色块里填的是天空（Kiara 给的云）：固定在屏幕上，几块提示像几扇小窗看到同一片天；压一层蓝，白字才看得清 */
+#bk .bk-hl { background: linear-gradient(rgba(25, 70, 200, 0.42), rgba(25, 70, 200, 0.42)), url(assets/sky/clouds.jpg) center / cover fixed, #2f66c8; color: #fff; font-family: var(--mono); line-height: 1; padding: 0.5em 0.7em; white-space: nowrap; letter-spacing: 0.02em; }
 
 /* 教学的手 */
 #bk .bk-hand { display: none; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; user-select: none; }

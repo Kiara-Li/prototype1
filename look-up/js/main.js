@@ -684,6 +684,7 @@ function startSky(now) {
   stopPhotoVideo();
   bookUI.caption(null);
   bookUI.place(null);                                  // 历史照片的卡片收掉（天空里没有书页了）
+  bookUI.hideTutorial();
   if (!bookUI.tutorial) bookUI.setHint('');
   if (!skyScene.vid) {
     const v = document.createElement('video');
@@ -952,8 +953,19 @@ function drawSkyBg(now, L) {
   ctx.globalAlpha = k;
   ctx.fillStyle = g;
   ctx.fillRect(-app.W, -app.H, app.W * 3, app.H * 3);
+  // 云（Kiara 给的天空照片）铺满整个屏幕，盖在蓝色上
+  if (cloudImg.complete && cloudImg.naturalWidth) {
+    const { W, H } = app;
+    const s = Math.max(W / cloudImg.naturalWidth, H / cloudImg.naturalHeight);
+    const cw = cloudImg.naturalWidth * s;
+    const ch = cloudImg.naturalHeight * s;
+    ctx.globalAlpha = k * S.cloudAlpha;
+    ctx.drawImage(cloudImg, (W - cw) / 2, (H - ch) / 2, cw, ch);
+  }
   ctx.restore();
 }
+const cloudImg = new Image();
+cloudImg.src = 'assets/sky/clouds.jpg';
 // 融进背景的视频画在书页的 canvas 上（不用 <video> 直接显示：浏览器显示视频和画 canvas 的颜色不完全一样，
 // 画在同一个 canvas 上，和背景取的颜色才对得上）：裁成那一栏的形状，四边羽化，慢慢浮现
 let featherCv = null;
@@ -971,7 +983,10 @@ function drawFeathered(v, r, alpha) {
   const sh = Math.min(vh, (vw * r.h) / r.w);
   g.globalCompositeOperation = 'source-over';
   g.clearRect(0, 0, w, h);
+  // 只要视频里的鸽子：变黑白、提亮到天空几乎全白，只剩鸽子是深的；下面用「正片叠底」印到云上（云是连续的，看不出视频的边）
+  g.filter = 'grayscale(1) brightness(2.4) contrast(1.6)';
   g.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, w, h);
+  g.filter = 'none';
   g.globalCompositeOperation = 'destination-in';
   const fx = S.featherX;
   const fy = S.featherY;
@@ -985,6 +1000,7 @@ function drawFeathered(v, r, alpha) {
   g.fillRect(0, 0, w, h);
   ctx.save();
   ctx.globalAlpha = alpha;
+  ctx.globalCompositeOperation = 'multiply';
   ctx.drawImage(featherCv, r.x, r.y, r.w, r.h);
   ctx.restore();
 }

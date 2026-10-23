@@ -88,6 +88,7 @@ window.LOOKUP = {
     skyBg: {
       stops: ['#3a78cb', '#3674c5', '#316fbf', '#2d6bba', '#2b68b7', '#2a68b7', '#2a69b9', '#2c6dbe', '#3072c5', '#3478ce'],
       fadeMs: 4000,             // 从灰渐变成蓝要多久
+      cloudAlpha: 1,            // 云（assets/sky/clouds.jpg）铺在蓝色上，多不透明
       featherX: 0.3,            // 视频左右各羽化多少（那一栏宽度的比例）
       featherY: 0.1,            //     上下
       videoFadeMs: 2500,        // 视频慢慢浮现

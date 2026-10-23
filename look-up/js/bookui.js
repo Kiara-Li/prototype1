@@ -518,12 +518,13 @@ export function createBookUI(o) {
       h.animate([{ transform: a[k], opacity: 0 }, { transform: a[k], opacity: 1, offset: 0.15 }, { transform: b[k], opacity: 1, offset: 0.55 },
         { transform: b[k], opacity: 1, offset: 0.8 }, { transform: a[k], opacity: 1 }], { duration: 2600, iterations: Infinity, easing: 'ease-in-out' });
     }
-    // 提示放在要做的动作旁边：示范的手上方，左边和照片对齐
+    // 提示放在要做的动作旁边：整块在示范的手上方（底边对着手的最高处），左边和照片对齐；不压到手和照片
     const k = B.tutorialHandScale;
     const sTr = (HAND.tr.scale * u * k) / 18;
-    const top = r.y - HAND.tr.corner[1] * sTr - 3 * u - 3.5 * u;
-    Object.assign(el.hint.style, { left: `${Math.max(u, r.x - 2.5 * u)}px`, top: `${Math.max(u, top)}px` });
+    const handTop = r.y - 2.5 * u - HAND.tr.corner[1] * sTr;      // 右上那只手（张开时）最高的地方
+    Object.assign(el.hint.style, { left: `${Math.max(u, r.x - 2.5 * u)}px`, top: '0px' });
     setHint(hint);
+    el.hint.style.top = `${Math.max(u, handTop - u - el.hint.offsetHeight)}px`;
   }
   function hideTutorial() {
     if (!tutorial) return;
