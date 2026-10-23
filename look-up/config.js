@@ -121,7 +121,9 @@ window.LOOKUP = {
     lookAbove: 0.2,             // 抬头判定：lookValue 超过这个（约 8°）……
     lookHoldMs: 250,            //          ……保持这么久就算
     poemHoldMs: 4500,           // 诗拼好以后停多久，自己收走
-    questionIdleMs: 25000,      // 问题这么久没人打字：自己跳过
+    questionIdleMs: 45000,      // 问题这么久没人动（输入框是空的、光标也不在里面）：自己跳过
+    skipLook: 0.75,             // 用力抬头（约 17° 以上 / 按住 ↑）……
+    skipHoldMs: 1500,           // ……保持这么久：不找鸽子也往上走
     cutHintMs: 5000,            // 一页上这么久还没切到鸽子：两只手再示范一次
     lookHintMs: 4000,           // 该抬头了、这么久还没抬：旁边出现一句提示
     enterMs: 1400,              // 进入一个 section / 同一个 section 里高度变了：跨页从上面落下来（上升）

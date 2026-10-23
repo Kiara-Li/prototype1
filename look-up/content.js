@@ -17,10 +17,7 @@ window.CONTENT = {
     begin: 'Begin',
     keysNote: 'No camera: use ↑ ↓ and drag a frame with the mouse.',
     // 结尾回到 dashboard 时
-    endLines: [                                       // TODO 占位
-      'This is your feather.',
-      'Print it, fold it, keep it.',
-    ],
+    endLines: ['The feather you made.'],
     download: 'Your sheet',                         // 打开最后的纸（碎片拼成的网格 + 诗），在那里下载 / 打印
     print: 'Print',
     tutorial: 'Folding steps',                      // 打开折羽毛的 12 步（js/fold.js）
@@ -65,14 +62,16 @@ window.CONTENT = {
     go: 'Continue',
     noCamUp: 'No camera? Press ↑',
     noCamHands: 'No camera? Click the card.',
-    featherFace: ['This is your feather.', 'Print it, fold it, keep it.'],
+    featherFace: ['The feather you made.'],          // 结尾 dashboard 的羽毛卡片：只有这一句，点卡片打开那张纸
   },
 
   // ---- 书页上的界面（bookui.js）
   book: {
-    tutorial: 'Make a window with your hands, like these. Hold it over a pigeon until it comes loose.',
-    tutorialMobile: 'Pinch until a pigeon fills the screen. Hold still until it comes loose.',
-    noCam: 'No camera? Draw a square around a pigeon, and wait.',
+    tutorial: 'Frame a pigeon with your hands, like this.',
+    tutorialMobile: 'Pinch in on a pigeon and hold still.',
+    noCam: 'No camera? Drag a square around a pigeon.',
+    skipHint: 'Or look up hard to go on.',          // 第二次示范时接在后面：用力抬头也能往上走
+    skipHintKeys: 'Or hold ↑ to go on.',
     up: 'LOOK UP',                                  // 卡片上竖着排，从下往上走；指引也是这两个字往上走
     lookHint: 'Look up to go higher.',   // 该抬头、过一会儿还没抬：出现在旁边
     lookHintKeys: 'Press ↑ to look up.',
@@ -171,7 +170,7 @@ window.CONTENT = {
     'Have you ever leaned out of a window just to look?',
     "What's on the ledge outside your window right now?",
   ],
-  answerNote: 'Your answers stay on this computer. They will be printed on your feather.',
+  answerNote: 'Your answers stay on this computer.',
   answerHint: 'Enter to keep · Esc to skip',
   answerHintMobile: 'Return to keep · tap outside to skip',
 

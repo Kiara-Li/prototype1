@@ -125,17 +125,6 @@ function setupNewDashboard() {
       setState('ascent');
     },
     feather: {
-      draw: (canvas) => {
-        const w = canvas.clientWidth;
-        const h = canvas.clientHeight;
-        canvas.width = w * devicePixelRatio;
-        canvas.height = h * devicePixelRatio;
-        const g = canvas.getContext('2d');
-        g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-        const last = app.newFeather || app.groundFeathers[app.groundFeathers.length - 1];
-        const colors = found.length ? featherColors(found) : last ? last.colors : featherColors([]);
-        drawFeather(g, w * 0.46, h * 0.94, 0.35, h * 0.86, h * 0.21, colors, 7);
-      },
       download: () => showSheet(),
       print: () => showSheet(),
       fold: () => openFold(T.sheet),
@@ -313,6 +302,7 @@ async function setupBook() {
     next: () => { if (bk.card === 'intro') toNext(); },     // 介绍读完
     yes: () => askSection(),
     skip: () => { if (bk.card === 'ready') finishSection(); },   // 不回答，直接往上
+    jump: (i) => jumpTo(i),                                       // 目录：点一段直接跳过去
   };
   window.lookUp.bookUI = bookUI;
   window.lookUp.rects = () => bookRects(performance.now());     // 调试：这一页照片在屏幕上的位置
@@ -390,8 +380,13 @@ function bookUpdate(now, dt) {
     if (bk.card === 'front' && settled && !bk.snap && !bk.cutHinted && !bookUI.tutorial && !input.frame.active
         && now - Math.max(bk.switchedAt, bk.enterAt) > B.cutHintMs + (bk.prevEnter ? B.enterMs : 0)) {
       bk.cutHinted = true;
-      showCutTutorial();
+      showCutTutorial(true);
     }
+    // 用力抬头（不管有没有切到鸽子）保持一会儿 → 往上走
+    if (settled && !bk.snap && !input.frame.active && input.lookValue > B.skipLook) {
+      if (!bk.skipSince) bk.skipSince = now;
+      if (now - bk.skipSince > B.skipHoldMs) { bk.skipSince = 0; skipAhead(now); }
+    } else bk.skipSince = 0;
     // 该抬头了、还没抬：卡片旁边一句提示
     if (bk.card === 'up' && bk.upAt && now - bk.upAt > B.lookHintMs && !bk.upSince) lookHint(cardRect(now));
     // 教学：第一次用手比出框 → 手离开
@@ -577,8 +572,8 @@ function cutOut(r, sq, shown, now) {
   if (bk.card === 'front') {
     const text = (bk.cur.id && T.photoIntros && T.photoIntros[bk.cur.id]) || (bk.idx === 0 ? sectionText().intro : '');
     bk.card = 'intro';
-    // 介绍读一会儿自己往下走：按字数算（最少 4 秒，最多 9 秒）
-    bk.introUntil = now + B.flipMs + (text ? Math.max(4000, Math.min(9000, 2500 + text.length * 55)) : B.noIntroMs);
+    // 介绍读一会儿自己往下走：按字数算（最少 3 秒，最多 6 秒）
+    bk.introUntil = now + B.flipMs + (text ? Math.max(3000, Math.min(6000, 1800 + text.length * 40)) : B.noIntroMs);
     if (text) bookUI.flipTo('intro', { text, dur: bk.introUntil - now - B.flipMs });
   }
 }
@@ -608,7 +603,7 @@ function finishSection() {
     if (sectionSound) sectionSound.stop();
     stopPhotoVideo();
     driver.releaseFrame();
-    bookUI.count(0);
+    bookUI.toc(null);
     // 结尾就在天空里：纸羽毛从天上落下来 → 落地，碎片拼成那张纸（landFeather）
     setState('falling');
     playFeather();
@@ -641,14 +636,15 @@ function preloadSection(i) {
 }
 
 // 两只手示范怎么比框（框在第一张自己拍的照片上）
-function showCutTutorial() {
+function showCutTutorial(withSkip) {
   const r = bookRects(performance.now())[0];
   if (!r) return;
   const side = Math.min(r.w, r.h) * 0.6;
   const v = driver.vision;
   const noCam = driver.keysOnly || !v || v.status === 'no-camera' || v.status === 'error';
-  bookUI.showTutorial({ x: r.x + r.w / 2 - side / 2, y: r.y + r.h / 2 - side / 2, w: side, h: side },
-    MOBILE ? T.book.tutorialMobile : noCam ? T.book.noCam : T.book.tutorial);
+  const text = MOBILE ? T.book.tutorialMobile : noCam ? T.book.noCam : T.book.tutorial;
+  const skip = withSkip && !MOBILE ? ` ${noCam ? T.book.skipHintKeys : T.book.skipHint}` : '';
+  bookUI.showTutorial({ x: r.x + r.w / 2 - side / 2, y: r.y + r.h / 2 - side / 2, w: side, h: side }, text + skip);
 }
 
 // 抬头的提示：r = 卡片（放在卡片下面）；null = 屏幕下方中间（指引的时候）
@@ -754,9 +750,43 @@ function drawSkyScene(now, L, o) {
   }
 }
 
+// 目录的每一项：名字、高度（这一段最后一页的高度；天空用 content.js 里的）
+function tocItems() {
+  return book.sections.map((s, k) => {
+    const t = T.sections[k] || {};
+    const gs = s.groups;
+    return { name: t.name || s.key, h: Math.round(s.sky ? t.height || C.book.skyScene.height : gs.length ? gs[gs.length - 1].height_in : 0) };
+  });
+}
+
+// 目录里点了一段：直接跳过去（正在答的问题收掉；从天空跳回来，天空也收掉）
+function jumpTo(i) {
+  if (!book || app.state !== 'ascent' || i === bk.sec || !book.sections[i]) return;
+  bookUI.cancelQuestion();
+  bookUI.hideTutorial();
+  bookUI.setHint('');
+  bk.snap = null;
+  bk.aim = null;
+  if (bk.skyAt >= 0 && !book.sections[i].sky) {
+    bk.skyAt = -1;
+    if (skyScene.vid) skyScene.vid.pause();
+  }
+  enterSection(i, performance.now());
+}
+
+// 大幅度抬头（或按住 ↑）保持一会儿：不找鸽子也往上走——同一段还有下一页就去下一页，不然进下一段
+function skipAhead(now) {
+  bookUI.hideTutorial();
+  bookUI.setHint('');
+  bk.snap = null;
+  bk.aim = null;
+  if (bk.idx + 1 < book.sections[bk.sec].groups.length) showSpread(bk.idx + 1, now, false);
+  else if (bk.sec + 1 < book.sections.length) enterSection(bk.sec + 1, now);
+}
+
 function enterSection(i, now) {
   bk.sec = i;
-  bookUI.count(i + 1, book.sections.length);          // 屏幕上方：第几段 / 一共几段
+  bookUI.toc(i, tocItems());                           // 屏幕上方的目录：现在第几段
   preloadSection(i);
   // 去天空之前的那段声音：路灯开始时从头放；进入天空时接到翅膀拍动
   const sec = book.sections[i];
@@ -783,7 +813,7 @@ function showSpread(j, now, entering) {
   // 同一个 section 里：高度变了 → 直接上升（像进入 section 一样，新的一页从上面落下来）；高度一样 → 方块翻页
   const rise = entering || !bk.cur || g.height_in !== bk.cur.height_in;
   if (rise) bk.enterAt = now;
-  bk.enterDir = !bk.cur ? 1 : -1;               // 第一页：从下面滑上来；之后：从上面落下来
+  bk.enterDir = !bk.cur || g.height_in < bk.cur.height_in ? 1 : -1;   // 第一页 / 往下跳：从下面滑上来；往上：从上面落下来
   if (sectionSound && !entering) sectionSound.spread();
   bk.cutHinted = false;
   bk.upAt = 0;
@@ -1053,7 +1083,7 @@ function drawHeights(now, L) {
   const lineC = mixC(B.rulerLine, '#ffffff');
   const inkC = mixC(B.ink, '#ffffff');
   const visitedC = mixC(B.visitedInk, '#dce8f8');
-  const guiding = bk.phase === 'guide' || bk.phase === 'skyguide';
+  const guiding = bk.phase === 'guide' || bk.phase === 'skyguide' || bk.skipSince > 0;
   const wave = guiding ? ((now - bk.guideAt) % 1800) / 1800 : -1;           // 指引：一道光从基线往上走
   const waveY = guiding ? y0 - ease(wave) * (y0 - 3 * u) : -1e9;
   ctx.save();

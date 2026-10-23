@@ -27,7 +27,7 @@ export function createBookUI(o) {
     <div class="bk-stack"><div class="bk-h">${rv('')}</div></div>
     <div class="bk-panel"><div class="bk-pbody"></div></div>
     <div class="bk-hint"></div>
-    <div class="bk-count">${rv('')}</div>
+    <div class="bk-toc"><div class="bk-tocline"></div><div class="bk-tocticks"></div><div class="bk-toclab">${rv('')}</div></div>
     <div class="bk-cap"><div class="bk-capmeta"></div><div class="bk-captitle"></div></div>
     <div class="bk-capv"></div>
     <div class="bk-guide"><div class="bk-gtext"></div></div>
@@ -37,7 +37,8 @@ export function createBookUI(o) {
   const el = {
     card: q('.bk-card'), rot: q('.bk-rot'), faces: [...root.querySelectorAll('.bk-face')],
     stack: q('.bk-stack'), h: q('.bk-h'), panel: q('.bk-panel'), pbody: q('.bk-pbody'), hint: q('.bk-hint'),
-    guide: q('.bk-guide'), gtext: q('.bk-gtext'), count: q('.bk-count'),
+    guide: q('.bk-guide'), gtext: q('.bk-gtext'),
+    toc: q('.bk-toc'), tocTicks: q('.bk-tocticks'), tocLab: q('.bk-toclab'),
     cap: q('.bk-cap'), capMeta: q('.bk-capmeta'), capTitle: q('.bk-captitle'), capV: q('.bk-capv'),
     hands: { bl: q('.bk-hand[data-k="bl"]'), tr: q('.bk-hand[data-k="tr"]') },
   };
@@ -430,11 +431,23 @@ export function createBookUI(o) {
     el.pbody.querySelector('.bk-done').onclick = () => compose(question, poemLabel);
     el.pbody.querySelector('[data-act="pskip"]').onclick = () => closePanel(null);   // 不回答，直接往上
     setTimeout(() => ins[0] && ins[0].focus(), B.panelMs);
-    // 一直没打字：过一会儿自己跳过（不让人卡在这里）
+    // 一直没人动：过一会儿自己跳过（不让人卡在这里）；但只要输入框里有字、或者光标还在输入框里，就不跳过
     clearTimeout(idleTimer);
-    const idle = () => { clearTimeout(idleTimer); idleTimer = setTimeout(() => closePanel(null), B.questionIdleMs); };
+    const idle = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        const typing = ins.some((i) => i.value.trim()) || ins.includes(document.activeElement);
+        if (typing) idle(); else closePanel(null);
+      }, B.questionIdleMs);
+    };
     idle();
-    ins.forEach((inp) => inp.addEventListener('input', idle));
+    ins.forEach((inp) => { inp.addEventListener('input', idle); inp.addEventListener('keydown', idle); });
+    // 点面板上任何地方（不是按钮）：光标回到输入框
+    el.panel.onpointerdown = (e) => {
+      if (e.target.closest('button, input') || !ins.length) return;
+      e.preventDefault();
+      (ins.find((i) => !i.value) || ins[0]).focus();
+    };
   }
 
   // 填完：句子里你的词后面各放一块切下来的鸽子 {  }，方块从右上角飞进来；剩下的接在句子后面
@@ -571,11 +584,49 @@ export function createBookUI(o) {
   }
 
   // 进度：屏幕上方中间一行很小的等宽字「03 / 07」（和 dashboard 顶上中间那行字一样），只标第几段，不写名字
-  function count(i, n) {
-    if (!i) { el.count.style.opacity = 0; return; }
-    el.count.style.opacity = 1;
-    setText(el.count, `${String(i).padStart(2, '0')} / ${String(n).padStart(2, '0')}`);
-    reveal(el.count, { dur: 260 });
+  // 目录：屏幕上方中间一条短线，挂着每一段一根刻度（和 dashboard 底边那排 chapter 刻度一样）。
+  //   现在这段：长、黑；去过的：深灰；还没去的：浅灰。下面一行等宽字「03 / 07」
+  //   鼠标放到刻度上：那行字换成「04 · Ledge & sill · 180″」；点一下直接跳过去（不用找鸽子、不用回答）
+  let tocItems = [];
+  let tocCur = -1;
+  const tocText = () => `${String(tocCur + 1).padStart(2, '0')} / ${String(tocItems.length).padStart(2, '0')}`;
+  function toc(cur, items) {
+    if (cur === null || cur < 0) { el.toc.style.opacity = 0; el.toc.style.pointerEvents = 'none'; return; }
+    if (items) {
+      tocItems = items;
+      el.tocTicks.innerHTML = items.map((it, i) => `<button class="bk-tick" data-i="${i}" aria-label="${esc(it.name)}"></button>`).join('');
+    }
+    tocCur = cur;
+    [...el.tocTicks.children].forEach((t, i) => {
+      t.classList.toggle('on', i === cur);
+      t.classList.toggle('seen', i < cur || (tocItems[i] && tocItems[i].seen));
+    });
+    el.toc.style.opacity = 1;
+    el.toc.style.pointerEvents = 'auto';
+    setText(el.tocLab, tocText());
+    reveal(el.tocLab, { dur: 240 });
+  }
+  el.tocTicks.addEventListener('mouseover', (e) => {
+    const t = e.target.closest('.bk-tick');
+    if (!t) return;
+    const it = tocItems[Number(t.dataset.i)];
+    setText(el.tocLab, `${String(Number(t.dataset.i) + 1).padStart(2, '0')} · ${it.name} · ${it.h}″`);
+  });
+  el.tocTicks.addEventListener('mouseleave', () => setText(el.tocLab, tocText()));
+  el.tocTicks.addEventListener('click', (e) => {
+    const t = e.target.closest('.bk-tick');
+    if (t && onFace.jump) onFace.jump(Number(t.dataset.i));
+  });
+
+  // 跳到别的段时：问题面板直接收掉（不算回答，也不算跳过）
+  function cancelQuestion() {
+    if (!answersDone) return;
+    clearTimeout(idleTimer);
+    answersDone = null;
+    el.panel.getAnimations().forEach((a) => a.cancel());
+    el.panel.style.display = 'none';
+    el.pbody.innerHTML = '';
+    el.card.style.visibility = '';
   }
 
   // 指引：屏幕上方，一个慢慢浮动的箭头 + 一句话（字用黑块拉出来）
@@ -603,7 +654,7 @@ export function createBookUI(o) {
   return {
     guide, caption,
     place, setFront, flipTo, video, hideCaption,
-    addPiece, openQuestion, showTutorial, hideTutorial, setHint, hintAt, count,
+    addPiece, openQuestion, showTutorial, hideTutorial, setHint, hintAt, toc, cancelQuestion,
     liveVideo: () => root.querySelector('.bk-face:not(.hidden) .bk-video.blend.on'),     // 天空背景跟着它取颜色
     set on(handlers) { onFace = handlers; },
     get face() { return current; },

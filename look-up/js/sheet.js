@@ -12,9 +12,13 @@ import { openFold } from './fold.js';
 const MM = 300 / 25.4;                 // 300 dpi
 const SQ_MM = 130;                     // 每一面的边长（mm）
 const SIDE = Math.round(SQ_MM * MM);   // 每一面多少像素
-const GREY = '#d9d9d9';                // 空格子：和书里历史照片的灰块一样
+const SKY = '#3a78cb';                 // 空格子（云图还没加载好时）：天空的蓝
 const INK = '#000';
 const MUTE = '#8c8c8c';
+
+// 天空（Kiara 给的云）：网格里空着的格子露出这一片天
+const clouds = new Image();
+clouds.src = 'assets/sky/clouds.jpg';
 
 const fontOf = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name) || 'sans-serif').trim();
 
@@ -43,7 +47,13 @@ function renderGrid(pieces) {
     const w = cl.s - (cl.x > 0 ? gap / 2 : 0) - (cl.x + cl.s < SIDE - 1 ? gap / 2 : 0);
     const h = cl.s - (cl.y > 0 ? gap / 2 : 0) - (cl.y + cl.s < SIDE - 1 ? gap / 2 : 0);
     if (pieces[i]) g.drawImage(pieces[i].canvas, x, y, w, h);
-    else { g.fillStyle = GREY; g.fillRect(x, y, w, h); }
+    else if (clouds.complete && clouds.naturalWidth) {
+      // 空格子：露出同一片天（云图铺满整个网格，每格取对应的那一块）
+      const sc = Math.max(SIDE / clouds.naturalWidth, SIDE / clouds.naturalHeight);
+      const ox = (clouds.naturalWidth * sc - SIDE) / 2;
+      const oy = (clouds.naturalHeight * sc - SIDE) / 2;
+      g.drawImage(clouds, (x + ox) / sc, (y + oy) / sc, w / sc, h / sc, x, y, w, h);
+    } else { g.fillStyle = SKY; g.fillRect(x, y, w, h); }
   });
   return { canvas: c, k };
 }
@@ -82,7 +92,7 @@ function tokens(sec, answers, piece) {
 // 版式参考 Look Up 的海报：左边是一把尺子（短刻度一路排上去，每个 section 一条长线，线上面写高度），
 // 每一句诗坐在自己那条线上；最低的 section 在最下面，越往上越高（读的时候也是一路往上看）。
 // 左上角两行等宽字（Look Up / 日期），下面一条长线
-function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
+function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, date }) {
   const c = document.createElement('canvas');
   c.width = c.height = SIDE;
   const g = c.getContext('2d');
@@ -123,21 +133,23 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
   for (let y = bottom; y > top + 2; y -= band / 5) hline(y, 0, tickW);
 
   // 字号：每一句都放得进自己那一格
-  const stanzas = answered.map((i, k) => ({ i, k, toks: tokens(sections[i], answers[i], pieceOf(i)) }));
+  const stanzas = answered.map((i, k) => ({ i, k, toks: tokens(sections[i], answers[i], pieceOf(i)), ex: Math.min(4, Math.max(0, piecesOf(i).length - 1)) }));
   const measure = (tok, f) => {
     g.font = `${f}px ${sans}`;
-    if (tok.img) return g.measureText(tok.pre || '').width + f * 1.3 + g.measureText((tok.post || '') + (tok.tail || '')).width;
+    if (tok.img) return g.measureText(tok.pre || '').width + f * 1.62 + g.measureText((tok.post || '') + (tok.tail || '')).width;
     if (tok.blank) return f * 3.2 + g.measureText(tok.tail || '').width;
     return g.measureText(tok.t + (tok.tail || '')).width;
   };
-  const wrapToks = (toks, f) => {
+  // ex：这一句线上蹲着几只鸽子（右边让出它们的位置，字不会撞上）
+  const wrapToks = (toks, f, ex = 0) => {
     g.font = `${f}px ${sans}`;
     const sp = g.measureText(' ').width;
+    const maxW = width - ex * f * 1.43;
     const lines = [[]];
     let w = 0;
     for (const tok of toks) {
       const tw = measure(tok, f);
-      if (w > 0 && w + sp + tw > width) { lines.push([]); w = 0; }
+      if (w > 0 && w + sp + tw > maxW) { lines.push([]); w = 0; }
       lines[lines.length - 1].push({ tok, x: w ? w + sp : 0 });
       w = (w ? w + sp : 0) + tw;
     }
@@ -145,15 +157,19 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
   };
   let f = SIDE * 0.034;
   for (let tries = 0; tries < 40; tries++) {
-    const lh = f * 1.34;
-    if (stanzas.every((st) => wrapToks(st.toks, f).length * lh + f * 0.55 <= band - f * 0.25)) break;
+    const lh = f * 1.52;
+    if (stanzas.every((st) => wrapToks(st.toks, f, st.ex).length * lh + f * 0.55 <= band - f * 0.25)) break;
     f *= 0.95;
   }
-  const lh = f * 1.34;
+  const lh = f * 1.52;
 
   for (const st of stanzas) {
     const y = lineY(st.k);
     hline(y);
+    // 这一段其余切下来的鸽子：蹲在这条线的右端，一只挨一只（最多 4 只）
+    const extra = piecesOf(st.i).slice(1, 5);
+    const ps = f * 1.25;
+    extra.forEach((p, n) => g.drawImage(p.canvas, right - (n + 1) * (ps + f * 0.18) + f * 0.18, y - ps, ps, ps));
     // 高度：等宽字，坐在长线上（和海报上的 25' 一样）
     const h = heightOf(st.i);
     if (h) {
@@ -162,7 +178,7 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
       g.fillText(`${Math.round(h)}″`, labX, y - labPx * 0.5);
     }
     // 这一句：最后一行坐在线上面一点
-    const lines = wrapToks(st.toks, f);
+    const lines = wrapToks(st.toks, f, st.ex);
     const base0 = y - f * 0.55 - (lines.length - 1) * lh;
     lines.forEach((line, li) => {
       const base = base0 + li * lh;
@@ -172,9 +188,10 @@ function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
         if (tok.img) {
           g.fillStyle = MUTE;
           if (tok.pre) { g.fillText(tok.pre, cx, base); cx += g.measureText(tok.pre).width; }
-          const s = f * 1.18;
-          g.drawImage(tok.img.canvas, cx + f * 0.06, base - f * 0.86, s, s);
-          cx += f * 1.3;
+          // 鸽子代替这个词：比字大一些，底边坐在字的基线上（像蹲在檐口上）
+          const s = f * 1.46;
+          g.drawImage(tok.img.canvas, cx + f * 0.08, base + f * 0.12 - s, s, s);
+          cx += f * 1.62;
           const post = (tok.post || '') + (tok.tail || '');
           if (post) g.fillText(post, cx, base);
         } else if (tok.blank) {
@@ -257,8 +274,9 @@ function print(c) {
 function renderSides({ pieces, sections, answers, T, date, heights }) {
   const ordered = [...pieces].sort((a, b) => a.h - b.h);
   const pieceOf = (i) => pieces.find((p) => p.sec === i) || null;
+  const piecesOf = (i) => pieces.filter((p) => p.sec === i);
   const heightOf = (i) => (heights && heights[i]) || (pieceOf(i) ? pieceOf(i).h : 0);      // 尺子上写 content.js 里每段的高度
-  return { grid: renderGrid(ordered), poem: renderPoem({ sections, answers, pieceOf, heightOf, title: T.title, date }) };
+  return { grid: renderGrid(ordered), poem: renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title: T.title, date }) };
 }
 // 调试：整张 A4
 export function renderSheetA4(o) {
@@ -271,6 +289,7 @@ export function renderSheetA4(o) {
 export async function openSheet(o) {
   const { pieces, T } = o;
   await document.fonts.ready;
+  await clouds.decode().catch(() => {});
   const ordered = [...pieces].sort((a, b) => a.h - b.h);
   const { grid, poem } = renderSides(o);
   let a4 = null;

@@ -111,13 +111,10 @@ html.dx-on #grain { display: none; }
                     font-size: calc(var(--u) * 1.2); line-height: calc(var(--u) * 1.5); letter-spacing: 0.12em; color: var(--dx-grey-ink); }
 
 /* 你的羽毛 */
-#dx .dx-fcanvas { position: absolute; left: 0; top: 0; width: 100%; height: calc(var(--u) * 24); }
-#dx .dx-ftext { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 24); font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; white-space: nowrap; }
-#dx .dx-flinks { position: absolute; left: calc(var(--u) * 10); top: calc(var(--u) * 31); display: flex; flex-direction: column; align-items: flex-start;
-                 font-family: var(--mono); font-size: calc(var(--u) * 1.1); line-height: calc(var(--u) * 1.75); letter-spacing: 0.08em; color: var(--dx-grey-ink); }
-#dx .dx-flinks a { border-bottom: 1px solid currentColor; }
-#dx .dx-flinks a:hover { opacity: 0.55; }
-#dx .dx-flinks span { opacity: 0.55; }
+#dx .dx-fimg { position: absolute; left: 12%; top: 8%; width: 76%; height: 62%; object-fit: contain; transform: rotate(-12deg); pointer-events: none; }
+#dx .dx-ftext { position: absolute; left: calc(var(--u) * 3); right: calc(var(--u) * 3); bottom: calc(var(--u) * 3);
+                font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; white-space: nowrap; }
+#dx .dx-face[data-kind="feather"] { cursor: pointer; }
 
 /* 摄像头小窗（两个测试的时候）：正方形、黑白、镜像，左下 / 右上两个角标 */
 #dx .dx-cam { opacity: 0; pointer-events: none; }

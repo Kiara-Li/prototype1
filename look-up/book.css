@@ -75,8 +75,18 @@
 /* 提示（教学、没有摄像头时） */
 /* 提示：放在要做的动作旁边（位置由 bookui.js 给），最多三四行宽 */
 /* 进度「03 / 07」：屏幕上方中间，很小的等宽字，字距拉开（和 dashboard 顶上中间那行一样） */
-#bk .bk-count { left: 50%; top: calc(var(--u) * 1.6); transform: translateX(-50%); font-family: var(--mono); font-size: max(11px, calc(var(--u) * 0.95));
-                letter-spacing: 0.25em; white-space: nowrap; opacity: 0; transition: opacity 400ms; }
+/* 目录：屏幕上方中间，一条短线挂着每一段一根刻度（和 dashboard 底边的 chapter 刻度一样），下面一行等宽字 */
+#bk .bk-toc { left: 50%; top: calc(var(--u) * 1.4); width: calc(var(--u) * 22); transform: translateX(-50%); opacity: 0; transition: opacity 400ms; }
+#bk .bk-tocline { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: #7b7b7b; }
+#bk .bk-tocticks { position: relative; display: flex; justify-content: space-between; height: calc(var(--u) * 2.4); }
+#bk .bk-tick { position: relative; width: calc(var(--u) * 1.6); margin: 0 calc(var(--u) * -0.8); height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+#bk .bk-tick::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: calc(var(--u) * 0.9); background: #b4b4b4;
+                       transition: height 250ms cubic-bezier(.3,0,.2,1), background 250ms; }
+#bk .bk-tick.seen::before { background: #7b7b7b; }
+#bk .bk-tick.on::before, #bk .bk-tick:hover::before { height: calc(var(--u) * 1.8); background: #000; width: 2px; margin-left: -0.5px; }
+#bk .bk-toclab { position: absolute; left: 50%; top: calc(var(--u) * 2.5); transform: translateX(-50%); font-family: var(--mono);
+                 font-size: max(11px, calc(var(--u) * 0.9)); letter-spacing: 0.18em; white-space: nowrap; }
+#bk .bk-toclab .rv { margin: 0 auto; }
 /* 提示：饱和的蓝色色块，白色等宽字；每行一条，宽度不一、左边错开，拼成阶梯状的一块 */
 #bk .bk-hbox { display: flex; flex-direction: column; align-items: flex-start; }
 #bk .bk-hint { z-index: 3; }                      /* 在示范的手上面 */

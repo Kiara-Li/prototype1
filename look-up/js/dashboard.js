@@ -160,9 +160,9 @@ export function createDashboard(o) {
       return `<div class="dx-hole">${ch.src ? `<img src="${esc(ch.src)}" alt="">` : ''}</div>
               <div class="dx-holelabel">${rv(`Chapter ${i + 1} · ${ch.label}`)}</div>`;
     },
-    feather: () => `<canvas class="dx-fcanvas"></canvas><div class="dx-ftext">${T.featherFace.map(rv).join('')}</div>
-      <div class="dx-flinks"><a data-act="download">${esc(o.T.dashboard.download)}</a>
-      <a data-act="fold">${esc(o.T.dashboard.tutorial)}</a><a data-act="again">${esc(o.T.dashboard.again)}</a></div>`,
+    // 你的羽毛：Kiara 折好的纸羽毛（扫描、抠好的那张）+ 一句话；点整张卡片打开最后那张纸（下载 / 打印 / 折法）
+    feather: () => `<img class="dx-fimg" src="assets/fold/step12.png" alt="" draggable="false">
+      <div class="dx-ftext">${T.featherFace.map(rv).join('')}</div>`,
   };
   function text(lines) { return `<div class="dx-ctext">${lines.map(rv).join('')}</div>`; }
   function btn(act, label) { return `<button class="dx-btn" data-act="${act}">${rv(label)}</button>`; }
@@ -183,7 +183,6 @@ export function createDashboard(o) {
     body.style.opacity = 1;
     body.innerHTML = faceHtml[kind](data);
     body.querySelectorAll('.rv-t').forEach((t) => { t.style.visibility = 'hidden'; });
-    if (kind === 'feather') o.feather.draw(body.querySelector('canvas'));
     if (kind === 'head') fitBig();
   }
 
@@ -600,6 +599,7 @@ export function createDashboard(o) {
       else if (a === 'again') o.feather.again();
       return;
     }
+    if (current === 'feather') { o.feather.download(); return; }      // 点羽毛卡片：打开那张纸
     if (step === 'idle' && (target === 'front' || target === 'congrats')) {
       pinned = true;
       if (target === 'front') flipTo('congrats');
