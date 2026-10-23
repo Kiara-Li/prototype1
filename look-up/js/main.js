@@ -188,6 +188,12 @@ function update(now, dt) {
   // 输入：电脑端摄像头 / 手势，手机端陀螺仪 / 捏合，都写进 input
   driver.update(now, dt, app.state);
   if (dash) dash.update(now);
+  // 结尾「Back to the start」：尺子一路降回 0，到底以后 dashboard 倒着展开（这时在 sheet 状态，不走 bookUpdate）
+  if (bk.descend && !bk.descend.done) {
+    const k = Math.min(1, (now - bk.descend.at) / C.book.descendMs);
+    bk.rulerH = bk.descend.from * (1 - easeInOut(k));
+    if (k >= 1) { bk.descend.done = true; toEnd(true); }
+  }
 
   // 滚轮之类的一次性位移（书：不用）
   if (input.scrollDelta) {
@@ -421,12 +427,7 @@ function bookUpdate(now, dt) {
   }
 
   // 尺子上的数字：跟着这一页的高度往上数（和书页上升一样快）；天空：一路冲到天空的高度
-  if (bk.descend) {
-    // 结尾「Back to the start」：尺子一路降回 0，到底以后 dashboard 倒着展开
-    const k = Math.min(1, (now - bk.descend.at) / C.book.descendMs);
-    bk.rulerH = bk.descend.from * (1 - easeInOut(k));
-    if (k >= 1 && !bk.descend.done) { bk.descend.done = true; toEnd(true); }
-  } else if (bk.cur) {
+  if (bk.cur && !bk.descend) {
     if (bk.rulerH === null) bk.rulerH = C.book.minHeight;     // 第一页：从视线的高度（60″）往上数
     const sk = bk.skyAt >= 0;
     const target = sk ? C.book.skyScene.height : bk.cur.height_in;
