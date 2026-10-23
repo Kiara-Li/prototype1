@@ -1091,7 +1091,20 @@ function drawHeights(now, L) {
   ctx.restore();
 }
 
-// 切掉的地方：和背景一样的颜色，看起来像被剪下来了
+// 切掉的地方露出蓝天：和最后天空那一场同一套蓝（按整个屏幕从上到下铺），每个洞像是同一片天空的一角
+let holeGrad = null;
+let holeGradH = 0;
+function holeSky() {
+  if (!holeGrad || holeGradH !== app.H) {
+    const st = C.book.skyBg.stops;
+    holeGrad = ctx.createLinearGradient(0, 0, 0, app.H);
+    st.forEach((c, i) => holeGrad.addColorStop(i / (st.length - 1), c));
+    holeGradH = app.H;
+  }
+  return holeGrad;
+}
+
+// 切掉的地方：露出蓝天，像被剪开了一样
 function drawHoles(r) {
   const list = bk.holes.get(r.item.photo.id);
   if (!list) return;
@@ -1104,7 +1117,7 @@ function drawHoles(r) {
     // 洞从中间张开（像被剪开），切口上有一条细线，慢慢淡掉
     const k = Math.min(1, (now - h.at) / 380);
     const e = 1 - Math.pow(1 - k, 3);
-    ctx.fillStyle = C.book.background;
+    ctx.fillStyle = holeSky();
     ctx.fillRect(x + (w * (1 - e)) / 2, y + (hh * (1 - e)) / 2, w * e, hh * e);
     const line = Math.max(0, 1 - (now - h.at - 300) / 1400);
     if (line > 0) {
