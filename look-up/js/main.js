@@ -284,6 +284,7 @@ const bk = {
   phase: 'guide', next: 0, sec: -1, idx: 0, cur: null, prev: null, prevEnter: false,
   switchedAt: -1e9, enterAt: -1e9, outAt: -1e9, inAt: -1e9, guideAt: 0, baseY: null, upSince: 0,
   targetH: 0,
+  rulerH: null,                // 尺子上现在的数字（跟着往上数）
   enterDir: 1,
   skyAt: -1,                   // 进入天空的时间（背景从灰变蓝）
   card: 'front',               // 这一页卡片：front → intro → up / ready → question
@@ -405,6 +406,11 @@ function bookUpdate(now, dt) {
     } else if (bk.card === 'up') bk.upSince = 0;
   }
 
+  // 尺子上的数字：跟着这一页的高度往上数（和书页上升一样快）
+  if (bk.cur) {
+    if (bk.rulerH === null) bk.rulerH = C.book.minHeight;     // 第一页：从视线的高度（60″）往上数
+    bk.rulerH += (bk.cur.height_in - bk.rulerH) * (1 - Math.exp(-dt / 420));
+  }
   // 高度尺跟着现在这一页的高度慢慢走
   const ty = heightToY(world, bk.targetH);
   app.camY += (ty - app.camY) * (1 - Math.exp(-dt / 900));
@@ -715,7 +721,8 @@ function showSpread(j, now, entering) {
 let photoVid = null;            // { item, el, onAt, offAt, timer }
 const PHOTO_VIDEO_FADE = 350;
 function startPhotoVideo(g, cfg, delay) {
-  const im = g.images.find((x) => x.own);
+  // 放在这一页最大的那张自己拍的照片上
+  const im = g.images.filter((x) => x.own).sort((a, b) => b.w * b.h - a.w * a.h)[0];
   if (!im) return;
   const el = document.createElement('video');
   Object.assign(el, { muted: true, playsInline: true, preload: 'auto', src: cfg.src });
@@ -913,32 +920,85 @@ function sampleVideo(v, aspect) {
   } catch { /* 视频还没准备好 */ }
 }
 
-// 高度尺：现在这一页的高度（黑，在基线上）+ 去过的高度（浅灰，留在当时基线的位置），越走越多
+// 高度尺：屏幕左右各一根贯穿全屏的细线（和 dashboard 的线一样），书页的基线横过去把两根连起来。
+//   刻度挂在线上、朝书页那边伸：每 3″ 一根短的，每 12″ 一根长的；数字（等宽字）写在线外面
+//   现在的高度：基线和尺子相交的地方，黑色粗刻度 + 大一号的数字；上升时刻度往下滚、数字往上数
+//   去过的高度：一根浅灰的长刻度
+//   该抬头的时候（指引）：一道黑的刻度沿着两根尺子往上走，旁边竖排的 LOOK UP 跟着走（像 dashboard 卡片两边的竖排句子）
 function drawHeights(now, L) {
   const B = C.book;
+  const { W, H } = app;
+  if (!bk.cur || bk.baseY === null || bk.rulerH === null) return;
+  const u = Math.min(W / 96, H / 62);
+  const ppi = H / B.rulerInchesPerScreen;            // 1 英寸多少像素
+  const y0 = baselineOf(bk.cur, L);                  // 现在的高度在这条线上
+  const hNow = bk.rulerH;
+  const yOf = (h) => y0 - (h - hNow) * ppi;
+  const mono = monoFont();
+  const xl = Math.round(Math.min(B.sidePx * 0.62, L.ox - 2 * u)) + 0.5;    // 两根尺子线
+  const xr = Math.round(W - (xl - 0.5)) - 0.5;
+  const guiding = bk.phase === 'guide' || bk.phase === 'skyguide';
+  const wave = guiding ? ((now - bk.guideAt) % 1800) / 1800 : -1;           // 指引：一道光从基线往上走
+  const waveY = guiding ? y0 - ease(wave) * (y0 - 3 * u) : -1e9;
   ctx.save();
-  ctx.font = `${B.heightPx}px ${monoFont()}`;
-  ctx.textBaseline = 'middle';
+  // 两根线
+  ctx.strokeStyle = B.rulerLine;
   ctx.lineWidth = 1;
-  const used = [];
-  const free = (y) => used.every((u) => Math.abs(u - y) > B.heightPx * 1.4);
-  const mark = (y, label, color) => {
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.moveTo(0, Math.round(y) + 0.5); ctx.lineTo(B.heightTickPx, Math.round(y) + 0.5); ctx.stroke();
-    if (free(y)) { ctx.fillText(label, B.heightTickPx + 6, y); used.push(y); }
-  };
-  const cur = bk.phase !== 'done' && bk.cur && bk.baseY !== null;
-  let curY = null;
-  if (cur) {
-    curY = bk.baseY + enterShift(now);
-    used.push(curY);
+  ctx.beginPath(); ctx.moveTo(xl, 0); ctx.lineTo(xl, H); ctx.moveTo(xr, 0); ctx.lineTo(xr, H); ctx.stroke();
+  // 刻度和数字
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.max(10, 0.9 * u)}px ${mono}`;
+  const lo = Math.max(0, Math.floor((hNow - (H - y0) / ppi) / 3) * 3);
+  const hi = hNow + y0 / ppi;
+  for (let h = lo; h <= hi; h += 3) {
+    const y = Math.round(yOf(h)) + 0.5;
+    const foot = h % 12 === 0;
+    const lit = guiding && y < y0 - u && Math.abs(y - waveY) < 2.4 * u;
+    const len = (foot ? 1.3 * u : 0.6 * u) * (lit ? 2 : 1);
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = lit ? B.ink : B.rulerLine;
+    ctx.lineWidth = lit ? 2 : 1;
+    ctx.beginPath(); ctx.moveTo(xl, y); ctx.lineTo(xl + len, y); ctx.moveTo(xr, y); ctx.lineTo(xr - len, y); ctx.stroke();
+    if (foot && Math.abs(y - y0) > 1.8 * u) {
+      ctx.fillStyle = lit ? B.ink : B.rulerLine;
+      ctx.textAlign = 'right'; ctx.fillText(`${h}″`, xl - 0.6 * u, y);
+      ctx.textAlign = 'left'; ctx.fillText(`${h}″`, xr + 0.6 * u, y);
+    }
   }
-  for (const [h, by] of bk.marks) {
-    if (cur && h === bk.cur.height_in) continue;
-    mark(L.oy + by * L.s, fmtHeight(h), B.visitedInk);
+  // 去过的高度：浅灰的长刻度
+  ctx.strokeStyle = B.visitedInk;
+  ctx.lineWidth = 1;
+  for (const h of bk.marks.keys()) {
+    if (Math.abs(h - hNow) < 1) continue;
+    const y = Math.round(yOf(h)) + 0.5;
+    if (y < -10 || y > H + 10) continue;
+    ctx.beginPath(); ctx.moveTo(xl, y); ctx.lineTo(xl + 3.2 * u, y); ctx.moveTo(xr, y); ctx.lineTo(xr - 3.2 * u, y); ctx.stroke();
   }
-  if (cur) { used.pop(); mark(curY, fmtHeight(bk.cur.height_in), B.ink); }
+  // 现在的高度：粗刻度 + 大一号的数字（上升时一路往上数）
+  const y = Math.round(y0) + 0.5;
+  ctx.strokeStyle = B.ink;
+  ctx.fillStyle = B.ink;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(xl - 1.2 * u, y); ctx.lineTo(xl + 2.4 * u, y); ctx.moveTo(xr + 1.2 * u, y); ctx.lineTo(xr - 2.4 * u, y); ctx.stroke();
+  ctx.font = `${Math.max(13, 1.3 * u)}px ${mono}`;
+  ctx.textBaseline = 'alphabetic';
+  const label = `${Math.round(hNow)}″`;
+  ctx.textAlign = 'right'; ctx.fillText(label, xl - 0.6 * u, y - 0.5 * u);
+  ctx.textAlign = 'left'; ctx.fillText(label, xr + 0.6 * u, y - 0.5 * u);
+  // 指引：竖排的 LOOK UP 贴着两根尺子，跟着那道光往上走
+  if (guiding) {
+    ctx.font = `${Math.max(13, 1.24 * u)}px ${sansFont()}`;
+    ctx.globalAlpha = Math.max(0, Math.min(1, wave * 6, (1 - wave) * 4));
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const [x, rot] of [[xl + 3.4 * u, -Math.PI / 2], [xr - 3.4 * u, Math.PI / 2]]) {
+      ctx.save();
+      ctx.translate(x, waveY);
+      ctx.rotate(rot);
+      ctx.fillText(T.book.up, 0, 0);
+      ctx.restore();
+    }
+  }
   ctx.restore();
 }
 
@@ -973,7 +1033,7 @@ function drawHoles(r) {
 function guideText() {
   if (app.state !== 'ascent' || (bk.phase !== 'guide' && bk.phase !== 'skyguide')) return '';
   if (bk.sec === -1) return '';                  // 第一页不需要指引（进来直接就是）
-  return T.book.up;                              // 往上走的 LOOK UP（不用句子）
+  return '';                                     // 指引画在尺子上（drawHeights），屏幕中间不放字
 }
 
 // ================================================================ 绘制

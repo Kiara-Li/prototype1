@@ -35,6 +35,8 @@ window.LOOKUP = {
     historical: '#d9d9d9',
     captions: false,            // 竖排小图注（太小看不清，先不显示）
     numbers: false,             // 组号
+    rulerInchesPerScreen: 84,   // 高度尺：一屏高 = 多少英寸（7 英尺）
+    rulerLine: '#7b7b7b',       //         线和刻度的颜色（和 dashboard 的线一样）
     heightPx: 11,               // 左边高度尺的字号
     heightTickPx: 28,           // 刻度线长度
     visitedInk: '#a3a3a3',      // 去过的高度：浅灰
@@ -43,12 +45,13 @@ window.LOOKUP = {
     // 每个 section 里按高度从低到高（一样高按页码）。In flight 书里没有成形的跨页 → 用记录表里的飞行照片，一张一页
     sections: [
       // 每个 section 只留最清楚、最有话说的一两页（Kiara 2026-10-23：页数太多太累）
+      // 顺序按高度一路往上（尺子上的数字只升不降）：120 → 144 → 180 → 192 → 216 → 300 → 348 → 天空
       { key: 'awning',  groups: ['35', '43'] },     // 1900 年 Mulberry 街的帆布雨棚 → 今天 Zero Irving 的玻璃雨棚（有视频）
-      { key: 'sign',    groups: ['55'] },           // Berenice Abbott，家禽店，1937
       { key: 'ledge',   groups: ['53'] },           // Kertész 窗台上的玻璃胸像（对上「从我的窗台望出去」）
-      { key: 'signal',  groups: ['63'] },           // 只有这一页
-      { key: 'fire',    groups: ['49', '67'] },     // 1934 年坐在消防梯上的人 → Weegee，热天夜里睡在消防梯上
-      { key: 'light',   groups: ['71', '77'] },     // 点灯工人（有视频）→ Hine 的 Icarus，接到天空
+      { key: 'sign',    groups: ['55'] },           // Berenice Abbott，家禽店，1937
+      { key: 'signal',  groups: ['63'] },           // 信号灯横杆（IMG_7643 那段视频拍的就是信号灯横杆上的鸽子）
+      { key: 'fire',    groups: ['67'] },           // Weegee，热天夜里睡在消防梯上
+      { key: 'light',   groups: ['77'] },           // Hine 的 Icarus，接到天空
     ],
     // 去天空之前的那段声音（js/skysound.js）：在 startSection 开始时从头播放、慢慢变大；
     // 抬头进入天空的那一刻接到 jumpTo，一秒后是翅膀拍动（录音里 30.5–33.5 秒）
@@ -90,10 +93,10 @@ window.LOOKUP = {
     },
     sheetDelayMs: 2600,         // 回到 dashboard 以后多久，碎片拼成最后那张纸
     // 建筑那几页：这一页落定以后，视频在自己拍的鸽子照片上快速放一遍，放完淡回原来的照片
-    // （43 = 屋檐 Zero Irving 那页，IMG_7641 截 3–7 秒、向左转；71 = 路灯那页，IMG_7643）
+    // （43 = 屋檐 Zero Irving 那页，IMG_7641 截 3–7 秒、向左转；63 = 信号灯那页，IMG_7643 拍的就是信号灯横杆）
     photoVideos: {
       '43': { src: 'assets/video/awning.mp4', rate: 2, delayMs: 1200 },
-      '71': { src: 'assets/video/streetlight.mp4', rate: 2, delayMs: 1200 },
+      '63': { src: 'assets/video/streetlight.mp4', rate: 2, delayMs: 1200 },
     },
     videos: {
       last: { src: 'assets/video/sky.mp4', rate: 1, delayMs: 1500, loop: true, blend: true },   // blend：四边羽化，融进背景             // 最后：天空最后一页右边那一栏；IMG_7637 天空和鸽子，去掉了声音
