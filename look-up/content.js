@@ -184,6 +184,7 @@ window.CONTENT = {
     download: 'Download A4',
     print: 'Print',
     close: 'Close',
+    home: 'Back to the start',                     // 结尾（天空里）那张纸下面：回到 dashboard
     fold: 'Folding steps',
     // 旧版（没有书页时）的背面
     heights: 'Pigeons you found',

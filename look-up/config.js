@@ -66,6 +66,7 @@ window.LOOKUP = {
       loopStart: 1,             // 还没去天空时，在这一段环境声里循环（秒）
       loopEnd: 29,
       jumpTo: 29.5,             // 进入天空时接到这里
+      wingsAt: 30.5,            // 录音里翅膀拍动开始的地方（鸽子在这一刻飞起来）
       crossfadeSec: 0.8,
     },
     // 历史照片换成视频：组号 → 视频。这一页落定、照片信息浮现之后再过 delayMs，灰色方块把照片换成视频
@@ -78,8 +79,8 @@ window.LOOKUP = {
       videoHeight: 0.84,        // 视频占屏幕多高（竖的，放在中间）
       sinkMs: 3200,             // 最后那页书往下沉、淡掉
       videoAt: 3400,            // 背景差不多全蓝了视频才开始浮现（不然半灰的背景上会看出一条）
-      birdsAt: 2600,            // 鸽子开始飞
-      birdStaggerMs: 380,       //   一只接一只
+      birdsAt: 1000,            // 鸽子开始飞（有声音时：对到翅膀声开始的那一刻）
+      birdStaggerMs: 240,       //   一只接一只
       birdFlyMs: 5600,          //   从下飞到上要多久
       birdU: 6.5,               //   多大（u）
       askMinMs: 8000,           // 最早多久以后问天空那一句
@@ -105,7 +106,7 @@ window.LOOKUP = {
         light:  { src: 'sound/sections/night_city.m4a', mode: 'loop', vol: 0.2 },                // 夜晚城市：远处的警笛（录音本身比较轻）
       },
     },
-    sheetDelayMs: 2600,         // 回到 dashboard 以后多久，碎片拼成最后那张纸
+
     // 建筑那几页：这一页落定以后，视频在自己拍的鸽子照片上快速放一遍，放完淡回原来的照片
     // （43 = 屋檐 Zero Irving 那页，IMG_7641 截 3–7 秒、向左转；63 = 信号灯那页，IMG_7643 拍的就是信号灯横杆）
     photoVideos: {

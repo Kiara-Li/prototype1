@@ -326,6 +326,7 @@ const sectionSound = C.book && C.book.sectionSounds ? createSectionSound(C.book.
 
 // 这一页的卡片：历史照片里最大的那张（天空：右边留出来的一栏）
 function cardOf(g) {
+  if (!g) return null;
   let best = null;
   for (const im of g.images) if (!im.own && (!best || im.w * im.h > best.w * best.h)) best = im;
   return best;
@@ -411,7 +412,7 @@ function bookUpdate(now, dt) {
     bk.rulerH += (target - bk.rulerH) * (1 - Math.exp(-dt / (sk ? 1100 : 420)));
   }
   // 天空：鸽子飞完以后问最后一句
-  if (bk.phase === 'sky' && !bk.skyAsked && now - bk.skyAt > skyScene.askAt) {
+  if (bk.phase === 'sky' && !bk.skyAsked && now - bk.skyAt > Math.max(C.book.skyScene.askMinMs, birdsStart() + skyScene.askAfter)) {
     bk.skyAsked = true;
     bk.card = 'ready';
     askSection();
@@ -607,7 +608,11 @@ function finishSection() {
     if (sectionSound) sectionSound.stop();
     stopPhotoVideo();
     driver.releaseFrame();
-    setState('top');
+    bookUI.count(0);
+    // 结尾就在天空里：纸羽毛从天上落下来 → 落地，碎片拼成那张纸（landFeather）
+    setState('falling');
+    playFeather();
+    app.fallFrom = app.camY;
   }
 }
 
@@ -664,7 +669,12 @@ function lookHint(r) {
 // 抬头进入天空：最后那页书往下沉、淡掉；背景从灰渐变成天空视频的蓝；尺子上的数字一路冲上去；
 // 天空视频在中间浮现（四边羽化，背景跟着视频取颜色，看不出边）；一路切下来的鸽子从下面一只只飞上去；
 // 最后问天空那一句（不答也会自己跳过）→ 结尾
-const skyScene = { vid: null, birds: [], askAt: 0 };
+const skyScene = { vid: null, birds: [], askAfter: 0 };
+// 鸽子起飞的时间（从进入天空算）：对到翅膀声开始的那一刻；声音还没好就按设置里的
+function birdsStart() {
+  const w = skySound && skySound.wingsAt();
+  return w ? Math.max(0, w - bk.skyAt) : C.book.skyScene.birdsAt;
+}
 function startSky(now) {
   const S = C.book.skyScene;
   bk.phase = 'sky';
@@ -690,11 +700,11 @@ function startSky(now) {
   skyScene.birds = app.pieces.map((p, i) => ({
     canvas: p.canvas,
     x: 0.18 + ((i * 0.618) % 1) * 0.64,                 // 横向散开（黄金比例错开，不会挤在一起）
-    delay: S.birdsAt + i * S.birdStaggerMs,
+    delay: i * S.birdStaggerMs,
     sway: (i % 2 ? 1 : -1) * (0.02 + ((i * 7) % 5) * 0.008),
     rot: ((i * 37) % 21) - 10,
   }));
-  skyScene.askAt = Math.max(S.askMinMs, S.birdsAt + n * S.birdStaggerMs + S.birdFlyMs * 0.6);
+  skyScene.askAfter = n * S.birdStaggerMs + S.birdFlyMs * 0.6;      // 鸽子起飞以后多久问天空那一句
 }
 // 天空视频在屏幕上的位置：竖的，在中间，差不多一屏高
 function skyVideoRect() {
@@ -729,7 +739,7 @@ function drawSkyScene(now, L, o) {
   const u = Math.min(W / 96, H / 62);
   const size = S.birdU * u;
   for (const b of skyScene.birds) {
-    const k = (t - b.delay) / S.birdFlyMs;
+    const k = (t - birdsStart() - b.delay) / S.birdFlyMs;
     if (k <= 0 || k >= 1) continue;
     const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
     const x = W * (b.x + Math.sin(k * Math.PI * 2) * b.sway);
@@ -745,6 +755,7 @@ function drawSkyScene(now, L, o) {
 
 function enterSection(i, now) {
   bk.sec = i;
+  bookUI.count(i + 1, book.sections.length);          // 屏幕上方：第几段 / 一共几段
   preloadSection(i);
   // 去天空之前的那段声音：路灯开始时从头放；进入天空时接到翅膀拍动
   const sec = book.sections[i];
@@ -1381,6 +1392,12 @@ function landFeather(now) {
   };
   app.newFeather = f;
   feathers.add(f);
+  if (BOOK) {
+    // 落地的同时，一路切下来的碎片在蓝天上拼成那张纸，翻过来是诗；下面一个按钮回到 dashboard
+    setState('sheet');
+    showSheet({ clear: true, onHome: toEnd });
+    return;
+  }
   setState('lastline');
   showLine(T.last);
 }
@@ -1490,10 +1507,11 @@ function setupDashboard() {
 }
 
 // 书：最后的纸（碎片拼成的网格，翻过来是诗），在 js/sheet.js
-function showSheet() {
+function showSheet(opts = {}) {
   if (!BOOK || !book) return;
   const secs = book.sections.map((s, i) => T.sections[i]).filter(Boolean);
   openSheet({
+    ...opts,
     pieces: app.pieces, sections: secs, answers: app.answerParts, T: T.sheet,
     // 尺子上的高度：这一段最后一页（问问题的那一页）的高度；天空用 content.js 里的
     heights: secs.map((s, i) => { const gs = book.sections[i].groups; return book.sections[i].sky ? s.height : gs.length ? gs[gs.length - 1].height_in : 0; }),
@@ -1574,8 +1592,8 @@ function hideHands() { $('handL').style.opacity = 0; $('handR').style.opacity = 
 
 function toEnd() {
   setState('end');
+  if (skyScene.vid) skyScene.vid.pause();
   try { localStorage.setItem(C.storage.unlocked, '1'); } catch { /* */ }
-  if (BOOK) setTimeout(showSheet, C.book.sheetDelayMs);      // 结尾：碎片自己拼成一张纸
   if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(); return; }
   $('dash').style.display = 'block';
   $('dStart').style.display = 'none';

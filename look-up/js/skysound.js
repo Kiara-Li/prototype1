@@ -14,6 +14,7 @@ export function createSkySound(cfg) {
   let src = null;
   let gain = null;
   let state = 'idle';            // idle → looping → finale → done
+  let finaleAt = 0;             // 接到 jumpTo 那一刻（performance.now）：翅膀声在这之后 (wingsAt - jumpTo) 秒
 
   function load() {
     if (loading) return loading;
@@ -66,6 +67,7 @@ export function createSkySound(cfg) {
         v.s.onended = () => { state = 'done'; };
         src = v.s;
         gain = v.g;
+        finaleAt = performance.now();
       });
       return;
     }
@@ -84,7 +86,10 @@ export function createSkySound(cfg) {
     v.s.onended = () => { state = 'done'; };
     src = v.s;
     gain = v.g;
+    finaleAt = performance.now();
   }
 
-  return { start, toFinale, load, get state() { return state; } };
+  // 翅膀声开始的时间（performance.now）；还没接到天空那一段 / 没有声音：null
+  const wingsAt = () => (finaleAt ? finaleAt + (cfg.wingsAt - cfg.jumpTo) * 1000 : null);
+  return { start, toFinale, load, wingsAt, get state() { return state; } };
 }

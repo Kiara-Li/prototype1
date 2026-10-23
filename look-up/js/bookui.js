@@ -27,6 +27,7 @@ export function createBookUI(o) {
     <div class="bk-stack"><div class="bk-h">${rv('')}</div></div>
     <div class="bk-panel"><div class="bk-pbody"></div></div>
     <div class="bk-hint"></div>
+    <div class="bk-count">${rv('')}</div>
     <div class="bk-cap"><div class="bk-capmeta"></div><div class="bk-captitle"></div></div>
     <div class="bk-capv"></div>
     <div class="bk-guide"><div class="bk-gtext"></div></div>
@@ -36,7 +37,7 @@ export function createBookUI(o) {
   const el = {
     card: q('.bk-card'), rot: q('.bk-rot'), faces: [...root.querySelectorAll('.bk-face')],
     stack: q('.bk-stack'), h: q('.bk-h'), panel: q('.bk-panel'), pbody: q('.bk-pbody'), hint: q('.bk-hint'),
-    guide: q('.bk-guide'), gtext: q('.bk-gtext'),
+    guide: q('.bk-guide'), gtext: q('.bk-gtext'), count: q('.bk-count'),
     cap: q('.bk-cap'), capMeta: q('.bk-capmeta'), capTitle: q('.bk-captitle'), capV: q('.bk-capv'),
     hands: { bl: q('.bk-hand[data-k="bl"]'), tr: q('.bk-hand[data-k="tr"]') },
   };
@@ -568,6 +569,14 @@ export function createBookUI(o) {
     });
   }
 
+  // 进度：屏幕上方中间一行很小的等宽字「03 / 07」（和 dashboard 顶上中间那行字一样），只标第几段，不写名字
+  function count(i, n) {
+    if (!i) { el.count.style.opacity = 0; return; }
+    el.count.style.opacity = 1;
+    setText(el.count, `${String(i).padStart(2, '0')} / ${String(n).padStart(2, '0')}`);
+    reveal(el.count, { dur: 260 });
+  }
+
   // 指引：屏幕上方，一个慢慢浮动的箭头 + 一句话（字用黑块拉出来）
   let guideText = null;
   function guide(text) {
@@ -593,7 +602,7 @@ export function createBookUI(o) {
   return {
     guide, caption,
     place, setFront, flipTo, video, hideCaption,
-    addPiece, openQuestion, showTutorial, hideTutorial, setHint, hintAt,
+    addPiece, openQuestion, showTutorial, hideTutorial, setHint, hintAt, count,
     liveVideo: () => root.querySelector('.bk-face:not(.hidden) .bk-video.blend.on'),     // 天空背景跟着它取颜色
     set on(handlers) { onFace = handlers; },
     get face() { return current; },

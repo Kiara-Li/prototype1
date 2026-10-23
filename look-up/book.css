@@ -74,6 +74,9 @@
 
 /* 提示（教学、没有摄像头时） */
 /* 提示：放在要做的动作旁边（位置由 bookui.js 给），最多三四行宽 */
+/* 进度「03 / 07」：屏幕上方中间，很小的等宽字，字距拉开（和 dashboard 顶上中间那行一样） */
+#bk .bk-count { left: 50%; top: calc(var(--u) * 1.6); transform: translateX(-50%); font-family: var(--mono); font-size: max(11px, calc(var(--u) * 0.95));
+                letter-spacing: 0.25em; white-space: nowrap; opacity: 0; transition: opacity 400ms; }
 /* 提示：饱和的蓝色色块，白色等宽字；每行一条，宽度不一、左边错开，拼成阶梯状的一块 */
 #bk .bk-hbox { display: flex; flex-direction: column; align-items: flex-start; }
 #bk .bk-hl { background: #1f45e6; color: #fff; font-family: var(--mono); line-height: 1; padding: 0.5em 0.7em; white-space: nowrap; letter-spacing: 0.02em; }

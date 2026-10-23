@@ -299,8 +299,9 @@ export async function openSheet(o) {
       <button class="sh-btn" data-act="download">${rv(T.download)}</button>
       <button class="sh-btn" data-act="print">${rv(T.print)}</button>
       <button class="sh-btn" data-act="fold">${rv(T.fold)}</button>
-      <button class="sh-btn sh-quiet" data-act="close">${rv(T.close)}</button>
+      <button class="sh-btn sh-quiet" data-act="${o.onHome ? 'home' : 'close'}">${rv(o.onHome ? T.home : T.close)}</button>
     </div>`;
+  if (o.clear) root.style.background = 'transparent';       // 结尾在天空里：后面还是蓝天
   document.body.appendChild(root);
   const q = (s) => root.querySelector(s);
   const front = q('.sh-front');
@@ -394,6 +395,7 @@ export async function openSheet(o) {
     else if (act.dataset.act === 'print') print(sheet());
     else if (act.dataset.act === 'fold') openFold(T);
     else if (act.dataset.act === 'close') close(root);
+    else if (act.dataset.act === 'home') { close(root); o.onHome(); }
   });
 }
 
