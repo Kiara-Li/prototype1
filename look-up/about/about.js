@@ -1,5 +1,5 @@
 // Look Up · About（Prototype 1 的演讲）：一屏一屏往下讲
-//   ← → / 空格 / 滚轮 翻页；上面的刻度（四个部分）和 What I learned 的 tab 可以点
+//   ← → / 空格 / 滚轮 翻页；上面的刻度（四个部分）可以点
 //   地址后面的 #id 直接打开那一屏（结尾回到 dashboard 以后，About 链接带 #learned）
 
 (() => {
@@ -15,7 +15,6 @@
   ];
   const partsEl = $('.parts');
   partsEl.innerHTML = PARTS.map((p, i) => `<button data-p="${i}">${p.name}</button>`).join('');
-  const tabs = $('.tabs');
   let cur = -1;
 
   function go(i) {
@@ -28,10 +27,6 @@
     $$('button', partsEl).forEach((b, k) => b.classList.toggle('on', k === part));
     $('.prompt').textContent = PARTS[part].prompt;
     $('.count').textContent = `${String(i + 1).padStart(2, '0')} / ${String(steps.length).padStart(2, '0')}`;
-    const inTabs = st.dataset.tab !== undefined;
-    tabs.classList.toggle('show', inTabs);
-    document.body.classList.toggle('tabs-on', inTabs);
-    $$('button', tabs).forEach((b, k) => b.classList.toggle('on', inTabs && k === Number(st.dataset.tab)));
     history.replaceState(null, '', `#${st.id}`);
     onShow(st);
   }
@@ -40,10 +35,6 @@
   partsEl.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (b) go(steps.findIndex((s) => Number(s.dataset.part) === Number(b.dataset.p)));
-  });
-  tabs.addEventListener('click', (e) => {
-    const b = e.target.closest('button');
-    if (b) go(indexOf(b.dataset.go));
   });
 
   // ---- 键盘、滚轮、手机左右滑

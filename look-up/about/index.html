@@ -8,7 +8,7 @@
 </head>
 <body>
 <!-- Look Up · About this project = Prototype 1 presentation (Kiara 的演讲顺序).
-     ← → / 空格 翻页；上面的刻度、tab 可以点；#learned 直接跳到 What I learned。
+     ← → / 空格 翻页；上面的刻度可以点；#learned 直接跳到 What I learned。
      文字都是 Kiara 自己说的话（中文口述，翻成平实的英文）。 -->
 
 <header class="band top">
@@ -32,8 +32,7 @@
   <section class="step thesis" data-part="0" id="thesis">
     <div class="col-text">
       <p class="label">My thesis</p>
-      <h2 class="big">The city doesn’t only belong to humans.</h2>
-      <p class="say">Humans and animals see the same city from two different perspectives.</p>
+      <h2 class="big">Looking at the city from two perspectives: humans’ and animals’.</h2>
     </div>
     <div class="pair">
       <figure class="ph"><img src="img/pigeon-ledge.jpg" alt="A pigeon on a ledge below anti-pigeon spikes"></figure>
@@ -53,9 +52,8 @@
   </section>
 
   <!-- ================================================ 02 What you learned + 03 Process images -->
-  <section class="step book" data-part="1" data-tab="0" id="learned">
+  <section class="step book" data-part="1" id="learned">
     <div class="col-text">
-      <p class="label">Where it started</p>
       <h2 class="big">It started from my pigeon book.</h2>
       <p class="say">Installation Heights of Street Furniture and Observed Pigeon Use, New York City</p>
       <p class="say">From the book, I wanted two perspectives on the city: the animals’ and the humans’. So I started on the human side.</p>
@@ -74,7 +72,7 @@
     </figure>
   </section>
 
-  <section class="step trace" data-part="1" data-tab="1" id="trace">
+  <section class="step trace" data-part="1" id="trace">
     <div class="col-text">
       <p class="label">TRACE · survey</p>
       <h2 class="big">I asked people to draw their memory of a city as one line.</h2>
@@ -94,21 +92,20 @@
     </figure>
   </section>
 
-  <section class="step happier" data-part="1" data-tab="1" id="happier">
-    <p class="label">What moved me</p>
+  <section class="step happier" data-part="1" id="happier">
     <h2 class="big quote">Someone told me: the happier they were, the more city animals they noticed.</h2>
     <p class="say wide">So could the animals we already know bring back our memories of the city? Even the details we never look at, like a streetlight, or anything up high, out of our sight.</p>
     <div class="lines" aria-hidden="true"></div>
   </section>
 
-  <section class="step surprised" data-part="1" data-tab="2" id="surprised">
+  <section class="step surprised" data-part="1" id="surprised">
     <p class="label">What surprised me</p>
-    <h2 class="big wide">I had never made something driven by emotion.</h2>
-    <p class="say wide">My work usually starts from research and facts. Emotion felt abstract, and I wasn’t sure this would work.</p>
-    <p class="say wide strong">So I tried to bring people in through things from everyday life.</p>
+    <h2 class="big wide">Making a work that starts from people’s emotions and memories.</h2>
+    <p class="say wide strong">My work usually starts from research and facts.</p>
+    <p class="say wide strong">This time, my approach is everyday life.</p>
   </section>
 
-  <section class="step media" data-part="1" data-tab="2" id="media">
+  <section class="step media" data-part="1" id="media">
     <div class="tiles">
       <figure class="tile"><div class="t-img hands"><img class="h-bl" src="../assets/dash/hand_bl.png" alt=""><img class="h-tr" src="../assets/dash/hand_tr.png" alt=""></div><figcaption><b>Gesture</b>Framing with your hands, like taking a photo</figcaption></figure>
       <figure class="tile"><div class="t-img"><img src="img/feather-real.jpg" alt=""></div><figcaption><b>Feather</b>Something you could pick up off the ground</figcaption></figure>
@@ -120,12 +117,14 @@
     <div class="media-say">
       <h2 class="mid">As many ways as I could to leave a memory, or help one come back.</h2>
       <p class="say">That was the happy part: I got to try different ways in. A physical piece couldn’t hold all of them at once.</p>
+      <p class="say gap">I also wanted people to leave traces on the website. What they record there is another way to create memory.</p>
     </div>
   </section>
 
-  <section class="step feather" data-part="1" data-tab="2" id="feather">
-    <p class="label">Process · the feather</p>
-    <h2 class="mid wide">“Imagine picking up a feather from the ground, opening it, and entering the world of becoming a pigeon.”</h2>
+  <section class="step feather" data-part="1" id="feather">
+    <p class="label">Process</p>
+    <h2 class="big wide">How do I bring people to the website?</h2>
+    <p class="say wide strong">Looking for a way in from the real world.</p>
     <div class="strip">
       <figure><img src="img/kit.jpg" alt=""><figcaption>Field kit</figcaption></figure>
       <figure><img src="img/poster.jpg" alt=""><figcaption>Poster</figcaption></figure>
@@ -136,7 +135,7 @@
     </div>
   </section>
 
-  <section class="step unresolved" data-part="1" data-tab="3" id="unresolved">
+  <section class="step unresolved" data-part="1" id="unresolved">
     <p class="label">What remains unresolved</p>
     <h2 class="big wide">Why does looking for pigeons matter to the audience?</h2>
     <p class="say wide">My answer for now: looking for pigeons helps you build a deeper memory with the city.</p>
@@ -161,15 +160,9 @@
 
 </main>
 
-<nav class="tabs" aria-label="What I learned">
-  <button data-go="learned">The pigeon book</button>
-  <button data-go="trace">TRACE</button>
-  <button data-go="surprised">What surprised me</button>
-  <button data-go="unresolved">Unresolved</button>
-</nav>
 
 <footer class="band bot">
-  <span class="keys">← → to move</span>
+  <span></span>
   <span class="prompt"></span>
   <span class="count"></span>
 </footer>
