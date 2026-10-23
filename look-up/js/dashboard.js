@@ -497,23 +497,33 @@ export function createDashboard(o) {
   //   17 卡片消失，两条竖线合成一条、两条横线合成一条：一个十字（dashboard 结束）
   //   18 十字再分开，中间是一个灰色的小方块
   //   19 线和方块往外散开，后面的书页露出来
-  function leave() {
-    step = 'leaving';
+  // 四根线移到 pos（{ lt, lb, cl, cr }，px）
+  const lineTo = (pos, dur, easing = EASE) => Promise.all(el.lines.map((e) => {
+    const k = e.dataset.k;
+    const prop = k === 'lt' || k === 'lb' ? 'top' : 'left';
+    const from = parseFloat(getComputedStyle(e)[prop]);
+    e.getAnimations().forEach((a) => a.cancel());
+    e.style[prop] = `${from}px`;
+    const a = e.animate([{ [prop]: `${from}px` }, { [prop]: `${pos[k]}px` }], { duration: dur, easing, fill: 'forwards' });
+    return quiet(a.finished);
+  }));
+  // 进入网站那段动画里线的几个位置：贴住小卡片的方框、十字、屏幕外
+  function linePos() {
     const { cx, cy, u, W, H } = L;
     const half = (D.smallCard * u) / 2;
+    return {
+      half,
+      box: { lt: cy - half, lb: cy + half, cl: cx - half, cr: cx + half },
+      cross: { lt: cy, lb: cy, cl: cx, cr: cx },
+      out: { lt: -2, lb: H + 2, cl: -2, cr: W + 2 },
+    };
+  }
+
+  function leave() {
+    step = 'leaving';
+    const { cx, cy, W, H } = L;
     const [t1, t2, t3, t4] = D.leaveSteps;
-    const lineTo = (pos, dur, easing = EASE) => Promise.all(el.lines.map((e) => {
-      const k = e.dataset.k;
-      const prop = k === 'lt' || k === 'lb' ? 'top' : 'left';
-      const from = parseFloat(getComputedStyle(e)[prop]);
-      e.getAnimations().forEach((a) => a.cancel());
-      e.style[prop] = `${from}px`;
-      const a = e.animate([{ [prop]: `${from}px` }, { [prop]: `${pos[k]}px` }], { duration: dur, easing, fill: 'forwards' });
-      return quiet(a.finished);
-    }));
-    const box = { lt: cy - half, lb: cy + half, cl: cx - half, cr: cx + half };
-    const cross = { lt: cy, lb: cy, cl: cx, cr: cx };
-    const out = { lt: -2, lb: H + 2, cl: -2, cr: W + 2 };
+    const { half, box, cross, out } = linePos();
     for (const e of [...el.edges]) e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: t1, easing: 'ease', fill: 'forwards' });
     moveHands('away', t1, EASE_IN, 0);
     Object.assign(el.sq.style, { left: `${cx - half}px`, top: `${cy - half}px`, width: `${2 * half}px`, height: `${2 * half}px` });
@@ -680,26 +690,75 @@ export function createDashboard(o) {
   }
 
   // 体验结束：回到 dashboard，解锁，卡片翻到你的羽毛
-  function showEnd() {
+  // back：从结尾「Back to the start」回来——进入网站那段动画倒着放（线从屏幕外收拢、灰方块缩成十字、十字分开、卡片长出来、线回到原位）
+  function showEnd(back = false) {
     played = true;
     unlocked = true;
-    root.classList.remove('fading');
-    root.style.backgroundColor = '';
     root.style.display = 'block';
     html.classList.add('dx-on');
     for (const e of [el.card, el.marks, el.sq, ...el.edges, ...el.lines]) e.getAnimations().forEach((a) => a.cancel());
+    if (back) { comeBack(); return; }
+    root.classList.remove('fading');
+    root.style.backgroundColor = '';
+    settle();
+  }
+
+  async function comeBack() {
+    step = 'returning';
+    setFace('front');
+    applyLock();
+    layout();
+    const { cx, cy, W, H } = L;
+    const [t1, t2, t3, t4] = D.backSteps;
+    const { half, box, cross, out } = linePos();
+    const rest = { lt: L.lt, lb: L.lb, cl: L.cl, cr: L.cr };
+    // 一开始：什么都没有，背景透明（还看得见书页），线在屏幕外
+    for (const e of [...ui, ...el.edges]) { e.style.transition = 'none'; e.style.opacity = 0; }
+    el.marks.style.opacity = 0;
+    el.card.style.opacity = 0;
+    for (const k of ['bl', 'tr']) { el.hands[k].style.transform = handTf('away')[k]; el.hands[k].style.opacity = 0; }
+    root.classList.remove('fading');
+    root.style.backgroundColor = 'transparent';
+    for (const e of el.lines) { const k = e.dataset.k; e.style[k === 'lt' || k === 'lb' ? 'top' : 'left'] = `${out[k]}px`; }
+    void root.offsetWidth;
+    for (const e of [...ui, ...el.edges]) e.style.transition = '';
+    // 19 倒放：线从屏幕外收拢成方框，灰方块从整屏缩回来，背景变回 dashboard 的颜色
+    root.style.setProperty('--leave', `${t4}ms`);
+    root.classList.add('fading');
+    root.style.backgroundColor = '';
+    Object.assign(el.sq.style, { left: `${cx - half}px`, top: `${cy - half}px`, width: `${2 * half}px`, height: `${2 * half}px` });
+    el.sq.animate([{ transform: `scale(${Math.max(W, H) / half})`, opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: t4, easing: EASE_OUT, fill: 'forwards' });
+    for (const e of el.lines) e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: t4, easing: 'ease-out' });
+    await lineTo(box, t4, EASE_OUT);
+    // 18 倒放：灰方块缩没，方框合成十字
+    el.sq.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0)', opacity: 1 }], { duration: t3, easing: EASE, fill: 'forwards' });
+    await lineTo(cross, t3);
+    // 17 倒放：十字分开，卡片从中间长出来
+    el.card.style.opacity = '';
+    el.card.animate([{ opacity: 0, transform: 'scale(0.02)' }, { opacity: 1, transform: 'none' }], { duration: t2 + t1, easing: EASE });
+    await lineTo(box, t2);
+    // 16 倒放：线回到原位，卡片四周的字出来，手回来
+    for (const e of el.edges) { e.style.opacity = ''; e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: t1 * 2, easing: 'ease' }); }
+    await lineTo(rest, t1, EASE_OUT);
+    root.classList.remove('fading');
+    el.sq.getAnimations().forEach((a) => a.cancel());
+    for (const e of el.lines) e.getAnimations().forEach((a) => a.cancel());
+    settle(true);
+  }
+
+  function settle(fast = false) {
     for (const e of ui) e.style.opacity = '';
     el.marks.style.opacity = 0;
     el.card.style.transform = '';
     setFace('front');
     applyLock();
     layout();
-    moveHands('rest', 1500, EASE_OUT, 1);
-    reveal(el.head, { delay: 300, stagger: 70 });
-    reveal(el.chap, { delay: 900 });
+    moveHands('rest', fast ? 700 : 1500, EASE_OUT, 1);
+    reveal(el.head, { delay: fast ? 0 : 300, stagger: fast ? 35 : 70 });
+    reveal(el.chap, { delay: fast ? 300 : 900 });
     step = 'idle';
     pinned = true;
-    setTimeout(() => flipTo('feather'), 900);
+    setTimeout(() => flipTo('feather'), fast ? 350 : 900);
   }
 
   window.addEventListener('resize', layout);

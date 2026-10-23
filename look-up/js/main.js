@@ -421,7 +421,12 @@ function bookUpdate(now, dt) {
   }
 
   // 尺子上的数字：跟着这一页的高度往上数（和书页上升一样快）；天空：一路冲到天空的高度
-  if (bk.cur) {
+  if (bk.descend) {
+    // 结尾「Back to the start」：尺子一路降回 0，到底以后 dashboard 倒着展开
+    const k = Math.min(1, (now - bk.descend.at) / C.book.descendMs);
+    bk.rulerH = bk.descend.from * (1 - easeInOut(k));
+    if (k >= 1 && !bk.descend.done) { bk.descend.done = true; toEnd(true); }
+  } else if (bk.cur) {
     if (bk.rulerH === null) bk.rulerH = C.book.minHeight;     // 第一页：从视线的高度（60″）往上数
     const sk = bk.skyAt >= 0;
     const target = sk ? C.book.skyScene.height : bk.cur.height_in;
@@ -959,6 +964,9 @@ function drawBookScene(now) {
   ctx.fillStyle = B.background;
   ctx.fillRect(-W, -H, W * 3, H * 3);
   const L = bookLayout(book, W, H, B);
+  // 往回降的时候，天空（连同基线）往上退出屏幕，后面露出灰色
+  ctx.save();
+  ctx.translate(0, -descendOff());
   drawSkyBg(now, L);
   const o = { ink: B.ink, bar: B.revealColor, historical: B.historical, historicalPhotos: B.historicalPhotos, captions: B.captions, numbers: B.numbers,
     sans: sansFont(), mono: monoFont(), drawOnPhoto: (r) => { drawPhotoVideo(r); drawHoles(r); } };
@@ -1001,8 +1009,22 @@ function drawBookScene(now) {
     }
   }
 
-  if (app.state !== 'dashboard' && app.state !== 'end') drawHeights(now, L);
+  ctx.restore();
+  // 往回降：天空一边往上退，一边淡成灰色（不留一条蓝色的硬边）
+  if (bk.descend) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, descendOff() / (0.7 * H));
+    ctx.fillStyle = B.background;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+  if (app.state !== 'dashboard' && (app.state !== 'end' || bk.descend)) drawHeights(now, L);
 }
+// 往回降了多少（px）：降下去的英寸数 × 一英寸多少像素
+function descendOff() {
+  return bk.descend ? (bk.descend.from - bk.rulerH) * (app.H / C.book.rulerInchesPerScreen) : 0;
+}
+const easeInOut = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
 
 // 天空这个 section 的背景：和最后那段天空视频一样的蓝（从上到下的渐变照视频取的颜色），
 // 对齐右边那一栏（视频出现的地方），这样看不出哪里是视频、哪里是背景，像真的看到了天空。
@@ -1118,7 +1140,7 @@ function drawHeights(now, L) {
   const xl = Math.round(Math.min(B.sidePx * 0.62, L.ox - 2 * u)) + 0.5;    // 两根尺子线
   const xr = Math.round(W - (xl - 0.5)) - 0.5;
   // 天空里：线和字变成白色（灰色在蓝天上看不清），跟着背景一起变
-  const skyK = bk.skyAt >= 0 ? ease(Math.min(1, (now - bk.skyAt) / C.book.skyBg.fadeMs)) : 0;
+  const skyK = (bk.skyAt >= 0 ? ease(Math.min(1, (now - bk.skyAt) / C.book.skyBg.fadeMs)) : 0) * Math.max(0, 1 - (2 * descendOff()) / H);   // 往回降：天空退走一半，尺子就变回灰色
   const mixC = (a, b) => { const x = hex(a); const y = hex(b); return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * skyK)).join(',')})`; };
   const lineC = mixC(B.rulerLine, '#ffffff');
   const inkC = mixC(B.ink, '#ffffff');
@@ -1481,7 +1503,7 @@ function landFeather(now) {
   if (BOOK) {
     // 落地的同时，一路切下来的碎片在蓝天上拼成那张纸，翻过来是诗；下面一个按钮回到 dashboard
     setState('sheet');
-    showSheet({ clear: true, onHome: toEnd });
+    showSheet({ clear: true, onHome: goHome });
     return;
   }
   setState('lastline');
@@ -1608,6 +1630,7 @@ function showSheet(opts = {}) {
   openSheet({ ...sheetArgs(), ...opts });
 }
 window.lookUp.sheet = showSheet;
+window.lookUp.home = () => goHome();      // 调试：结尾「Back to the start」
 window.lookUp.fold = () => openFold(T.sheet);
 
 function sheetData() {
@@ -1679,12 +1702,20 @@ function placeHands(open, fadeIn) {
 }
 function hideHands() { $('handL').style.opacity = 0; $('handR').style.opacity = 0; }
 
-async function toEnd() {
+// 结尾那张纸下面「Back to the start」：先快速降回 0（update 里），再回 dashboard
+function goHome() {
+  if (bk.descend) return;
+  bookUI.toc(null);
+  bk.descend = { at: performance.now(), from: bk.rulerH ?? C.book.skyScene.height, done: false };
+  if (BOOK && book) app.endImagesP = sheetImages(sheetArgs()).catch(() => null);   // 卡片上那张纸，降的时候就先画好
+}
+
+async function toEnd(back = false) {
   setState('end');
   if (skyScene.vid) skyScene.vid.pause();
   if (skyScene.first) skyScene.first.pause();
-  if (BOOK && book) { try { app.endImages = await sheetImages(sheetArgs()); } catch { /* 没有就放纸羽毛 */ } }
-  if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(); return; }
+  if (BOOK && book) { try { app.endImages = await (app.endImagesP || sheetImages(sheetArgs())); } catch { /* 没有就放纸羽毛 */ } }
+  if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(back); return; }
   $('dash').style.display = 'block';
   $('dStart').style.display = 'none';
   $('dEnd').style.opacity = 1;

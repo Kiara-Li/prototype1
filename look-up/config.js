@@ -36,6 +36,7 @@ window.LOOKUP = {
     captions: false,            // 竖排小图注（太小看不清，先不显示）
     numbers: false,             // 组号
     rulerInchesPerScreen: 84,   // 高度尺：一屏高 = 多少英寸（7 英尺）
+    descendMs: 1100,            // 结尾「Back to the start」：尺子从天空降回 0 要多久（要快）
     rulerLine: '#7b7b7b',       //         线和刻度的颜色（和 dashboard 的线一样）
     heightPx: 11,               // 左边高度尺的字号
     heightTickPx: 28,           // 刻度线长度
@@ -341,6 +342,7 @@ window.LOOKUP = {
     smallCard: 11,              // 缩小后的卡片边长（u）
     handsHoldMs: 0,             // 检测到手势之后，四角标记出现、再停这么久进入（0 = 马上）
     leaveSteps: [450, 340, 340, 700],    // 进入网站：线贴住卡片 → 合成十字 → 分开成灰方块 → 散开（毫秒）
+    backSteps: [240, 180, 180, 360],     // 结尾回来：上面那段倒着放，更快（毫秒，顺序和 leaveSteps 一样）
     chapters: [0, 12, 60, 180, 600, 2400, 12000, 60000],   // TODO 占位：chapter 的刻度（英寸），之后按真正的 chapter 改
   },
 
