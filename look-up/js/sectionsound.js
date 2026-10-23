@@ -5,6 +5,9 @@
 //   every   隔一会儿响一次，间隔在 everyMs 范围里随机（踩在铁梯上的脚步）
 // 换 section 的时候，上一段淡出、这一段淡入。文件找不到就不响，不报错。
 // 和 skysound.js（路灯 → 天空那段）、audio.js（按高度切换，关着）互不影响。
+//
+// 底音（cfg.bed）：Kiara 在联合广场公园录的环境声，从第一章开始一直放（循环），是主要的声音；
+// 上面每一章那一点（别人录的）只是辅助，比底音小。去天空之前慢慢压低，进天空淡掉（让给翅膀声）。
 
 export function createSectionSound(cfg) {
   let ctx = null;
@@ -100,5 +103,36 @@ export function createSectionSound(cfg) {
     s.timer = setTimeout(() => once(s, s.c), s.c.firstMs || 900);
   }
 
-  return { enter, spread, stop: () => ctx && stopCur(cfg.fadeOutSec) };
+  // ---- 底音
+  let bed = null;
+  async function bedStart() {
+    if (bed || !cfg.bed) return;
+    audio();
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    gain.connect(ctx.destination);
+    bed = { gain, src: null };
+    const b = await load(cfg.bed.src);
+    if (!b || !bed) return;
+    const src = ctx.createBufferSource();
+    src.buffer = b;
+    src.loop = true;
+    src.loopStart = 1;
+    src.loopEnd = Math.max(2, b.duration - 1);
+    src.connect(gain);
+    src.start(0, 1);
+    bed.src = src;
+    bedTo(cfg.bed.vol, cfg.bed.fadeInSec);
+  }
+  // 底音的音量慢慢变到 v（0 = 停）
+  function bedTo(v, sec) {
+    if (!bed || !ctx) return;
+    const t = ctx.currentTime;
+    const g = bed.gain.gain;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(v, t + sec);
+  }
+
+  return { enter, spread, stop: () => ctx && stopCur(cfg.fadeOutSec), bedStart, bedTo };
 }

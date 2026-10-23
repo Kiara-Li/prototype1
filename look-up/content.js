@@ -81,6 +81,7 @@ window.CONTENT = {
     next: 'Go higher',
     read: 'Next',
     skip: 'Skip',
+    pick: 'Pick one',                               // 问题下面：在这一章切下来的鸽子里选一只
     inch: 'inch',
   },
 
@@ -122,23 +123,23 @@ window.CONTENT = {
   // ---- 每一页卡片上的历史照片：切到这一页的鸽子以后，卡片翻过来是这一句（组号 → 一句）
   // 只写图注上有的、或者有把握的事；不确定的就不写
   photoIntros: {
-    '35': 'Before air conditioning, a shop kept cool with canvas.',
-    '43': 'The glass canopy at Zero Irving on East 14th Street, photographed in 2023.',
+    '35': 'Before air conditioning, a shop kept cool with canvas, and the street gathered underneath.',
+    '43': 'A glass canopy on East 14th Street, 2023. People still wait under it for the rain to pass.',
     '45': 'James and Karla Murray have spent decades photographing New York storefronts and their signs.',
     '51': 'Some signs outgrow their shops. The Hollywood Sign, 2013.',
-    '55': 'Berenice Abbott photographed this poultry shop in 1937 for Changing New York.',
+    '55': 'Berenice Abbott photographed this poultry shop on the Lower East Side in 1937, while the city changed around it.',
     '39': 'Helen Levitt photographed the streets of New York, mostly children at play.',
-    '53': 'André Kertész photographed this glass bust on his window in 1978.',
+    '53': 'A glass bust on André Kertész’s window, 1978. For years he photographed the city from that window.',
     '59': 'The same corner in the 1950s, under the Academy of Music’s marquee.',
-    '63': 'Berkeley, 1968. A man climbs onto the traffic light at Haste and Telegraph.',
+    '63': 'Berkeley, 1968. A man climbs up to sit on the traffic light at Haste and Telegraph.',
     '49': 'In 1934 the city photographed the backs of tenements, with people sitting out on the fire escapes.',
-    '67': 'On hot nights people slept on the fire escapes. Weegee, around 1938.',
+    '67': 'On hot nights the fire escape became a bedroom. Weegee photographed these children on the Lower East Side, around 1938.',
     '69': 'Two men balance between a fire escape and a utility line.',
     '47': 'Tom Otterness’s small bronze figures in Nelson Rockefeller Park, among the Type B lampposts.',
     '71': 'Around 1910, lamp trimmers climbed up to service each arc lamp by hand.',
     '73': 'Mark Handforth’s Lamppost, made for the Public Art Fund in 2003.',
     '75': 'Alexander Rodchenko pointed his camera straight up a fire escape in Moscow, 1925.',
-    '77': 'Lewis Hine photographed the men who built the Empire State Building. He called this one Icarus.',
+    '77': 'Lewis Hine photographed the men who built the Empire State Building, high above the city. He called this one Icarus.',
   },
 
   // ---- 书：每个 section 之前的指引（现在屏幕上只出现往上走的 LOOK UP，这些句子不用了）（一句比一句往上）。顺序和 config.book.sections 一样

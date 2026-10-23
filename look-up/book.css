@@ -71,6 +71,8 @@
 #bk .bk-br { font-family: var(--mono); margin: 0 0.15em; }
 #bk .bk-slot { display: inline-block; width: calc(var(--u) * 4.4); height: calc(var(--u) * 3.2); vertical-align: middle; overflow: hidden; margin: 0 0.3em; }
 #bk .bk-slot .bk-piece { position: static; }
+#bk .bk-slot { position: relative; overflow: visible; }
+#bk .bk-was { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); white-space: nowrap; }
 
 /* 提示（教学、没有摄像头时） */
 /* 提示：放在要做的动作旁边（位置由 bookui.js 给），最多三四行宽 */
@@ -119,6 +121,17 @@
 #bk .bk-poem { margin-top: 0; text-align: center; }
 #bk .bk-poem .bk-w, #bk .bk-poem .bk-br { display: inline-block; }
 #bk .bk-slot { box-shadow: 0 0 0 1px rgba(0,0,0,0.06); }
+/* 问题下面：这一章切下来的鸽子，选一只（选中的有左下 / 右上两个角标） */
+#bk .bk-choose { margin-top: calc(var(--u) * 2); }
+#bk .bk-chooselab { font-family: var(--mono); font-size: max(11px, calc(var(--u) * 0.9)); letter-spacing: 0.12em; color: #7b7b7b; margin-bottom: calc(var(--u) * 0.7); }
+#bk .bk-picks { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 0.9); }
+#bk .bk-pick { position: relative; width: calc(var(--u) * 4.6); height: calc(var(--u) * 4.6); padding: 0; border: 0; background: none; cursor: pointer; opacity: 0.55; transition: opacity 200ms; }
+#bk .bk-pick img { display: block; width: 100%; height: 100%; object-fit: cover; }
+#bk .bk-pick.on, #bk .bk-pick:hover { opacity: 1; }
+#bk .bk-pick::before, #bk .bk-pick::after { content: ""; position: absolute; width: 0.9em; height: 0.9em; border: 0 solid #000; opacity: 0; transition: opacity 200ms; font-size: calc(var(--u) * 1.2); }
+#bk .bk-pick::before { left: -0.35em; bottom: -0.35em; border-left-width: 2px; border-bottom-width: 2px; }
+#bk .bk-pick::after { right: -0.35em; top: -0.35em; border-top-width: 2px; border-right-width: 2px; }
+#bk .bk-pick.on::before, #bk .bk-pick.on::after { opacity: 1; }
 #bk .bk-grp { display: inline-block; white-space: nowrap; margin-right: 0.25em; }
 
 /* 历史照片的信息：卡片上面一行（摄影师, 标题），右边竖排（年份 · 收藏） */

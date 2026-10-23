@@ -111,10 +111,10 @@ html.dx-on #grain { display: none; }
                     font-size: calc(var(--u) * 1.2); line-height: calc(var(--u) * 1.5); letter-spacing: 0.12em; color: var(--dx-grey-ink); }
 
 /* 你的羽毛 */
-#dx .dx-fimg { position: absolute; left: 12%; top: 8%; width: 76%; height: 62%; object-fit: contain; transform: rotate(-12deg); pointer-events: none; }
-#dx .dx-ftext { position: absolute; left: calc(var(--u) * 3); right: calc(var(--u) * 3); bottom: calc(var(--u) * 3);
-                font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em; white-space: nowrap; }
-#dx .dx-face[data-kind="feather"] { cursor: pointer; }
+/* 结尾的卡片：你做的那张纸铺满（正面拼贴 / 背面诗）；还没有的时候放 Kiara 折的纸羽毛 */
+#dx .dx-fimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+#dx .dx-fimg.fold { inset: 12%; width: 76%; height: 76%; object-fit: contain; transform: rotate(-12deg); }
+#dx .dx-face[data-kind="feather"], #dx .dx-face[data-kind="poem"] { cursor: pointer; }
 
 /* 摄像头小窗（两个测试的时候）：正方形、黑白、镜像，左下 / 右上两个角标 */
 #dx .dx-cam { opacity: 0; pointer-events: none; }

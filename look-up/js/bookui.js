@@ -382,9 +382,14 @@ export function createBookUI(o) {
   let answersDone = null;
   let idleTimer = 0;
   let poemLabel = '';
-  function openQuestion(question, done, label) {
+  // choices：这一章切下来的鸽子（图片地址）。不止一只时，问题下面一排让人选一只；诗里只放选中的那一只
+  let choices = [];
+  let pick = 0;
+  function openQuestion(question, done, label, picks = []) {
     answersDone = done;
     poemLabel = label || '';
+    choices = picks;
+    pick = 0;
     const W = window.innerWidth;
     const H = window.innerHeight;
     const pw = Math.min(W - 8 * u, 57 * u);
@@ -415,6 +420,8 @@ export function createBookUI(o) {
     el.pbody.innerHTML = `
       <div class="bk-q">${wrap(question.prompt, pw - 5 * u, 2.11 * u, sans()).map(rv).join('')}</div>
       <div class="bk-fill">${fillHtml}</div>
+      ${choices.length > 1 ? `<div class="bk-choose"><div class="bk-chooselab">${esc(TB.pick)}</div><div class="bk-picks">${
+        choices.map((c, i) => `<button class="bk-pick${i === 0 ? ' on' : ''}" data-k="${i}"><img src="${esc(c)}" alt=""></button>`).join('')}</div></div>` : ''}
       <div class="bk-pbtns"><button class="bk-btn bk-quiet" data-act="pskip">${rv(TB.skip)}</button>
       <button class="bk-btn bk-done" data-act="done">${rv(TB.done)}</button></div>`;
     el.pbody.querySelectorAll('.rv-t').forEach((t) => { t.style.visibility = 'hidden'; });
@@ -430,6 +437,13 @@ export function createBookUI(o) {
     });
     el.pbody.querySelector('.bk-done').onclick = () => compose(question, poemLabel);
     el.pbody.querySelector('[data-act="pskip"]').onclick = () => closePanel(null);   // 不回答，直接往上
+    el.pbody.querySelectorAll('.bk-pick').forEach((b) => {
+      b.onclick = () => {
+        pick = Number(b.dataset.k);
+        el.pbody.querySelectorAll('.bk-pick').forEach((x) => x.classList.toggle('on', x === b));
+        idleTimer && clearTimeout(idleTimer);
+      };
+    });
     setTimeout(() => ins[0] && ins[0].focus(), B.panelMs);
     // 一直没人动：过一会儿自己跳过（不让人卡在这里）；但只要输入框里有字、或者光标还在输入框里，就不跳过
     clearTimeout(idleTimer);
@@ -450,61 +464,84 @@ export function createBookUI(o) {
     };
   }
 
-  // 填完：句子里你的词后面各放一块切下来的鸽子 {  }，方块从右上角飞进来；剩下的接在句子后面
+  // 填完：选中的那只鸽子飞进句子里，换掉 [ ] 里那个词（雨棚、窗台……就是它站着的那个东西）
   function compose(question, label) {
     clearTimeout(idleTimer);
     const ins = [...el.pbody.querySelectorAll('.bk-in')];
     const answers = ins.map((i) => i.value.trim());
-    const parts = plainSentence(question.sentence).split('___');
+    // 选中的那只鸽子从哪里飞过来：选择那一排里它的位置（只有一只时：右上角那一叠）
+    const pickBtn = el.pbody.querySelector(`.bk-pick[data-k="${pick}"]`);
+    const from = pickBtn ? pickBtn.getBoundingClientRect() : pieces[0] ? pieces[0].el.getBoundingClientRect() : null;
+    const src = choices[pick] || (pieces[0] && pieces[0].el.src);
+    // 第一个 [词] 换成鸽子的位置（词先还在，鸽子落上去时淡掉）；其余的 [ ] 照常显示
+    let word = '';
+    const sent = question.sentence.replace(/\[([^\]]*)\]/, (m, w) => { word = w; return src ? '\u0001' : w; });
+    const parts = plainSentence(sent).split('___');
+    const words = (t) => t.split('\u0001').map((x) => (x ? `<span class="bk-w">${esc(x)}</span>` : ''))
+      .join(`<span class="bk-slot"><span class="bk-was">${esc(word)}</span></span>`);
     let html = '';
-    let n = 0;
     parts.forEach((p, i) => {
-      html += `<span class="bk-w">${esc(p)}</span>`;
-      if (i < parts.length - 1) {
-        // 你的词和它后面的 { 鸽子 } 绑在一起，不在中间断行
-        const piece = n < pieces.length ? `<span class="bk-slot" data-n="${n++}"></span>` : '';
-        html += `<span class="bk-grp"><span class="bk-w bk-ans">${esc(answers[i] || '…')}</span>${piece}</span>`;
-      }
+      html += words(p);
+      if (i < parts.length - 1) html += `<span class="bk-w bk-ans">${esc(answers[i] || '…')}</span>`;
     });
-    while (n < pieces.length) html += `<span class="bk-grp"><span class="bk-slot" data-n="${n++}"></span></span>`;
     el.pbody.innerHTML = `<div class="bk-poemwrap"><div class="bk-plabel">${rv(label || '')}</div><div class="bk-poem">${html}</div></div>`;
     el.pbody.querySelectorAll('.bk-w').forEach((w, i) => w.animate([{ opacity: 0, transform: 'translateY(0.25em)' }, { opacity: 1, transform: 'none' }],
       { duration: 700, delay: 80 + i * 45, easing: EASE_OUT, fill: 'backwards' }));
     reveal(el.pbody.querySelector('.bk-plabel'), { delay: 200 });
-    // 方块从右上角飞到句子里
-    const slots = [...el.pbody.querySelectorAll('.bk-slot')];
-    slots.forEach((slot, i) => {
-      const p = pieces[i];
-      const a = p.el.getBoundingClientRect();
-      const b = slot.getBoundingClientRect();
-      const img = p.el;
-      img.getAnimations().forEach((x) => x.cancel());
+    const slot = el.pbody.querySelector('.bk-slot');
+    if (slot && src) {
+      const img = document.createElement('img');
+      img.className = 'bk-piece';
+      img.src = src;
       slot.appendChild(img);
-      Object.assign(img.style, { position: 'static', left: '', top: '', width: '100%', height: '100%', transform: 'none' });
-      img.animate([
-        { transform: `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(${a.width / b.width})`, transformOrigin: '0 0' },
-        { transform: 'none', transformOrigin: '0 0' },
-      ], { duration: B.poemFlyMs, delay: i * 120, easing: EASE, fill: 'backwards' });
-    });
+      Object.assign(img.style, { position: 'relative', zIndex: 1, width: '100%', height: '100%', objectFit: 'cover' });
+      if (from) {
+        const b = slot.getBoundingClientRect();
+        img.animate([
+          { transform: `translate(${from.left - b.left}px, ${from.top - b.top}px) scale(${from.width / b.width})`, transformOrigin: '0 0' },
+          { transform: 'none', transformOrigin: '0 0' },
+        ], { duration: B.poemFlyMs, easing: EASE, fill: 'backwards' });
+      }
+      slot.querySelector('.bk-was').animate([{ opacity: 1 }, { opacity: 0 }],
+        { duration: B.poemFlyMs * 0.5, delay: B.poemFlyMs * 0.5, easing: EASE_OUT, fill: 'both' });
+    }
+    // 右上角那一叠：这一章用完了，淡掉
+    for (const p of pieces) {
+      p.el.getAnimations().forEach((x) => x.cancel());
+      const a = p.el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, easing: EASE_OUT, fill: 'forwards' });
+      quiet(a.finished).then(() => p.el.remove());
+    }
     setText(el.h, '');
     // 诗停一会儿，自己收走（不用点）
-    setTimeout(() => closePanel(answers), B.poemFlyMs + slots.length * 120 + B.poemHoldMs);
+    setTimeout(() => closePanel(answers), B.poemFlyMs + B.poemHoldMs);
   }
 
   function closePanel(answers) {
     if (!answersDone) return;                        // 已经在收了
     clearTimeout(idleTimer);
-    // 往上飘走（接着就是「再往上看」）
-    const a = el.panel.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${-6 * u}px)` }], { duration: 900, easing: EASE_IN, fill: 'forwards' });
+    // 收起来存好：缩成一点，飞进屏幕上方的目录（这一章做完了）；跳过：往上淡掉
+    const pr = el.panel.getBoundingClientRect();
+    const tr = el.toc.getBoundingClientRect();
+    const dx = tr.left + tr.width / 2 - (pr.left + pr.width / 2);
+    const dy = tr.top - (pr.top + pr.height / 2);
+    el.panel.style.transformOrigin = '50% 50%';
+    const a = answers
+      ? el.panel.animate([
+        { opacity: 1, transform: 'none' },
+        { opacity: 1, transform: 'scale(0.96)', offset: 0.18 },
+        { opacity: 0, transform: `translate(${dx}px, ${dy}px) scale(0.03)` },
+      ], { duration: 650, easing: EASE_IN, fill: 'forwards' })
+      : el.panel.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${-4 * u}px)` }], { duration: 450, easing: EASE_IN, fill: 'forwards' });
     quiet(a.finished).then(() => {
       a.cancel();
+      el.panel.style.transformOrigin = '';
       el.panel.style.display = 'none';
       el.pbody.innerHTML = '';
       el.card.style.visibility = '';
       pieces.length = 0;
       const done = answersDone;
       answersDone = null;
-      if (done) done(answers);
+      if (done) done(answers, pick);
     });
   }
 

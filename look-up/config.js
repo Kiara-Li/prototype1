@@ -75,8 +75,8 @@ window.LOOKUP = {
     // 天空（js/main.js 的 startSky）：抬头以后的一场，不切鸽子
     skyScene: {
       height: 960,              // 尺子冲到这里（英寸）
-      video: 'assets/video/sky.mp4',   // IMG_7637，天空和鸽子，没有声音
-      videoHeight: 0.84,        // 视频占屏幕多高（竖的，放在中间）
+      videoFirst: 'assets/video/sky_birds.mp4',   // 先放一遍：IMG_7642，蓝天里一群鸽子飞过（没有声音）
+      video: 'assets/video/sky.mp4',   // 接着一直循环：IMG_7637，天空和鸽子（没有声音）。两段都铺满屏幕，只把鸽子印到云上
       sinkMs: 3200,             // 最后那页书往下沉、淡掉
       videoAt: 3400,            // 背景差不多全蓝了视频才开始浮现（不然半灰的背景上会看出一条）
       birdsAt: 1000,            // 鸽子开始飞（有声音时：对到翅膀声开始的那一刻）
@@ -89,14 +89,16 @@ window.LOOKUP = {
       stops: ['#3a78cb', '#3674c5', '#316fbf', '#2d6bba', '#2b68b7', '#2a68b7', '#2a69b9', '#2c6dbe', '#3072c5', '#3478ce'],
       fadeMs: 4000,             // 从灰渐变成蓝要多久
       cloudAlpha: 1,            // 云（assets/sky/clouds.jpg）铺在蓝色上，多不透明
-      featherX: 0.3,            // 视频左右各羽化多少（那一栏宽度的比例）
-      featherY: 0.1,            //     上下
+      featherX: 0.06,           // 视频四边羽化多少（铺满屏幕，只留一点）
+      featherY: 0.04,           //     上下
       videoFadeMs: 2500,        // 视频慢慢浮现
     },
     // 每个 section 自己的一点声音（js/sectionsound.js）：很小声，垫在下面。文件放在 sound/sections/，没有就不响
     //   loop 一直循环 · spread 每翻到一页响一次 · every 隔一会儿响一次（everyMs 之间随机）
     sectionSounds: {
-      master: 1,
+      // 底音：Kiara 在联合广场公园录的（主要的声音）；下面每一章那一点是别人录的，只是辅助（master 压低）
+      bed: { src: 'sound/union_square.m4a', vol: 0.3, fadeInSec: 4, lowVol: 0.14, lowSec: 6 },
+      master: 0.6,
       fadeInSec: 2.5,
       fadeOutSec: 1.5,
       sections: {
@@ -113,6 +115,7 @@ window.LOOKUP = {
     photoVideos: {
       '43': { src: 'assets/video/awning.mp4', rate: 2, delayMs: 1200 },
       '63': { src: 'assets/video/streetlight.mp4', rate: 2, delayMs: 1200 },
+      '77': { src: 'assets/video/high.mp4', rate: 1, delayMs: 1200 },   // 路灯那页（去天空之前最高的一页）：IMG_7643 的 10–13 秒，楼角、路灯、电线上的鸽子飞起来
     },
     videos: {
       last: { src: 'assets/video/sky.mp4', rate: 1, delayMs: 1500, loop: true, blend: true },   // blend：四边羽化，融进背景             // 最后：天空最后一页右边那一栏；IMG_7637 天空和鸽子，去掉了声音
@@ -120,7 +123,7 @@ window.LOOKUP = {
     // 没放进来的组：01–33（低于视线，或者不在白名单）、37、41、57、61、65、79、81
     lookAbove: 0.2,             // 抬头判定：lookValue 超过这个（约 8°）……
     lookHoldMs: 250,            //          ……保持这么久就算
-    poemHoldMs: 4500,           // 诗拼好以后停多久，自己收走
+    poemHoldMs: 1600,           // 诗拼好以后停多久，就收起来存好（缩进屏幕上方的目录）
     questionIdleMs: 45000,      // 问题这么久没人动（输入框是空的、光标也不在里面）：自己跳过
     skipLook: 0.75,             // 用力抬头（约 17° 以上 / 按住 ↑）……
     skipHoldMs: 1500,           // ……保持这么久：不找鸽子也往上走

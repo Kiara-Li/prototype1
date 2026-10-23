@@ -23,7 +23,7 @@ import { createDashboard } from './dashboard.js';
 import { loadBook, loadGroup, bookLayout, baselineOf, spreadRects, drawSpread, drawBaseline, revealTotal } from './book.js';
 import { createBookUI } from './bookui.js';
 import { createSkySound } from './skysound.js';
-import { openSheet } from './sheet.js';
+import { openSheet, sheetImages } from './sheet.js';
 import { openFold } from './fold.js';
 import { createSectionSound } from './sectionsound.js';
 
@@ -57,10 +57,12 @@ const app = {
   answers: [],
   answerParts: [],         // 书：每个 section 填的词（数组），最后那张纸上用
   pieces: [],              // 书：一路切下来的鸽子 { canvas, h, sec }，最后拼成一张纸
+  choice: {},              // 书：每一章问问题时选的那一只（放进诗里）
   groundFeathers: [],
   newFeather: null,
   view: { s: 1, dy: 0 },   // dashboard / 开场时整个画面的放大和偏移
   clearConfirm: false,
+  startSec: Number(PARAMS.get('chapter')) || 0,     // 从第几章进去（dashboard 上点了 chapter）
 };
 window.lookUp = { app, input, found, sky };   // 控制台调试用
 
@@ -110,8 +112,12 @@ function setupNewDashboard() {
   try { unlocked = localStorage.getItem(C.storage.unlocked) === '1'; } catch { /* */ }
   if (PARAMS.has('unlock')) unlocked = true;
   if (PARAMS.has('lock')) unlocked = false;
-  // chapter 刻度（占位）：每个高度用离它最近的那一行的照片当窗口里的画面
-  const chapters = C.dash.chapters.map((h) => {
+  // chapter 刻度：书里的每一章。窗口里放这一章第一页最大的那张自己拍的照片（天空：云）；点一下从这一章进去
+  const chapters = BOOK && book ? tocItems().map((it, i) => {
+    const g = book.sections[i].groups[0];
+    const own = g ? g.images.filter((x) => x.own).sort((a, b) => b.w * b.h - a.w * a.h)[0] : null;
+    return { h: it.h, label: `${it.name} · ${it.h}″`, src: own ? `../data/${own.file}` : 'assets/sky/clouds.jpg' };
+  }) : C.dash.chapters.map((h) => {
     let best = null;
     for (const r of world.rows) if (!best || Math.abs(Math.log1p(r.h) - Math.log1p(h)) < Math.abs(Math.log1p(best.h) - Math.log1p(h))) best = r;
     return { h, label: fmtHeight(h), src: best ? best.items[0].photo.src : null };
@@ -124,7 +130,21 @@ function setupNewDashboard() {
       startAudio();
       setState('ascent');
     },
+    // 点一个 chapter：从这一章进去（这一次已经走完了：重新打开页面，直接从那一章开始）
+    onChapter: (i) => {
+      if (app.state !== 'dashboard') {
+        const q = new URLSearchParams(location.search);
+        q.set('skipdash', '');
+        q.set('chapter', String(i));
+        location.search = q.toString().replace(/=(&|$)/g, '$1');
+        return;
+      }
+      app.startSec = i;
+      driver.begin();
+      dash.enter();
+    },
     feather: {
+      images: () => app.endImages,                 // 结尾卡片：你做的那张纸（正面拼贴 / 背面诗）
       download: () => showSheet(),
       print: () => showSheet(),
       fold: () => openFold(T.sheet),
@@ -360,7 +380,7 @@ function cardRect(now) {
 function bookUpdate(now, dt) {
   const B = C.book;
   // 一进来就是第一页（不先放一句指引）：等 dashboard 的线框完全散开、只剩空白，再从下面滑上来
-  if (bk.phase === 'guide' && bk.sec === -1 && !(dash && dash.step === 'leaving')) enterSection(0, now);
+  if (bk.phase === 'guide' && bk.sec === -1 && !(dash && dash.step === 'leaving')) enterSection(app.startSec || 0, now);
   if (bk.phase === 'guide' || bk.phase === 'skyguide') {
     // 判定很宽松：抬一下头就算
     if (app.pausedQ === null && input.lookValue > B.lookAbove) {
@@ -619,15 +639,19 @@ function askSection() {
   input.frame.active = false;
   const sec = bk.sec;
   const q = sectionText().question;
-  bookUI.openQuestion(q, (answers) => {
+  // 这一章切下来的鸽子：让人选一只放进诗里
+  const mine = app.pieces.filter((p) => p.sec === sec);
+  mine.forEach((p) => { if (!p.url) p.url = p.canvas.toDataURL('image/jpeg', 0.85); });
+  bookUI.openQuestion(q, (answers, pick) => {
     if (answers) {
       app.answerParts[sec] = answers;
+      if (mine[pick]) app.choice[sec] = mine[pick];
       const parts = q.sentence.replace(/\[([^\]]*)\]/g, '$1').split('___');
       app.answers[sec] = parts.map((p, i) => p + (i < answers.length ? answers[i] || '…' : '')).join('').trim();
       try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
     }
     finishSection();
-  }, '');
+  }, '', mine.map((p) => p.url));
 }
 
 // 这个 section 和下一个 section 的图片开始下载（书里别的页不下载）
@@ -682,16 +706,23 @@ function startSky(now) {
   bookUI.place(null);                                  // 历史照片的卡片收掉（天空里没有书页了）
   bookUI.hideTutorial();
   if (!bookUI.tutorial) bookUI.setHint('');
-  if (!skyScene.vid) {
+  // 两段天空视频（都静音）：先是一群鸽子飞过（IMG_7642，放一遍），接着是天空和鸽子（IMG_7637，一直循环）
+  const mk = (src, loop) => {
     const v = document.createElement('video');
-    Object.assign(v, { muted: true, playsInline: true, loop: true, preload: 'auto', src: S.video });
+    Object.assign(v, { muted: true, playsInline: true, loop, preload: 'auto', src });
     v.setAttribute('muted', '');
     v.setAttribute('playsinline', '');
     v.className = 'hidden-video';
     document.body.appendChild(v);
-    skyScene.vid = v;
+    return v;
+  };
+  if (!skyScene.first) {
+    skyScene.first = mk(S.videoFirst, false);
+    skyScene.vid = mk(S.video, true);
+    skyScene.first.addEventListener('ended', () => quiet(skyScene.vid.play()));
   }
-  quiet(skyScene.vid.play());
+  skyScene.first.currentTime = 0;
+  quiet(skyScene.first.play());
   // 鸽子：一路切下来的那些，从屏幕底下错开飞上去
   const n = app.pieces.length;
   skyScene.birds = app.pieces.map((p, i) => ({
@@ -703,13 +734,15 @@ function startSky(now) {
   }));
   skyScene.askAfter = n * S.birdStaggerMs + S.birdFlyMs * 0.6;      // 鸽子起飞以后多久问天空那一句
 }
-// 天空视频在屏幕上的位置：竖的，在中间，差不多一屏高
+// 天空视频在屏幕上的位置：铺满整个屏幕（鸽子尽量大）
 function skyVideoRect() {
   const { W, H } = app;
-  const h = H * C.book.skyScene.videoHeight;
-  const w = Math.min(W * 0.6, (h * 9) / 16);
+  const w = Math.max(W, (H * 9) / 16);
+  const h = (w * 16) / 9;
   return { x: (W - w) / 2, y: (H - h) / 2, w, h };
 }
+// 现在放的是哪一段：第一段放完以后是第二段
+const skyVideo = () => (skyScene.first && !skyScene.first.ended && !skyScene.first.error ? skyScene.first : skyScene.vid);
 function quiet(p) { return p && p.catch ? p.catch(() => {}) : p; }
 
 function drawSkyScene(now, L, o) {
@@ -728,7 +761,7 @@ function drawSkyScene(now, L, o) {
   // 基线（地平线）留着，把两边的尺子连起来
   if (bk.cur && bk.baseY !== null) drawBaseline(ctx, bk.cur, L, bk.baseY, W, C.book.ink, 1 - 0.65 * sink);
   // 天空视频：慢慢浮现，四边羽化
-  const v = skyScene.vid;
+  const v = skyVideo();
   if (v && v.readyState >= 2 && t > S.videoAt) {
     drawFeathered(v, skyVideoRect(), Math.min(1, (t - S.videoAt) / C.book.skyBg.videoFadeMs));
   }
@@ -770,7 +803,10 @@ function jumpTo(i) {
   if (bk.skyAt >= 0 && !book.sections[i].sky) {
     bk.skyAt = -1;
     if (skyScene.vid) skyScene.vid.pause();
+    if (skyScene.first) skyScene.first.pause();
   }
+  // 跳回翅膀那段之前：底音回到正常音量
+  if (sectionSound && !book.sections[i].sky && book.sections[i].key !== C.book.skySound.startSection) sectionSound.bedTo(C.book.sectionSounds.bed.vol, 2);
   enterSection(i, performance.now());
 }
 
@@ -790,8 +826,11 @@ function enterSection(i, now) {
   preloadSection(i);
   // 去天空之前的那段声音：路灯开始时从头放；进入天空时接到翅膀拍动
   const sec = book.sections[i];
-  if (skySound && sec.key === C.book.skySound.startSection) skySound.start();
-  if (skySound && sec.sky) skySound.toFinale();
+  // 底音（联合广场公园）：从第一章开始一直放；翅膀那段开始时压低，进天空淡掉
+  if (sectionSound) sectionSound.bedStart();
+  const bedCfg = C.book.sectionSounds.bed;
+  if (skySound && sec.key === C.book.skySound.startSection) { skySound.start(); if (sectionSound) sectionSound.bedTo(bedCfg.lowVol, bedCfg.lowSec); }
+  if (skySound && sec.sky) { skySound.toFinale(); if (sectionSound) sectionSound.bedTo(0, 3); }
   if (sectionSound) sectionSound.enter(sec.key);      // 这个 section 自己的一点声音（雨、铃声、嘀嗒……）
   if (sec.sky) { startSky(now); return; }
   bk.phase = 'section';
@@ -974,7 +1013,7 @@ function drawSkyBg(now, L) {
   const k = ease(Math.min(1, (now - bk.skyAt) / S.fadeMs));
   const r = skyVideoRect();
   if (!skyLive.stops) skyLive.stops = S.stops.map((c) => hex(c));
-  const v = skyScene.vid;
+  const v = skyVideo();
   if (v && v.readyState >= 2 && now - bk.skyAt > C.book.skyScene.videoAt) sampleVideo(v, r.w / r.h);
   const g = ctx.createLinearGradient(0, r.y, 0, r.y + r.h);
   const n = skyLive.stops.length;
@@ -1552,17 +1591,20 @@ function setupDashboard() {
   $('eAgain').onclick = () => location.reload();
 }
 
-// 书：最后的纸（碎片拼成的网格，翻过来是诗），在 js/sheet.js
-function showSheet(opts = {}) {
-  if (!BOOK || !book) return;
+// 最后那张纸要用的东西：碎片、每章选的那只、诗、尺子上的高度、日期
+function sheetArgs() {
   const secs = book.sections.map((s, i) => T.sections[i]).filter(Boolean);
-  openSheet({
-    ...opts,
-    pieces: app.pieces, sections: secs, answers: app.answerParts, T: T.sheet,
+  return {
+    pieces: app.pieces, choice: app.choice, sections: secs, answers: app.answerParts, T: T.sheet,
     // 尺子上的高度：这一段最后一页（问问题的那一页）的高度；天空用 content.js 里的
     heights: secs.map((s, i) => { const gs = book.sections[i].groups; return book.sections[i].sky ? s.height : gs.length ? gs[gs.length - 1].height_in : 0; }),
     date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-  });
+  };
+}
+// 书：最后的纸（碎片拼成的网格，翻过来是诗），在 js/sheet.js
+function showSheet(opts = {}) {
+  if (!BOOK || !book) return;
+  openSheet({ ...sheetArgs(), ...opts });
 }
 window.lookUp.sheet = showSheet;
 window.lookUp.fold = () => openFold(T.sheet);
@@ -1636,9 +1678,11 @@ function placeHands(open, fadeIn) {
 }
 function hideHands() { $('handL').style.opacity = 0; $('handR').style.opacity = 0; }
 
-function toEnd() {
+async function toEnd() {
   setState('end');
   if (skyScene.vid) skyScene.vid.pause();
+  if (skyScene.first) skyScene.first.pause();
+  if (BOOK && book) { try { app.endImages = await sheetImages(sheetArgs()); } catch { /* 没有就放纸羽毛 */ } }
   try { localStorage.setItem(C.storage.unlocked, '1'); } catch { /* */ }
   if (dash) { app.view.s = 1; app.view.dy = 0; dash.showEnd(); return; }
   $('dash').style.display = 'block';

@@ -20,6 +20,35 @@ const MUTE = '#8c8c8c';
 const clouds = new Image();
 clouds.src = 'assets/sky/clouds.jpg';
 
+// 鸽子碎片：一层灰色的滤镜 + Figma 那种 Texture（每个像素在半径里随机挪一下，边缘碎成颗粒）；算一次就存起来
+function textured(p) {
+  if (p.tex) return p.tex;
+  const src = p.canvas;
+  const n = src.width;
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.filter = 'grayscale(0.9) contrast(1.06)';
+  g.drawImage(src, 0, 0);
+  g.filter = 'none';
+  const R = Math.max(2, Math.round(n * 0.0095));     // Figma：Size 1，Radius 2.6（按碎片大小换算）
+  const from = g.getImageData(0, 0, n, n).data;
+  const out = g.createImageData(n, n);
+  const d = out.data;
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const sx = Math.min(n - 1, Math.max(0, x + Math.round((Math.random() * 2 - 1) * R)));
+      const sy = Math.min(n - 1, Math.max(0, y + Math.round((Math.random() * 2 - 1) * R)));
+      const i = (y * n + x) * 4;
+      const j = (sy * n + sx) * 4;
+      d[i] = from[j]; d[i + 1] = from[j + 1]; d[i + 2] = from[j + 2]; d[i + 3] = 255;
+    }
+  }
+  g.putImageData(out, 0, 0);
+  p.tex = c;
+  return c;
+}
+
 const fontOf = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name) || 'sans-serif').trim();
 
 // ---------------------------------------------------------------- 正面：网格
@@ -46,7 +75,7 @@ function renderGrid(pieces) {
     const y = cl.y + (cl.y > 0 ? gap / 2 : 0);
     const w = cl.s - (cl.x > 0 ? gap / 2 : 0) - (cl.x + cl.s < SIDE - 1 ? gap / 2 : 0);
     const h = cl.s - (cl.y > 0 ? gap / 2 : 0) - (cl.y + cl.s < SIDE - 1 ? gap / 2 : 0);
-    if (pieces[i]) g.drawImage(pieces[i].canvas, x, y, w, h);
+    if (pieces[i]) g.drawImage(textured(pieces[i]), x, y, w, h);
     else if (clouds.complete && clouds.naturalWidth) {
       // 空格子：露出同一片天（云图铺满整个网格，每格取对应的那一块）
       const sc = Math.max(SIDE / clouds.naturalWidth, SIDE / clouds.naturalHeight);
@@ -92,7 +121,7 @@ function tokens(sec, answers, piece) {
 // 版式参考 Look Up 的海报：左边是一把尺子（短刻度一路排上去，每个 section 一条长线，线上面写高度），
 // 每一句诗坐在自己那条线上；最低的 section 在最下面，越往上越高（读的时候也是一路往上看）。
 // 左上角两行等宽字（Look Up / 日期），下面一条长线
-function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, date }) {
+function renderPoem({ sections, answers, pieceOf, heightOf, title, date }) {
   const c = document.createElement('canvas');
   c.width = c.height = SIDE;
   const g = c.getContext('2d');
@@ -133,18 +162,17 @@ function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, dat
   for (let y = bottom; y > top + 2; y -= band / 5) hline(y, 0, tickW);
 
   // 字号：每一句都放得进自己那一格
-  const stanzas = answered.map((i, k) => ({ i, k, toks: tokens(sections[i], answers[i], pieceOf(i)), ex: Math.min(4, Math.max(0, piecesOf(i).length - 1)) }));
+  const stanzas = answered.map((i, k) => ({ i, k, toks: tokens(sections[i], answers[i], pieceOf(i)) }));
   const measure = (tok, f) => {
     g.font = `${f}px ${sans}`;
     if (tok.img) return g.measureText(tok.pre || '').width + f * 1.62 + g.measureText((tok.post || '') + (tok.tail || '')).width;
     if (tok.blank) return f * 3.2 + g.measureText(tok.tail || '').width;
     return g.measureText(tok.t + (tok.tail || '')).width;
   };
-  // ex：这一句线上蹲着几只鸽子（右边让出它们的位置，字不会撞上）
-  const wrapToks = (toks, f, ex = 0) => {
+  const wrapToks = (toks, f) => {
     g.font = `${f}px ${sans}`;
     const sp = g.measureText(' ').width;
-    const maxW = width - ex * f * 1.43;
+    const maxW = width;
     const lines = [[]];
     let w = 0;
     for (const tok of toks) {
@@ -158,7 +186,7 @@ function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, dat
   let f = SIDE * 0.034;
   for (let tries = 0; tries < 40; tries++) {
     const lh = f * 1.52;
-    if (stanzas.every((st) => wrapToks(st.toks, f, st.ex).length * lh + f * 0.55 <= band - f * 0.25)) break;
+    if (stanzas.every((st) => wrapToks(st.toks, f).length * lh + f * 0.55 <= band - f * 0.25)) break;
     f *= 0.95;
   }
   const lh = f * 1.52;
@@ -166,10 +194,6 @@ function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, dat
   for (const st of stanzas) {
     const y = lineY(st.k);
     hline(y);
-    // 这一段其余切下来的鸽子：蹲在这条线的右端，一只挨一只（最多 4 只）
-    const extra = piecesOf(st.i).slice(1, 5);
-    const ps = f * 1.25;
-    extra.forEach((p, n) => g.drawImage(p.canvas, right - (n + 1) * (ps + f * 0.18) + f * 0.18, y - ps, ps, ps));
     // 高度：等宽字，坐在长线上（和海报上的 25' 一样）
     const h = heightOf(st.i);
     if (h) {
@@ -178,7 +202,7 @@ function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, dat
       g.fillText(`${Math.round(h)}″`, labX, y - labPx * 0.5);
     }
     // 这一句：最后一行坐在线上面一点
-    const lines = wrapToks(st.toks, f, st.ex);
+    const lines = wrapToks(st.toks, f);
     const base0 = y - f * 0.55 - (lines.length - 1) * lh;
     lines.forEach((line, li) => {
       const base = base0 + li * lh;
@@ -190,7 +214,7 @@ function renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title, dat
           if (tok.pre) { g.fillText(tok.pre, cx, base); cx += g.measureText(tok.pre).width; }
           // 鸽子代替这个词：比字大一些，底边坐在字的基线上（像蹲在檐口上）
           const s = f * 1.46;
-          g.drawImage(tok.img.canvas, cx + f * 0.08, base + f * 0.12 - s, s, s);
+          g.drawImage(textured(tok.img), cx + f * 0.08, base + f * 0.12 - s, s, s);
           cx += f * 1.62;
           const post = (tok.post || '') + (tok.tail || '');
           if (post) g.fillText(post, cx, base);
@@ -271,14 +295,21 @@ function print(c) {
 }
 
 // 两面：正面按高度从低到高；背面每一句用那一段切到的第一只鸽子
-function renderSides({ pieces, sections, answers, T, date, heights }) {
+function renderSides({ pieces, choice, sections, answers, T, date, heights }) {
   const ordered = [...pieces].sort((a, b) => a.h - b.h);
-  const pieceOf = (i) => pieces.find((p) => p.sec === i) || null;
-  const piecesOf = (i) => pieces.filter((p) => p.sec === i);
+  // 诗里每一句：问问题时选的那一只（没选过就用这一章第一只）
+  const pieceOf = (i) => (choice && choice[i]) || pieces.find((p) => p.sec === i) || null;
   const heightOf = (i) => (heights && heights[i]) || (pieceOf(i) ? pieceOf(i).h : 0);      // 尺子上写 content.js 里每段的高度
-  return { grid: renderGrid(ordered), poem: renderPoem({ sections, answers, pieceOf, piecesOf, heightOf, title: T.title, date }) };
+  return { grid: renderGrid(ordered), poem: renderPoem({ sections, answers, pieceOf, heightOf, title: T.title, date }) };
 }
 // 调试：整张 A4
+// 两面的图片（结尾 dashboard 的卡片用：正面拼贴、背面诗）
+export async function sheetImages(o) {
+  await document.fonts.ready;
+  await clouds.decode().catch(() => {});
+  const { grid, poem } = renderSides(o);
+  return { front: grid.canvas.toDataURL('image/jpeg', 0.88), back: poem.toDataURL('image/jpeg', 0.88) };
+}
 export function renderSheetA4(o) {
   const { grid, poem } = renderSides(o);
   return renderA4(grid.canvas, poem);
@@ -347,7 +378,7 @@ export async function openSheet(o) {
   cells.forEach((cl, i) => {
     const e = document.createElement(ordered[i] ? 'img' : 'div');
     e.className = ordered[i] ? 'sh-piece' : 'sh-piece sh-empty';
-    if (ordered[i]) e.src = ordered[i].canvas.toDataURL('image/jpeg', 0.9);
+    if (ordered[i]) e.src = textured(ordered[i]).toDataURL('image/jpeg', 0.9);
     const tx = px + cl.x * k;
     const ty = py + cl.y * k;
     const s = cl.s * k;

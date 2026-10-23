@@ -160,9 +160,9 @@ export function createDashboard(o) {
       return `<div class="dx-hole">${ch.src ? `<img src="${esc(ch.src)}" alt="">` : ''}</div>
               <div class="dx-holelabel">${rv(`Chapter ${i + 1} · ${ch.label}`)}</div>`;
     },
-    // 你的羽毛：Kiara 折好的纸羽毛（扫描、抠好的那张）+ 一句话；点整张卡片打开最后那张纸（下载 / 打印 / 折法）
-    feather: () => `<img class="dx-fimg" src="assets/fold/step12.png" alt="" draggable="false">
-      <div class="dx-ftext">${T.featherFace.map(rv).join('')}</div>`,
+    // 结尾：卡片上是你自己做的那张纸——正面鸽子拼贴，鼠标放上去翻到背面的诗；点卡片打开那张纸（下载 / 打印 / 折法）
+    feather: () => { const m = o.feather.images(); return m ? `<img class="dx-fimg" src="${esc(m.front)}" alt="">` : `<img class="dx-fimg fold" src="assets/fold/step12.png" alt="">`; },
+    poem: () => { const m = o.feather.images(); return m ? `<img class="dx-fimg" src="${esc(m.back)}" alt="">` : ''; },
   };
   function text(lines) { return `<div class="dx-ctext">${lines.map(rv).join('')}</div>`; }
   function btn(act, label) { return `<button class="dx-btn" data-act="${act}">${rv(label)}</button>`; }
@@ -599,7 +599,7 @@ export function createDashboard(o) {
       else if (a === 'again') o.feather.again();
       return;
     }
-    if (current === 'feather') { o.feather.download(); return; }      // 点羽毛卡片：打开那张纸
+    if (current === 'feather' || current === 'poem' || target === 'poem') { o.feather.download(); return; }      // 点结尾的卡片：打开那张纸
     if (step === 'idle' && (target === 'front' || target === 'congrats')) {
       pinned = true;
       if (target === 'front') flipTo('congrats');
@@ -608,9 +608,11 @@ export function createDashboard(o) {
   el.card.addEventListener('mouseenter', () => {
     hover = true;
     if (step === 'idle' && peek === null && target === 'front') flipTo('congrats');
+    if (step === 'idle' && target === 'feather' && o.feather.images()) flipTo('poem');     // 结尾：翻到背面的诗
   });
   el.card.addEventListener('mouseleave', () => {
     hover = false;
+    if (step === 'idle' && target === 'poem') flipTo('feather');
     idleNext = performance.now() + D.idleBackMs;
   });
 
@@ -627,7 +629,9 @@ export function createDashboard(o) {
   });
   el.feather.addEventListener('click', () => {
     if (!unlocked || step !== 'idle') return;
-    if (target === 'feather') { pinned = false; flipTo('front'); idleNext = performance.now() + D.flipMs + D.idleFrontMs; }
+    // 已经做过那张纸：卡片翻到它（再点一下翻回去）；还没有：直接打开折羽毛的教程
+    if (!o.feather.images()) { o.feather.fold(); return; }
+    if (target === 'feather' || target === 'poem') { pinned = false; flipTo('front'); idleNext = performance.now() + D.flipMs + D.idleFrontMs; }
     else { pinned = true; flipTo('feather'); }
   });
 
@@ -644,6 +648,11 @@ export function createDashboard(o) {
     reveal(el.chap, { dur: 220 });
     pulseHands();
     flipTo('window', i);
+  });
+  el.ticks.addEventListener('click', (e) => {
+    const t = e.target.closest('.dx-tick');
+    if (!t || !unlocked || step !== 'idle' || !o.onChapter) return;
+    o.onChapter(Number(t.dataset.i));
   });
   el.ticks.addEventListener('mouseleave', () => {
     if (peek === null) return;
@@ -695,8 +704,15 @@ export function createDashboard(o) {
 
   window.addEventListener('resize', layout);
 
+  // 直接进入网站（dashboard 上点了一个 chapter）：线框收拢、散开，和比完手势进去一样
+  function enter() {
+    if (step === 'leaving' || step === 'gone') return;
+    for (const k of ['bl', 'tr']) el.hands[k].getAnimations().forEach((a) => a.cancel());
+    leave();
+  }
+
   return {
-    show, showEnd, update,
+    show, showEnd, update, enter,
     get step() { return step; },
     get face() { return current; },
     get debug() { return { closeP, pigeonShown, pigeonAt, enterAsap, flipping, target }; },
