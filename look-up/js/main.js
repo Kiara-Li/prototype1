@@ -600,7 +600,7 @@ function cutOut(r, sq, shown, now) {
     const text = (bk.cur.id && T.photoIntros && T.photoIntros[bk.cur.id]) || (bk.idx === 0 ? sectionText().intro : '');
     bk.card = 'intro';
     // 介绍读一会儿自己往下走：按字数算（最少 3 秒，最多 6 秒）
-    bk.introUntil = now + B.flipMs + (text ? Math.max(3000, Math.min(6000, 1800 + text.length * 40)) : B.noIntroMs);
+    bk.introUntil = now + B.flipMs + (text ? Math.max(2800, Math.min(5600, 1600 + text.length * 36)) : B.noIntroMs);
     if (text) bookUI.flipTo('intro', { text, dur: bk.introUntil - now - B.flipMs });
   }
 }

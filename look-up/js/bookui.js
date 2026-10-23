@@ -204,13 +204,12 @@ export function createBookUI(o) {
     const btnPx = Math.max(12, cardFont() * 0.72);
     if (kind === 'intro') {
       // 介绍：固定大小的白卡，字号固定（和 dashboard 卡片上的字一样），左对齐；
-      // 底下一根细线慢慢画满 = 读完了会自己往下走（不用点）
+      // 字出来以后，白色方块一行一行把字盖掉 = 读完了会自己往下走（不用点）
       const P = paperSize();
       const pd = 2.2 * u;
       const fs = Math.max(15, 2.11 * u);
       const lines = wrap(data.text, P.w - 2 * pd, fs, sans());
-      return `<div class="bk-text" style="left:${pd}px;top:${pd}px;font-size:${fs}px;line-height:${fs * 1.27}px">${lines.map(rv).join('')}</div>
-        <div class="bk-prog" style="left:${pd}px;right:${pd}px;bottom:${pd}px"></div>`;
+      return `<div class="bk-text" style="left:${pd}px;top:${pd}px;font-size:${fs}px;line-height:${fs * 1.27}px">${lines.map(rv).join('')}</div>`;
     }
     if (kind === 'up') {
       // 「LOOK UP」转 90° 竖着排，从卡片底下往上走到顶（视线跟着往上）
@@ -297,6 +296,27 @@ export function createBookUI(o) {
     }, delayMs);
   }
 
+  // 介绍卡：字出来得快一点；读的时间里，白色方块从第一行开始一行一行把字盖掉（按字数分配时间），最后一行盖掉时翻页
+  const INTRO_REVEAL = { stagger: 60, dur: 220 };
+  function wipeOut(scope, total) {
+    if (!scope) return;
+    const lines = [...scope.querySelectorAll('.rv')];
+    const chars = lines.map((l) => l.textContent.length);
+    const sum = chars.reduce((a, b) => a + b, 0) || 1;
+    const shown = (lines.length - 1) * INTRO_REVEAL.stagger + 2 * INTRO_REVEAL.dur;
+    const start = shown + (total - shown) * 0.22;           // 先让人读一会儿
+    const wipe = 340;
+    let acc = 0;
+    lines.forEach((line, i) => {
+      acc += chars[i];
+      const end = start + (total - 80 - start) * (acc / sum);
+      line.querySelector('.rv-bar').animate([
+        { transform: 'scaleX(0)', transformOrigin: '0 50%', background: '#fff', top: '-0.08em', bottom: '-0.12em' },
+        { transform: 'scaleX(1)', transformOrigin: '0 50%', background: '#fff', top: '-0.08em', bottom: '-0.12em' },
+      ], { duration: wipe, delay: Math.max(shown, end - wipe), easing: 'cubic-bezier(.7,0,.25,1)', fill: 'forwards' });
+    });
+  }
+
   function flipTo(kind, data) {
     const g = gen;
     queue = queue.then(() => (g === gen ? doFlip(kind, data) : null));
@@ -325,9 +345,10 @@ export function createBookUI(o) {
       from.classList.add('hidden');
       from.querySelectorAll('video').forEach((v) => v.pause());       // 翻走的那一面上的视频不用再放
       current = kind;
-      reveal(to.querySelector('.bk-body'));
-      const prog = to.querySelector('.bk-prog');
-      if (prog && data && data.dur) prog.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: data.dur, easing: 'linear', fill: 'both' });
+      if (kind === 'intro' && data && data.dur) {
+        reveal(to.querySelector('.bk-body'), INTRO_REVEAL);
+        wipeOut(to.querySelector('.bk-text'), data.dur);
+      } else reveal(to.querySelector('.bk-body'));
       const lk = to.querySelector('.bk-lookup span');
       if (lk) {
         const travel = Math.max(0, lk.parentElement.clientHeight - lk.offsetHeight);

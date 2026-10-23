@@ -54,7 +54,6 @@
 #bk .bk-q { font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 2.68); letter-spacing: -0.01em;
             padding-bottom: calc(var(--u) * 1.4); border-bottom: 1px solid #7b7b7b; }      /* 问题下面一根细线（和 dashboard 的线一样） */
 /* 介绍卡底下：读的时间（一根细线慢慢画满） */
-#bk .bk-prog { position: absolute; height: 1px; background: #7b7b7b; transform: scaleX(0); transform-origin: 0 50%; }
 #bk .bk-fill, #bk .bk-poem { margin-top: calc(var(--u) * 2.5); font-size: calc(var(--u) * 2.11); line-height: calc(var(--u) * 3.6); letter-spacing: -0.01em; }
 #bk .bk-in { font: inherit; letter-spacing: inherit; color: #000; background: transparent; border: 0; border-bottom: 2px solid #000;
              border-radius: 0; padding: 0 0.15em; margin: 0 0.25em; outline: none; min-width: 3em; }
