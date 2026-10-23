@@ -60,12 +60,36 @@ export function createBookUI(o) {
   const shown = () => el.faces[angle === 0 ? 0 : 1];
   const back = () => el.faces[angle === 0 ? 1 : 0];
 
+  // 卡片翻成白纸（介绍）时，不跟着照片的大小：从照片的位置变成一张固定大小的卡（字号就能固定）
+  //   底边还在基线上，横向对着照片的中间，不超出两边的尺子
+  const morph = { from: 0, to: 0, at: -1e9 };
+  const paperSize = () => ({ w: Math.min(26 * u, window.innerWidth - 16 * u), h: 21 * u });
+  function paperRect(r) {
+    const { w, h } = paperSize();
+    const x = Math.max(8 * u, Math.min(window.innerWidth - 8 * u - w, r.x + r.w / 2 - w / 2));
+    return { x, y: Math.max(2 * u, r.y + r.h - h), w, h };
+  }
+  function morphTo(k) {
+    const now = performance.now();
+    morph.from = morphK(now);
+    morph.to = k;
+    morph.at = now;
+  }
+  function morphK(now) {
+    const t = Math.min(1, (now - morph.at) / B.flipMs);
+    const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    return morph.from + (morph.to - morph.from) * e;
+  }
+
   // opts.room：卡片右边空出来多少（px，放竖排的那行字）；opts.cap：要不要显示照片的信息
   function place(r, opts = {}) {
     rect = r;
-    placeCaption(r, opts);
-    if (!r) { el.card.style.display = 'none'; return; }
-    Object.assign(el.card.style, { display: 'block', left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` });
+    if (!r) { placeCaption(r, opts); el.card.style.display = 'none'; return; }
+    const k = morphK(performance.now());
+    const p = paperRect(r);
+    const m = k <= 0 ? r : { x: r.x + (p.x - r.x) * k, y: r.y + (p.y - r.y) * k, w: r.w + (p.w - r.w) * k, h: r.h + (p.h - r.h) * k };
+    placeCaption(m, k > 0.5 ? { ...opts, room: 0, cap: false } : opts);
+    Object.assign(el.card.style, { display: 'block', left: `${m.x}px`, top: `${m.y}px`, width: `${m.w}px`, height: `${m.h}px` });
   }
 
   // ---- 历史照片的信息，排在卡片四周（和 dashboard 卡片四周的字一样）：
@@ -177,8 +201,14 @@ export function createBookUI(o) {
     if (kind === 'front') return data ? `<img class="bk-photo" src="${esc(data)}" alt="">` : '';
     const btnPx = Math.max(12, cardFont() * 0.72);
     if (kind === 'intro') {
-      // 介绍：读一会儿自己往下走（main.js 按字数算时间），不用点
-      return label(data.label) + text(data.text, pad + lab * 2.6, lab * 2.6);
+      // 介绍：固定大小的白卡，字号固定（和 dashboard 卡片上的字一样），左对齐；
+      // 底下一根细线慢慢画满 = 读完了会自己往下走（不用点）
+      const P = paperSize();
+      const pd = 2.2 * u;
+      const fs = Math.max(15, 2.11 * u);
+      const lines = wrap(data.text, P.w - 2 * pd, fs, sans());
+      return `<div class="bk-text" style="left:${pd}px;top:${pd}px;font-size:${fs}px;line-height:${fs * 1.27}px">${lines.map(rv).join('')}</div>
+        <div class="bk-prog" style="left:${pd}px;right:${pd}px;bottom:${pd}px"></div>`;
     }
     if (kind === 'up') {
       // 「LOOK UP」转 90° 竖着排，从卡片底下往上走到顶（视线跟着往上）
@@ -214,6 +244,7 @@ export function createBookUI(o) {
     el.faces[0].classList.remove('hidden');
     fill(el.faces[0], 'front', src);
     current = 'front';
+    morph.from = 0; morph.to = 0; morph.at = -1e9;
   }
 
   // 历史照片换成一段视频（config.book.videos）：灰色方块从左边拉过来盖住照片 → 照片没了 → 方块收向右边，露出视频。
@@ -272,6 +303,7 @@ export function createBookUI(o) {
 
   function doFlip(kind, data) {
     if (!rect) return Promise.resolve();
+    morphTo(kind === 'front' ? 0 : 1);
     const from = shown();
     const to = back();
     fill(to, kind, data);
@@ -292,6 +324,8 @@ export function createBookUI(o) {
       from.querySelectorAll('video').forEach((v) => v.pause());       // 翻走的那一面上的视频不用再放
       current = kind;
       reveal(to.querySelector('.bk-body'));
+      const prog = to.querySelector('.bk-prog');
+      if (prog && data && data.dur) prog.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: data.dur, easing: 'linear', fill: 'both' });
       const lk = to.querySelector('.bk-lookup span');
       if (lk) {
         const travel = Math.max(0, lk.parentElement.clientHeight - lk.offsetHeight);
@@ -364,10 +398,21 @@ export function createBookUI(o) {
       { transform: 'none' },
     ], { duration: B.panelMs, easing: EASE });
     const parts = plainSentence(question.sentence).split('___');
+    // 空格和它后面紧跟的标点绑在一起（不会剩一个句号掉到下一行）：每个空开一个 bk-grp，下一段开头的标点放进去再关上
+    let fillHtml = '';
+    parts.forEach((p, i) => {
+      let rest = p;
+      if (i > 0) {
+        const lead = (p.match(/^[,.;:!?’”]+/) || [''])[0];
+        fillHtml += `${esc(lead)}</span>`;
+        rest = p.slice(lead.length);
+      }
+      fillHtml += `<span>${esc(rest)}</span>`;
+      if (i < parts.length - 1) fillHtml += `<span class="bk-grp"><input class="bk-in" data-i="${i}" size="6" autocomplete="off" spellcheck="false">`;
+    });
     el.pbody.innerHTML = `
-      <div class="bk-plabel">${rv(poemLabel)}</div>
       <div class="bk-q">${wrap(question.prompt, pw - 5 * u, 2.11 * u, sans()).map(rv).join('')}</div>
-      <div class="bk-fill">${parts.map((p, i) => `<span>${esc(p)}</span>${i < parts.length - 1 ? `<input class="bk-in" data-i="${i}" size="6" autocomplete="off" spellcheck="false">` : ''}`).join('')}</div>
+      <div class="bk-fill">${fillHtml}</div>
       <div class="bk-pbtns"><button class="bk-btn bk-quiet" data-act="pskip">${rv(TB.skip)}</button>
       <button class="bk-btn bk-done" data-act="done">${rv(TB.done)}</button></div>`;
     el.pbody.querySelectorAll('.rv-t').forEach((t) => { t.style.visibility = 'hidden'; });

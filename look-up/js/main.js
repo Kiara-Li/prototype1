@@ -321,6 +321,7 @@ async function setupBook() {
   window.lookUp.bookUI = bookUI;
   window.lookUp.rects = () => bookRects(performance.now());     // 调试：这一页照片在屏幕上的位置
   window.lookUp.pigeonsOf = pigeonsOf;
+  window.lookUp.ask = () => { bk.card = 'ready'; askSection(); };   // 调试：直接打开这一段的问题
   window.lookUp.show = (i, j = 0) => { enterSection(i, performance.now()); if (j) showSpread(j, performance.now()); };   // 调试：直接跳到第 i 个 section 的第 j 页
 }
 let bookUI = null;
@@ -573,12 +574,10 @@ function cutOut(r, sq, shown, now) {
     bk.card = 'intro';
     // 介绍读一会儿自己往下走：按字数算（最少 4 秒，最多 9 秒）
     bk.introUntil = now + B.flipMs + (text ? Math.max(4000, Math.min(9000, 2500 + text.length * 55)) : B.noIntroMs);
-    if (text) bookUI.flipTo('intro', { label: sectionLabel(), text });
+    if (text) bookUI.flipTo('intro', { text, dur: bk.introUntil - now - B.flipMs });
   }
 }
 
-const inches = () => `${Math.round(bk.cur ? bk.cur.height_in : 0)}″`;      // 和右上角「120 inch」一样用英寸
-const sectionLabel = () => `${sectionText().name || ''} · ${inches()}`;
 const sectionText = () => (T.sections && T.sections[bk.sec]) || { intro: '', question: { prompt: '', sentence: '___' } };
 
 // 介绍看完：同一个 section 还有下一页 → 自动往上走（不用再抬头）；最后一页 → 直接问这一段的问题
@@ -624,7 +623,7 @@ function askSection() {
       try { localStorage.setItem(C.storage.answers, JSON.stringify(app.answers)); } catch { /* */ }
     }
     finishSection();
-  }, `${sectionText().name || ''} · from ${inches()} up`);
+  }, '');
 }
 
 // 这个 section 和下一个 section 的图片开始下载（书里别的页不下载）
