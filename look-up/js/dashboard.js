@@ -58,7 +58,7 @@ export function createDashboard(o) {
     <div class="dx-ticks ui">${o.chapters.map((c, i) => `<div class="dx-tick" data-i="${i}" title="${esc(c.label)}"></div>`).join('')}</div>
     <div class="dx-band" data-k="bot">
       <span></span><div class="dx-chap dx-label ui">${rv('')}</div>
-      <a class="dx-about dx-small ui" href="${esc(T.aboutUrl)}" target="_blank" rel="noopener">${rv(T.about)}</a>
+      <a class="dx-about dx-small ui" href="${esc(T.aboutUrl)}">${rv(T.about)}</a>
     </div>
     <img class="dx-hand" data-k="bl" src="${HAND.bl.src}" alt="" draggable="false">
     <img class="dx-hand" data-k="tr" src="${HAND.tr.src}" alt="" draggable="false">
@@ -694,6 +694,7 @@ export function createDashboard(o) {
   function showEnd(back = false) {
     played = true;
     unlocked = true;
+    el.about.href = `${T.aboutUrl}#learned`;        // 看完以后点 About：直接到 What I learned（演讲的后半段）
     root.style.display = 'block';
     html.classList.add('dx-on');
     for (const e of [el.card, el.marks, el.sq, ...el.edges, ...el.lines]) e.getAnimations().forEach((a) => a.cancel());

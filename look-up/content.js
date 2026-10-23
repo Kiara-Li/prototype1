@@ -31,7 +31,7 @@ window.CONTENT = {
     thesis: 'Kiara Li thesis website',
     thesisUrl: 'https://kiarali.com',               // TODO 之后换成 living archive 的地址
     about: 'About this project',
-    aboutUrl: 'https://kiarali.com',                // TODO 之后换成只介绍这个项目的页面
+    aboutUrl: 'about/',                             // 这个项目的介绍 = Prototype 1 的演讲（about/index.html）
     feather: 'See your feather and how to fold it',
     featherLocked: 'Look all the way up to unlock this',
     headline: ['LOOK UP!', 'AN ART', 'EXPERIMENT', 'THAT HAS YOU', 'LOOK UP', 'TO FIND THE', 'PIGEONS HIDING', 'IN THE CITY.'],
