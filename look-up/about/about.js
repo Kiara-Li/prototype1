@@ -7,12 +7,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const steps = $$('.step');
   // 四个部分：老师要讲的几点（What you learned 和 Process images 合在一起讲）
-  const PARTS = [
-    { name: 'Prototype 1', prompt: '01 · Prototype 1' },
-    { name: 'What I learned', prompt: '02 What you learned · 03 Process images' },
-    { name: 'Toward Prototype 2', prompt: '04 · Toward Prototype 2' },
-    { name: 'Question', prompt: '' },
-  ];
+  const PARTS = [{ name: 'Prototype 1' }, { name: 'What I learned' }, { name: 'Toward Prototype 2' }, { name: 'Question' }];
   const partsEl = $('.parts');
   partsEl.innerHTML = PARTS.map((p, i) => `<button data-p="${i}">${p.name}</button>`).join('');
   let cur = -1;
@@ -25,8 +20,6 @@
     const st = steps[i];
     const part = Number(st.dataset.part);
     $$('button', partsEl).forEach((b, k) => b.classList.toggle('on', k === part));
-    $('.prompt').textContent = PARTS[part].prompt;
-    $('.count').textContent = `${String(i + 1).padStart(2, '0')} / ${String(steps.length).padStart(2, '0')}`;
     history.replaceState(null, '', `#${st.id}`);
     onShow(st);
   }

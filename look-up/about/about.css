@@ -24,10 +24,7 @@ img, video { display: block; }
 .band > :first-child { justify-self: start; }
 .band > :last-child { justify-self: end; text-align: right; }
 .band.top { top: calc(var(--u) * 2); }
-.band.bot { bottom: calc(var(--u) * 2); }
-.band.bot .prompt { justify-self: center; }
 .who:hover { color: var(--ink); }
-.prompt { text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
 
 /* 中间：每一部分一根刻度（和 dashboard 的 chapter 刻度一样），下面一行字 */
 .parts { position: relative; display: flex; gap: calc(var(--u) * 2.4); padding-top: calc(var(--u) * 1.1); border-top: 1px solid var(--line); }
@@ -44,14 +41,12 @@ img, video { display: block; }
 .step.on { opacity: 1; visibility: visible; transform: none; transition: opacity 450ms var(--ease), transform 600ms var(--ease), visibility 0s; }
 .step.before { transform: translateY(calc(var(--u) * -1.2)); }
 
-.label { margin: 0 0 calc(var(--u) * 1.6); font-family: var(--mono); font-size: max(11px, calc(var(--u) * 1.05)); letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-ink); }
 .big { margin: 0; font-weight: 400; font-size: calc(var(--u) * 4.6); line-height: 1.04; letter-spacing: -0.03em; max-width: 18em; }
 .big.wide { max-width: 22em; }
 .mid { margin: 0; font-weight: 400; font-size: calc(var(--u) * 2.6); line-height: 1.12; letter-spacing: -0.02em; }
 .say { margin: calc(var(--u) * 1.8) 0 0; font-size: calc(var(--u) * 1.5); line-height: 1.4; max-width: 30em; color: #222; }
 .say.wide { max-width: 40em; }
 .say.strong { color: var(--ink); font-size: calc(var(--u) * 1.9); }
-.n { display: block; font-family: var(--mono); font-size: max(11px, calc(var(--u) * 1.05)); letter-spacing: 0.06em; color: var(--grey-ink); margin-bottom: calc(var(--u) * 0.8); }
 
 /* 按钮：等宽字 + 左下 / 右上两个角标（和网站里的按钮一样） */
 .btn { position: relative; display: inline-block; font-family: var(--mono); font-size: max(12px, calc(var(--u) * 1.2)); letter-spacing: 0.04em; padding: calc(var(--u) * 0.8) calc(var(--u) * 1.2); }
@@ -64,7 +59,7 @@ img, video { display: block; }
 /* ---- 封面 */
 .cover { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: calc(var(--u) * 6); }
 .huge { margin: 0; font-weight: 400; font-size: calc(var(--u) * 15); line-height: 0.86; letter-spacing: -0.045em; }
-.cover .sub { margin: calc(var(--u) * 3) 0 0; font-family: var(--mono); font-size: max(12px, calc(var(--u) * 1.3)); letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-ink); }
+.cover .sub { margin: calc(var(--u) * 3) 0 0; font-size: calc(var(--u) * 1.8); letter-spacing: -0.01em; }
 .cover .name { margin: calc(var(--u) * 0.6) 0 0; font-size: calc(var(--u) * 2.4); letter-spacing: -0.02em; }
 .cover-card { margin: 0; width: calc(var(--u) * 40); aspect-ratio: 1; background: var(--paper); box-shadow: 0 calc(var(--u) * 0.6) calc(var(--u) * 2.4) rgba(0, 0, 0, 0.08); }
 .cover-card img { width: 100%; height: 100%; object-fit: contain; }
@@ -143,8 +138,7 @@ img, video { display: block; }
 .t-img.q p { margin: 0; font-size: calc(var(--u) * 1.25); line-height: 1.45; }
 .t-img.q .blank { display: inline-block; width: 4em; border-bottom: 2px solid var(--ink); }
 .t-img.q .inl { display: inline-block; vertical-align: -0.35em; width: 2.2em; height: 1.5em; object-fit: cover; filter: grayscale(0.9); }
-.tile figcaption { margin-top: calc(var(--u) * 0.6); font-size: calc(var(--u) * 1.05); line-height: 1.3; color: #333; }
-.tile figcaption b { display: block; font-weight: 400; font-family: var(--mono); font-size: max(10px, calc(var(--u) * 0.9)); letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey-ink); margin-bottom: 0.2em; }
+.tile figcaption { margin-top: calc(var(--u) * 0.6); font-size: calc(var(--u) * 1.15); line-height: 1.3; color: var(--ink); }
 .media-say .say { margin-top: calc(var(--u) * 2); }
 .media-say .say.gap { margin-top: calc(var(--u) * 3.6); }
 
@@ -154,11 +148,10 @@ img, video { display: block; }
 .strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: calc(var(--u) * 1); margin-top: calc(var(--u) * 3.5); }
 .strip figure { margin: 0; }
 .strip img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
-.strip figcaption { margin-top: calc(var(--u) * 0.6); font-family: var(--mono); font-size: max(10px, calc(var(--u) * 0.9)); letter-spacing: 0.06em; color: var(--grey-ink); }
 
 /* ---- Toward Prototype 2 */
 .next { display: flex; flex-direction: column; justify-content: center; }
-.cols { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: calc(var(--u) * 4); border-top: 1px solid var(--line); padding-top: calc(var(--u) * 1.6); }
+.cols { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: calc(var(--u) * 4); }
 .cols h3 { margin: 0 0 calc(var(--u) * 1.2); font-weight: 400; font-size: calc(var(--u) * 3.1); line-height: 1.05; letter-spacing: -0.025em; }
 .cols p { margin: 0 0 calc(var(--u) * 1); font-size: calc(var(--u) * 1.45); line-height: 1.4; color: #222; }
 
@@ -175,8 +168,7 @@ img, video { display: block; }
   .step { padding: 64px 16px 56px; overflow-y: auto; }
   .cover, .thesis, .book, .trace, .media { grid-template-columns: minmax(0, 1fr); gap: 24px; align-content: start; }
   .band { left: 16px; right: 16px; }
-  .band.bot .prompt { display: none; }
-  .cover-card { width: 100%; }
+    .cover-card { width: 100%; }
   .big { font-size: 34px; } .thesis .big, .book .big, .trace .big { font-size: 30px; }
   .mid { font-size: 24px; } .huge { font-size: 96px; } .huge-q { font-size: 44px; }
   .say { font-size: 16px; } .say.strong { font-size: 18px; }
