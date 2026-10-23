@@ -177,9 +177,8 @@ export function createBookUI(o) {
     if (kind === 'front') return data ? `<img class="bk-photo" src="${esc(data)}" alt="">` : '';
     const btnPx = Math.max(12, cardFont() * 0.72);
     if (kind === 'intro') {
-      // 介绍不会自己翻走：读完点 Next
-      return label(data.label) + text(data.text, pad + lab * 2.6, lab * 2.6 + btnPx * 3.2)
-        + `<button class="bk-btn bk-cardbtn" data-act="next" style="left:${pad}px;bottom:${pad * 0.6}px;font-size:${btnPx}px">${rv(TB.read)}</button>`;
+      // 介绍：读一会儿自己往下走（main.js 按字数算时间），不用点
+      return label(data.label) + text(data.text, pad + lab * 2.6, lab * 2.6);
     }
     if (kind === 'up') {
       // 「LOOK UP」转 90° 竖着排，从卡片底下往上走到顶（视线跟着往上）
@@ -345,6 +344,7 @@ export function createBookUI(o) {
   // ================================================================ 面板：填空 → 你的词 + 切下来的鸽子
 
   let answersDone = null;
+  let idleTimer = 0;
   let poemLabel = '';
   function openQuestion(question, done, label) {
     answersDone = done;
@@ -384,10 +384,16 @@ export function createBookUI(o) {
     el.pbody.querySelector('.bk-done').onclick = () => compose(question, poemLabel);
     el.pbody.querySelector('[data-act="pskip"]').onclick = () => closePanel(null);   // 不回答，直接往上
     setTimeout(() => ins[0] && ins[0].focus(), B.panelMs);
+    // 一直没打字：过一会儿自己跳过（不让人卡在这里）
+    clearTimeout(idleTimer);
+    const idle = () => { clearTimeout(idleTimer); idleTimer = setTimeout(() => closePanel(null), B.questionIdleMs); };
+    idle();
+    ins.forEach((inp) => inp.addEventListener('input', idle));
   }
 
   // 填完：句子里你的词后面各放一块切下来的鸽子 {  }，方块从右上角飞进来；剩下的接在句子后面
   function compose(question, label) {
+    clearTimeout(idleTimer);
     const ins = [...el.pbody.querySelectorAll('.bk-in')];
     const answers = ins.map((i) => i.value.trim());
     const parts = plainSentence(question.sentence).split('___');
@@ -402,8 +408,7 @@ export function createBookUI(o) {
       }
     });
     while (n < pieces.length) html += `<span class="bk-grp"><span class="bk-slot" data-n="${n++}"></span></span>`;
-    el.pbody.innerHTML = `<div class="bk-poemwrap"><div class="bk-plabel">${rv(label || '')}</div><div class="bk-poem">${html}</div></div>
-      <div class="bk-pbtns"><button class="bk-btn bk-done" data-act="next">${rv(TB.next)}</button></div>`;
+    el.pbody.innerHTML = `<div class="bk-poemwrap"><div class="bk-plabel">${rv(label || '')}</div><div class="bk-poem">${html}</div></div>`;
     el.pbody.querySelectorAll('.bk-w').forEach((w, i) => w.animate([{ opacity: 0, transform: 'translateY(0.25em)' }, { opacity: 1, transform: 'none' }],
       { duration: 700, delay: 80 + i * 45, easing: EASE_OUT, fill: 'backwards' }));
     reveal(el.pbody.querySelector('.bk-plabel'), { delay: 200 });
@@ -423,11 +428,13 @@ export function createBookUI(o) {
       ], { duration: B.poemFlyMs, delay: i * 120, easing: EASE, fill: 'backwards' });
     });
     setText(el.h, '');
-    setTimeout(() => reveal(el.pbody.querySelector('.bk-done')), B.poemFlyMs + slots.length * 120);
-    el.pbody.querySelector('.bk-done').onclick = () => closePanel(answers);
+    // 诗停一会儿，自己收走（不用点）
+    setTimeout(() => closePanel(answers), B.poemFlyMs + slots.length * 120 + B.poemHoldMs);
   }
 
   function closePanel(answers) {
+    if (!answersDone) return;                        // 已经在收了
+    clearTimeout(idleTimer);
     // 往上飘走（接着就是「再往上看」）
     const a = el.panel.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${-6 * u}px)` }], { duration: 900, easing: EASE_IN, fill: 'forwards' });
     quiet(a.finished).then(() => {

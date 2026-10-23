@@ -565,7 +565,8 @@ function cutOut(r, sq, shown, now) {
   if (bk.card === 'front') {
     const text = (bk.cur.id && T.photoIntros && T.photoIntros[bk.cur.id]) || (bk.idx === 0 ? sectionText().intro : '');
     bk.card = 'intro';
-    bk.introUntil = text ? Infinity : now + B.noIntroMs;      // 有介绍：等你点 Next
+    // 介绍读一会儿自己往下走：按字数算（最少 4 秒，最多 9 秒）
+    bk.introUntil = now + B.flipMs + (text ? Math.max(4000, Math.min(9000, 2500 + text.length * 55)) : B.noIntroMs);
     if (text) bookUI.flipTo('intro', { label: sectionLabel(), text });
   }
 }
